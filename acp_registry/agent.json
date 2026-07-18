@@ -3,7 +3,7 @@
   "name": "Sarthi Agent",
   "version": "0.18.2",
   "description": "Self-improving open-source AI agent by Nous Research with ACP editor integration, persistent memory, skills, and rich tool support.",
-  "repository": "https://github.com/jitendra-singh-thakur/sarthi-agent",
+  "repository": "https://github.com/jitu06583/sarthi-agent_desktop",
   "website": "https://sarthi-agent.vercel.app/docs/user-guide/features/acp",
   "authors": ["Nous Research"],
   "license": "MIT",

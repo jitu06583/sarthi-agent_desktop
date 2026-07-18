@@ -12,8 +12,8 @@
  * testable without booting Electron (main.ts requires('electron') at load).
  */
 
-const OFFICIAL_REPO_HTTPS_URL = 'https://github.com/jitendra-singh-thakur/sarthi-agent.git'
-const OFFICIAL_REPO_CANONICAL = 'github.com/jitendra-singh-thakur/sarthi-agent'
+const OFFICIAL_REPO_HTTPS_URL = 'https://github.com/jitu06583/sarthi-agent_desktop.git'
+const OFFICIAL_REPO_CANONICAL = 'github.com/jitu06583/sarthi-agent_desktop'
 
 // Normalize common GitHub remote URL forms to `host/owner/repo` (lowercased,
 // no trailing slash, no .git suffix) so SSH and HTTPS forms of the same repo
