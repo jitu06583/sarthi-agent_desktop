@@ -43,8 +43,8 @@ NC='\033[0m' # No Color
 BOLD='\033[1m'
 
 # Configuration
-REPO_URL_SSH="git@github.com:NousResearch/sarthi-agent.git"
-REPO_URL_HTTPS="https://github.com/jitendra-singh-thakur/sarthi-agent.git"
+REPO_URL_SSH="git@github.com:jitu06583/sarthi-agent_desktop.git"
+REPO_URL_HTTPS="https://github.com/jitu06583/sarthi-agent_desktop.git"
 SARTHI_HOME="${SARTHI_HOME:-$HOME/.sarthi}"
 # INSTALL_DIR is resolved AFTER arg parsing and OS detection so we can pick an
 # FHS-style layout for root installs.  Track whether the user gave us an
