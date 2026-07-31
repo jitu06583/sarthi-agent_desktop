@@ -7,6 +7,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW = REPO_ROOT / ".github" / "workflows" / "hermes-forward-sync.yml"
+VALIDATION_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "hermes-sync-validation.yml"
 BASELINE = REPO_ROOT / ".github" / "hermes-sync" / "baseline"
 
 
@@ -37,6 +38,9 @@ class HermesSyncWorkflowContractTests(unittest.TestCase):
         self.assertIn("automation/hermes-forward-sync", text)
         self.assertIn("open_pr", text)
         self.assertRegex(text, r"if: steps\.existing\.outputs\.open_pr != 'true'")
+        self.assertIn("set -euo pipefail", text)
+        self.assertIn('open_count="$(gh pr list', text)
+        self.assertIn('if [[ "$open_count" == "0" ]]', text)
 
     def test_workflow_creates_draft_pr_without_auto_merge(self) -> None:
         text = self.workflow_text()
@@ -47,6 +51,20 @@ class HermesSyncWorkflowContractTests(unittest.TestCase):
         self.assertNotIn("gh pr merge", text)
         self.assertNotRegex(text, r"(?m)^\s*auto-merge:")
         self.assertNotIn("candidate-baseline .github/hermes-sync/baseline", text)
+
+    def test_manual_dispatch_always_checks_out_main(self) -> None:
+        text = self.workflow_text()
+
+        self.assertRegex(text, r"uses: actions/checkout@v4\s+with:\s+ref: main\s+fetch-depth: 0")
+
+    def test_pull_request_validation_workflow_runs_focused_tests(self) -> None:
+        text = VALIDATION_WORKFLOW.read_text(encoding="utf-8")
+
+        self.assertIn("pull_request:", text)
+        self.assertIn("name: Hermes Sync Validation", text)
+        self.assertIn("python -m unittest discover", text)
+        self.assertIn("python -m py_compile", text)
+        self.assertNotIn("contents: write", text)
 
     def test_baseline_is_full_sha(self) -> None:
         baseline = BASELINE.read_text(encoding="utf-8")

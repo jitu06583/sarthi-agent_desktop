@@ -1,0 +1,8 @@
+# Hermes synchronization ownership
+
+/.github/hermes-sync/ @jitu06583
+/.github/workflows/hermes-forward-sync.yml @jitu06583
+/.github/workflows/hermes-sync-validation.yml @jitu06583
+/scripts/hermes_sync.py @jitu06583
+/tests/scripts/test_hermes_sync.py @jitu06583
+/tests/scripts/test_hermes_sync_workflow.py @jitu06583

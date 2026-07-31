@@ -54,9 +54,16 @@ class HermesSyncCliTests(unittest.TestCase):
     def tearDown(self) -> None:
         self.temp_dir.cleanup()
 
-    def run_sync(self, *, check: bool = False) -> subprocess.CompletedProcess[str]:
+    def run_sync(
+        self,
+        *,
+        check: bool = False,
+        output_dir: Path | None = None,
+        extra_args: list[str] | None = None,
+    ) -> subprocess.CompletedProcess[str]:
         env = os.environ.copy()
         env.pop("GITHUB_OUTPUT", None)
+        selected_output = output_dir or self.output_dir
         return subprocess.run(
             [
                 sys.executable,
@@ -66,9 +73,10 @@ class HermesSyncCliTests(unittest.TestCase):
                 "--baseline-file",
                 str(self.baseline_file),
                 "--output-dir",
-                str(self.output_dir),
+                str(selected_output),
                 "--upstream-url",
                 str(self.upstream),
+                *(extra_args or []),
             ],
             cwd=REPO_ROOT,
             check=check,
@@ -101,6 +109,28 @@ class HermesSyncCliTests(unittest.TestCase):
         self.assertIn("No Hermes update", result.stdout)
         self.assertFalse(self.output_dir.exists())
 
+    def test_no_update_preserves_existing_pending_artifacts(self) -> None:
+        self.output_dir.mkdir()
+        sentinel = self.output_dir / "sentinel.txt"
+        sentinel.write_text("keep me\n", encoding="utf-8")
+
+        result = self.run_sync(check=True)
+
+        self.assertIn("No Hermes update", result.stdout)
+        self.assertEqual(sentinel.read_text(encoding="utf-8"), "keep me\n")
+
+    def test_rejects_output_directory_outside_repository_without_deleting_it(self) -> None:
+        outside = self.root / "outside" / "pending"
+        outside.mkdir(parents=True)
+        sentinel = outside / "sentinel.txt"
+        sentinel.write_text("keep me\n", encoding="utf-8")
+
+        result = self.run_sync(output_dir=outside)
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("must be inside repository", result.stderr)
+        self.assertEqual(sentinel.read_text(encoding="utf-8"), "keep me\n")
+
     def test_update_writes_report_patch_and_candidate(self) -> None:
         upstream_tip = self.add_upstream_commit()
 
@@ -121,6 +151,15 @@ class HermesSyncCliTests(unittest.TestCase):
         self.assertIn("future.txt", patch)
         self.assertEqual(candidate, f"{upstream_tip}\n")
         self.assertEqual(self.baseline_file.read_text(encoding="utf-8"), f"{self.baseline}\n")
+
+    def test_rejects_patch_larger_than_configured_limit(self) -> None:
+        self.add_upstream_commit()
+
+        result = self.run_sync(extra_args=["--max-patch-bytes", "100"])
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("exceeds configured limit of 100 bytes", result.stderr)
+        self.assertFalse(self.output_dir.exists())
 
     def test_rejects_non_ancestor_baseline(self) -> None:
         unrelated = self.root / "unrelated"

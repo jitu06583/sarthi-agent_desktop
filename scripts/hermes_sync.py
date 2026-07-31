@@ -15,13 +15,14 @@ from typing import Sequence
 
 UPSTREAM_REF = "refs/remotes/hermes-sync/upstream"
 SHA_RE = re.compile(r"^[0-9a-f]{40}$")
+DEFAULT_MAX_PATCH_BYTES = 90 * 1024 * 1024
 
 
 class HermesSyncError(RuntimeError):
     """Raised when synchronization cannot proceed safely."""
 
 
-def run_git(repo: Path, *args: str, capture_bytes: bool = False) -> str | bytes:
+def run_git(repo: Path, *args: str) -> str:
     """Run Git in *repo* and return stdout, raising a readable sync error."""
     try:
         result = subprocess.run(
@@ -30,18 +31,34 @@ def run_git(repo: Path, *args: str, capture_bytes: bool = False) -> str | bytes:
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            text=not capture_bytes,
-            encoding=None if capture_bytes else "utf-8",
+            text=True,
+            encoding="utf-8",
         )
     except subprocess.CalledProcessError as exc:
         stderr = exc.stderr
-        if isinstance(stderr, bytes):
-            stderr = stderr.decode("utf-8", errors="replace")
         detail = (stderr or "git command failed").strip()
         raise HermesSyncError(f"git {' '.join(args)} failed: {detail}") from exc
-    if capture_bytes:
-        return result.stdout
     return result.stdout.strip()
+
+
+def run_git_to_file(repo: Path, output: Path, *args: str) -> None:
+    """Run Git while streaming stdout directly to *output*."""
+    try:
+        with output.open("wb") as handle:
+            subprocess.run(
+                ["git", *args],
+                cwd=repo,
+                check=True,
+                stdout=handle,
+                stderr=subprocess.PIPE,
+            )
+    except subprocess.CalledProcessError as exc:
+        detail = (exc.stderr or b"git command failed").decode(
+            "utf-8", errors="replace"
+        ).strip()
+        raise HermesSyncError(f"git {' '.join(args)} failed: {detail}") from exc
+    except OSError as exc:
+        raise HermesSyncError(f"Unable to write generated patch {output}: {exc}") from exc
 
 
 def read_baseline(path: Path) -> str:
@@ -72,17 +89,35 @@ def _resolve_path(repo: Path, value: Path) -> Path:
     return value if value.is_absolute() else repo / value
 
 
+def validate_output_dir(repo: Path, output_dir: Path) -> Path:
+    """Return a safe resolved pending directory inside *repo*."""
+    resolved = output_dir.resolve()
+    try:
+        relative = resolved.relative_to(repo)
+    except ValueError as exc:
+        raise HermesSyncError(
+            f"Output directory must be inside repository {repo}: {resolved}"
+        ) from exc
+    if resolved == repo or ".git" in relative.parts or resolved.name != "pending":
+        raise HermesSyncError(
+            "Output directory must be a directory named 'pending' inside the repository "
+            f"and outside .git: {resolved}"
+        )
+    return resolved
+
+
 def generate(
     repo: Path,
     baseline_file: Path,
     upstream_url: str,
     upstream_branch: str,
     output_dir: Path,
+    max_patch_bytes: int,
 ) -> bool:
     """Fetch upstream and generate artifacts when commits follow the baseline."""
     repo = repo.resolve()
     baseline_file = _resolve_path(repo, baseline_file)
-    output_dir = _resolve_path(repo, output_dir)
+    output_dir = validate_output_dir(repo, _resolve_path(repo, output_dir))
     baseline = read_baseline(baseline_file)
 
     run_git(
@@ -97,9 +132,6 @@ def generate(
         raise HermesSyncError(f"Fetched upstream resolved to an invalid SHA: {upstream_sha}")
 
     run_git(repo, "cat-file", "-e", f"{baseline}^{{commit}}")
-
-    if output_dir.exists():
-        shutil.rmtree(output_dir)
 
     if baseline == upstream_sha:
         set_github_outputs(False, upstream_sha, 0)
@@ -135,17 +167,32 @@ def generate(
             upstream_sha,
         )
     )
-    patch = run_git(
-        repo,
-        "format-patch",
-        "--binary",
-        "--full-index",
-        "--stdout",
-        f"{baseline}..{upstream_sha}",
-        capture_bytes=True,
-    )
 
+    if output_dir.exists():
+        shutil.rmtree(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
+    patch_path = output_dir / "upstream.patch"
+    try:
+        run_git_to_file(
+            repo,
+            patch_path,
+            "format-patch",
+            "--binary",
+            "--full-index",
+            "--stdout",
+            f"{baseline}..{upstream_sha}",
+        )
+        patch_size = patch_path.stat().st_size
+        if patch_size > max_patch_bytes:
+            raise HermesSyncError(
+                f"Generated patch is {patch_size} bytes and exceeds configured limit of "
+                f"{max_patch_bytes} bytes; review the upstream range manually or raise the "
+                "limit explicitly"
+            )
+    except (HermesSyncError, OSError):
+        shutil.rmtree(output_dir, ignore_errors=True)
+        raise
+
     report = (
         "# Pending Hermes Forward Synchronization\n\n"
         f"- Accepted baseline: `{baseline}`\n"
@@ -165,7 +212,6 @@ def generate(
     (output_dir / "changed-files.tsv").write_text(
         f"status\tpath\n{changed_files}\n", encoding="utf-8", newline="\n"
     )
-    (output_dir / "upstream.patch").write_bytes(bytes(patch))
     (output_dir / "candidate-baseline").write_text(
         f"{upstream_sha}\n", encoding="utf-8", newline="\n"
     )
@@ -189,6 +235,12 @@ def build_parser() -> argparse.ArgumentParser:
         "--upstream-url", default="https://github.com/NousResearch/hermes-agent.git"
     )
     parser.add_argument("--upstream-branch", default="main")
+    parser.add_argument(
+        "--max-patch-bytes",
+        type=int,
+        default=DEFAULT_MAX_PATCH_BYTES,
+        help="maximum generated patch size before failing safely",
+    )
     return parser
 
 
@@ -201,6 +253,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             upstream_url=args.upstream_url,
             upstream_branch=args.upstream_branch,
             output_dir=args.output_dir,
+            max_patch_bytes=args.max_patch_bytes,
         )
     except HermesSyncError as exc:
         print(f"Hermes sync error: {exc}", file=sys.stderr)

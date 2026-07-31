@@ -20,6 +20,7 @@ jobs:
       - name: Check out Sarthi
         uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
 
       - name: Check for an open synchronization PR
@@ -28,16 +29,21 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          if gh pr list \
+          set -euo pipefail
+          open_count="$(gh pr list \
             --repo "$GITHUB_REPOSITORY" \
             --head "automation/hermes-forward-sync" \
             --state open \
             --json number \
-            --jq 'length' | grep -qx '0'; then
+            --jq 'length')"
+          if [[ "$open_count" == "0" ]]; then
             echo "open_pr=false" >> "$GITHUB_OUTPUT"
-          else
+          elif [[ "$open_count" =~ ^[1-9][0-9]*$ ]]; then
             echo "open_pr=true" >> "$GITHUB_OUTPUT"
             echo "A Hermes synchronization PR is already open; leaving reviewer changes untouched."
+          else
+            echo "Unexpected pull request count: $open_count" >&2
+            exit 1
           fi
 
       - name: Generate upstream review artifacts
