@@ -43,9 +43,9 @@ The generated artifacts live under `.github/hermes-sync/pending/`. A reviewer po
 
 ### GitHub Actions workflow
 
-`.github/workflows/hermes-forward-sync.yml` runs daily and through `workflow_dispatch`. It grants only `contents: write` and `pull-requests: write`, executes the generator, and uses a maintained pull-request action to create or update one draft PR from `automation/hermes-forward-sync`.
+`.github/workflows/hermes-forward-sync.yml` runs daily and through `workflow_dispatch`. It grants only `contents: write` and `pull-requests: write`, executes the generator, and creates one draft PR from `automation/hermes-forward-sync`. While that PR remains open, later scheduled runs exit without rewriting the branch, so reviewer changes cannot be overwritten. After the PR is merged or closed, the next run can create a fresh synchronization PR.
 
-If no upstream change exists, the workflow makes no commit and creates no PR. If generation or ancestry validation fails, the workflow fails visibly and does not advance the baseline.
+If no upstream change exists, the workflow makes no commit and creates no PR. If an open synchronization PR already exists, the workflow performs a successful no-op. If generation or ancestry validation fails, the workflow fails visibly and does not advance the baseline.
 
 ### Pull-request review flow
 
