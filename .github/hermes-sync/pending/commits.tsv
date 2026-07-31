@@ -1,0 +1,7 @@
+sha	author_date	author	subject
+1d58e7d2318fe88fae0b04fbb496f5fb931e3929	2026-07-31T13:49:36-05:00	Brooklyn Nicholson	fix(kanban): tag worker sessions with their own source
+9fe36aecb105f3d2a45d20dc2641193c7bae02e1	2026-07-31T13:49:36-05:00	Brooklyn Nicholson	fix(state): reclaim kanban worker rows already on disk
+e41d2029b72a14024bab6b074408ed34949e2976	2026-07-31T13:49:36-05:00	Brooklyn Nicholson	fix(sessions): keep kanban worker runs out of the session lists
+805c483ca56a65984b21baf7d06ea82ba9faec3d	2026-07-31T13:49:36-05:00	Brooklyn Nicholson	test(kanban): cover worker session tagging and retag
+c2872cf53b6529ae0cb7f44ac4d78718b0695e48	2026-07-31T14:03:32-05:00	Brooklyn Nicholson	fix(kanban): key the worker-session retag per board, not per database
+4b60979dc188655eb4fb81abf292890147ec2d4c	2026-07-31T14:09:01-05:00	brooklyn!	Merge pull request #75583 from NousResearch/bb/hide-kanban-worker-sessions

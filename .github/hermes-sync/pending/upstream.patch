@@ -1,0 +1,602 @@
+From 1d58e7d2318fe88fae0b04fbb496f5fb931e3929 Mon Sep 17 00:00:00 2001
+From: Brooklyn Nicholson <brooklyn.bb.nicholson@gmail.com>
+Date: Fri, 31 Jul 2026 13:49:36 -0500
+Subject: [PATCH 1/5] fix(kanban): tag worker sessions with their own source
+
+Workers spawn as `hermes chat -q "work kanban task <id>"` without
+HERMES_SESSION_SOURCE, so every attempt persisted as an untitled `cli`
+row. Tag them `kanban` and register it as a local, non-messaging
+surface.
+---
+ gateway/session_context.py |  1 +
+ hermes_cli/kanban_db.py    | 27 +++++++++++++++++++++++++++
+ 2 files changed, 28 insertions(+)
+
+diff --git a/gateway/session_context.py b/gateway/session_context.py
+index 24d556d2cba71673a0166855d4ebd910efb38f22..05318768eb7766145a392b65128f9b867492c6db 100644
+--- a/gateway/session_context.py
++++ b/gateway/session_context.py
+@@ -350,6 +350,7 @@ NON_MESSAGING_SESSION_SURFACES = frozenset(
+         "codex",
+         "desktop",
+         "gateway",
++        "kanban",
+         "local",
+         "msgraph_webhook",
+         "tool",
+diff --git a/hermes_cli/kanban_db.py b/hermes_cli/kanban_db.py
+index 0248592f6a994f0c649c91cc8d6aacb9e56a79b9..f9ec2e200142ea7f8ff2efdc6eb27b43f9c4e46f 100644
+--- a/hermes_cli/kanban_db.py
++++ b/hermes_cli/kanban_db.py
+@@ -8841,6 +8841,24 @@ def _resolve_worker_cli_toolsets(hermes_home: Optional[str]) -> Optional[list[st
+         return None
+ 
+ 
++def _retag_legacy_worker_sessions(workspaces_root_path: str) -> None:
++    """Reclaim pre-tag worker rows in state.db so they leave the session lists.
++
++    Best-effort and gated to run once per database — a dispatcher tick must
++    never fail because a session DB was busy or missing.
++    """
++    try:
++        from hermes_state import SessionDB
++
++        db = SessionDB()
++        try:
++            db.retag_kanban_worker_sessions(workspaces_root_path)
++        finally:
++            db.close()
++    except Exception as exc:
++        _log.debug("kanban worker: legacy session retag skipped (%s)", exc)
++
++
+ def _default_spawn(
+     task: Task,
+     workspace: str,
+@@ -8898,6 +8916,14 @@ def _default_spawn(
+         env["HERMES_TENANT"] = task.tenant
+     env["HERMES_KANBAN_TASK"] = task.id
+     env["HERMES_KANBAN_WORKSPACE"] = workspace
++    # Tag the worker's session so it lands in state.db as `kanban`, not as an
++    # untitled `cli` row. A worker is a dispatcher-owned run whose transcript is
++    # read on the board and in `hermes kanban log` — it is not a conversation
++    # the user started, so every session-browsing surface (desktop sidebar, TUI
++    # resume picker, session_search) filters it out by source. Without this the
++    # sidebar renders one row per attempt, labeled with the worker's own prompt
++    # ("work kanban task t_…").
++    env["HERMES_SESSION_SOURCE"] = "kanban"
+     # Pin TERMINAL_CWD to the task's workspace so the worker's file tools and
+     # context-file loader anchor on the workspace, not whatever cwd the
+     # dispatching gateway happened to export. The worker subprocess is already
+@@ -8945,6 +8971,7 @@ def _default_spawn(
+     # but unusual symlink / Docker layouts are caught here too.
+     env["HERMES_KANBAN_DB"] = str(kanban_db_path(board=board))
+     env["HERMES_KANBAN_WORKSPACES_ROOT"] = str(workspaces_root(board=board))
++    _retag_legacy_worker_sessions(env["HERMES_KANBAN_WORKSPACES_ROOT"])
+     # Board slug — the final defense-in-depth pin. If the worker ever
+     # resolves kanban paths without the DB / workspaces env vars, the
+     # board slug still forces it to the right directory.
+-- 
+2.54.0
+
+
+From 9fe36aecb105f3d2a45d20dc2641193c7bae02e1 Mon Sep 17 00:00:00 2001
+From: Brooklyn Nicholson <brooklyn.bb.nicholson@gmail.com>
+Date: Fri, 31 Jul 2026 13:49:36 -0500
+Subject: [PATCH 2/5] fix(state): reclaim kanban worker rows already on disk
+
+Retag pre-tag `cli` rows whose cwd sits under the board's workspaces
+root, gated once per database via state_meta.
+---
+ hermes_state.py | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
+
+diff --git a/hermes_state.py b/hermes_state.py
+index 7753ea69f811f8a976d36e57351ede0d5f757a81..a35e5efd6e314e0be4f6019bfbdb5c09c6da9a1b 100644
+--- a/hermes_state.py
++++ b/hermes_state.py
+@@ -7748,6 +7748,40 @@ class SessionDB(SessionSearchMixin, SessionSchemaMixin, SessionPortabilityMixin)
+             )
+         self._execute_write(_do)
+ 
++    def retag_kanban_worker_sessions(self, workspaces_root: str) -> int:
++        """Retag legacy kanban worker rows from ``cli`` to ``kanban``.
++
++        Workers used to spawn without ``HERMES_SESSION_SOURCE``, so their runs
++        landed as untitled ``cli`` rows and the sidebar rendered one per attempt
++        labeled with the worker's own prompt. New workers tag themselves; this
++        reclaims the rows already on disk so they drop out of the session lists
++        too. Identified by cwd under the board's workspaces root — a path only
++        the dispatcher ever runs a session in.
++
++        Runs once per database (``state_meta`` gate) and returns the number of
++        rows retagged.
++        """
++        if self.get_meta("kanban_worker_source_retagged") == "1":
++            return 0
++
++        prefix = str(workspaces_root).rstrip("/\\")
++        if not prefix:
++            return 0
++
++        def _do(conn):
++            cursor = conn.execute(
++                "UPDATE sessions SET source = 'kanban' "
++                "WHERE source = 'cli' AND (cwd = ? OR cwd LIKE ? ESCAPE '\\')",
++                (prefix, prefix.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "/%"),
++            )
++            # Read rowcount before set_meta reuses this cursor for its INSERT,
++            # which would otherwise overwrite it with the meta write's count.
++            retagged = cursor.rowcount or 0
++            self.set_meta("kanban_worker_source_retagged", "1", cursor=cursor)
++            return retagged
++
++        return self._execute_write(_do)
++
+     def apply_telegram_topic_migration(self) -> None:
+         """Create Telegram DM topic-mode tables on explicit /topic opt-in.
+ 
+-- 
+2.54.0
+
+
+From e41d2029b72a14024bab6b074408ed34949e2976 Mon Sep 17 00:00:00 2001
+From: Brooklyn Nicholson <brooklyn.bb.nicholson@gmail.com>
+Date: Fri, 31 Jul 2026 13:49:36 -0500
+Subject: [PATCH 3/5] fix(sessions): keep kanban worker runs out of the session
+ lists
+
+Exclude the source from the desktop sidebar and project tree, the TUI
+resume picker, session_search, and the CLI session listings.
+---
+ .../app/session/hooks/use-session-list-actions.ts   | 11 ++++++-----
+ apps/desktop/src/lib/session-source.ts              |  3 ++-
+ cli.py                                              |  2 +-
+ hermes_cli/console_engine.py                        |  4 ++--
+ tools/session_search_tool.py                        |  6 +++---
+ tui_gateway/methods_session.py                      | 13 +++++++------
+ tui_gateway/server.py                               | 11 ++++++-----
+ 7 files changed, 27 insertions(+), 23 deletions(-)
+
+diff --git a/apps/desktop/src/app/session/hooks/use-session-list-actions.ts b/apps/desktop/src/app/session/hooks/use-session-list-actions.ts
+index 611484e0d73940f5e0ecdef09114aadaa4148fda..d7ab9ea0914c007e25dfa4c8c461478db70ce3d0 100644
+--- a/apps/desktop/src/app/session/hooks/use-session-list-actions.ts
++++ b/apps/desktop/src/app/session/hooks/use-session-list-actions.ts
+@@ -29,12 +29,13 @@ import {
+ } from '@/store/session'
+ import { $workingSessionIds, getRecentlySettledSessionIds } from '@/store/session-states'
+ 
+-// The recents list is local-only: cron rows have their own section, and each
+-// messaging platform (telegram, discord, …) is fetched separately into its own
+-// self-managed sidebar section (refreshMessagingSessions). Excluding both here
+-// keeps "Load more" paging through interactive local chats instead of
++// The recents list is local-only: cron rows have their own section, kanban
++// dispatcher workers are read on the board, and each messaging platform
++// (telegram, discord, …) is fetched separately into its own self-managed
++// sidebar section (refreshMessagingSessions). Excluding them here keeps
++// "Load more" paging through interactive local chats instead of
+ // interleaving gateway threads that bury them.
+-const SIDEBAR_EXCLUDED_SOURCES = ['cron', 'subagent', 'tool', ...MESSAGING_SESSION_SOURCE_IDS]
++const SIDEBAR_EXCLUDED_SOURCES = ['cron', 'kanban', 'subagent', 'tool', ...MESSAGING_SESSION_SOURCE_IDS]
+ // The messaging slice is the inverse: drop cron + every local source so only
+ // external-platform conversations remain, then split per platform in the UI.
+ const MESSAGING_EXCLUDED_SOURCES = ['cron', ...LOCAL_SESSION_SOURCE_IDS]
+diff --git a/apps/desktop/src/lib/session-source.ts b/apps/desktop/src/lib/session-source.ts
+index 6958c62611a3045b0a588a6912c7d2be8d285b2d..38fc60cdedd28ee880c66313e7c681b3962fb8b1 100644
+--- a/apps/desktop/src/lib/session-source.ts
++++ b/apps/desktop/src/lib/session-source.ts
+@@ -9,6 +9,7 @@ const SOURCE_LABELS: Record<string, string> = {
+   discord: 'Discord',
+   email: 'Email',
+   gateway: 'Gateway',
++  kanban: 'Kanban',
+   local: 'Local',
+   matrix: 'Matrix',
+   mattermost: 'Mattermost',
+@@ -42,7 +43,7 @@ const SOURCE_ALIASES: Record<string, string[]> = {
+ // platform. A handoff *from* one of these isn't a platform origin worth a badge.
+ // Exported so the recents fetch can keep these in the main list while the
+ // messaging fetch excludes them.
+-export const LOCAL_SESSION_SOURCE_IDS = ['cli', 'codex', 'desktop', 'gateway', 'local', 'tui']
++export const LOCAL_SESSION_SOURCE_IDS = ['cli', 'codex', 'desktop', 'gateway', 'kanban', 'local', 'tui']
+ const LOCAL_SOURCE_IDS = new Set(LOCAL_SESSION_SOURCE_IDS)
+ 
+ // External messaging platforms that each get their own self-managed sidebar
+diff --git a/cli.py b/cli.py
+index 5b4bef350be476af53b2a02ed19cc35331b43219..2b86f97458648b31460de3b5eca583b82bc0ec08 100644
+--- a/cli.py
++++ b/cli.py
+@@ -7712,7 +7712,7 @@ class HermesCLI(CLIAgentSetupMixin, CLICommandsMixin, CLIBillingMixin):
+                 include_all_sources=False,
+                 include_unnamed=True,
+                 limit=limit,
+-                exclude_sources=["tool"],
++                exclude_sources=["kanban", "tool"],
+             )
+         except Exception:
+             return []
+diff --git a/hermes_cli/console_engine.py b/hermes_cli/console_engine.py
+index 4b1eddbaf8c04169627fc94cd62b4dc9eeb73d2b..50a4592fc0e5c3c0b331a886189227ba2d126dd2 100644
+--- a/hermes_cli/console_engine.py
++++ b/hermes_cli/console_engine.py
+@@ -1324,7 +1324,7 @@ def _sessions_list(_engine: HermesConsoleEngine, args: list[str]) -> str:
+     db = SessionDB()
+     try:
+         sessions = db.list_sessions_rich(
+-            exclude_sources=["tool"],
++            exclude_sources=["kanban", "tool"],
+             limit=ns.limit,
+             order_by_last_active=True,
+         )
+@@ -1340,7 +1340,7 @@ def _sessions_stats(_engine: HermesConsoleEngine, args: list[str]) -> str:
+     db = SessionDB()
+     try:
+         total = db.session_count()
+-        listable = db.session_count(exclude_children=True, exclude_sources=["tool"])
++        listable = db.session_count(exclude_children=True, exclude_sources=["kanban", "tool"])
+         messages = db.message_count()
+         lines = [
+             f"Total sessions: {total}",
+diff --git a/tools/session_search_tool.py b/tools/session_search_tool.py
+index ed9fd49502c4ee91d3eeb734b519bbc789bfaa5f..be063a83e40bbdf94e72db0099fd441a82732f0f 100644
+--- a/tools/session_search_tool.py
++++ b/tools/session_search_tool.py
+@@ -35,9 +35,9 @@ from typing import Any, Dict, List, Optional, Union
+ 
+ # Sources that are excluded from session browsing/searching by default.
+ # Third-party integrations tag their sessions with HERMES_SESSION_SOURCE=tool;
+-# delegate subagent runs are tagged "subagent" — neither belongs in the
+-# user's session history.
+-_HIDDEN_SESSION_SOURCES = ("subagent", "tool")
++# delegate subagent runs are tagged "subagent"; kanban dispatcher workers are
++# tagged "kanban" — none belongs in the user's session history.
++_HIDDEN_SESSION_SOURCES = ("kanban", "subagent", "tool")
+ 
+ # Automation sources that are kept searchable but DEMOTED below interactive
+ # sessions in discover ranking. Cron jobs run on a schedule and accumulate
+diff --git a/tui_gateway/methods_session.py b/tui_gateway/methods_session.py
+index 5b00a42a51da8bcedb6d51be4074e02867e4544e..68210a4c8a38d3dbd79914cfe7dcfbca1109d849 100644
+--- a/tui_gateway/methods_session.py
++++ b/tui_gateway/methods_session.py
+@@ -170,10 +170,11 @@ def _(rid, params: dict) -> dict:
+             # ones not enumerated here), ACP adapter clients, webhook sessions,
+             # custom `HERMES_SESSION_SOURCE` values, and older installs with
+             # different source labels. We deny-list only the noisy internal
+-            # sources (``tool`` sub-agent runs) rather than allow-listing a
+-            # fixed set of platform names that goes stale whenever a new
+-            # platform is added or a user names their own source.
+-            deny = frozenset({"tool"})
++            # sources (``tool`` sub-agent runs and ``kanban`` dispatcher
++            # workers) rather than allow-listing a fixed set of platform names
++            # that goes stale whenever a new platform is added or a user names
++            # their own source.
++            deny = frozenset({"kanban", "tool"})
+ 
+             limit = int(params.get("limit", 200) or 200)
+             # Over-fetch modestly so per-source filtering doesn't leave us
+@@ -215,7 +216,7 @@ def _(rid, params: dict) -> dict:
+     """Return the most recent human-facing session id, or ``None``.
+ 
+     Mirrors ``session.list``'s deny-list behaviour (drops ``tool``
+-    sub-agent rows).  Used by TUI auto-resume when
++    sub-agent rows and ``kanban`` worker rows).  Used by TUI auto-resume when
+     ``display.tui_auto_resume_recent`` is on; the field is also handy
+     for any CLI tooling that wants "latest session" without paginating
+     the full list.
+@@ -232,7 +233,7 @@ def _(rid, params: dict) -> dict:
+         if db is None:
+             return _ok(rid, {"session_id": None})
+         try:
+-            deny = frozenset({"tool"})
++            deny = frozenset({"kanban", "tool"})
+             # Over-fetch by a generous bounded amount so heavy sub-agent
+             # users (lots of recent ``tool`` rows) don't get a false
+             # "no eligible session" answer.  ``session.list`` uses a
+diff --git a/tui_gateway/server.py b/tui_gateway/server.py
+index ca5876ac00bef85da41873a8a0e9382ff8a4d145..2ecb4c3ed94d609523767d8c68a6ba7ae599ac92 100644
+--- a/tui_gateway/server.py
++++ b/tui_gateway/server.py
+@@ -618,7 +618,7 @@ def _transfer_active_session_slot(
+ # TUI backend itself creates ("tui", plus whatever a client passes as its
+ # own ``source``) and the CLI's own sessions are NOT gateway-owned.
+ _NON_GATEWAY_SOURCES = frozenset({
+-    "", "tui", "cli", "webui", "desktop", "cron", "subagent", "test",
++    "", "tui", "cli", "webui", "desktop", "cron", "kanban", "subagent", "test",
+     "local", "acp", "webhook", "api_server", "msgraph_webhook",
+ })
+ 
+@@ -11033,10 +11033,11 @@ def _discover_repos_payload(
+     return out
+ 
+ 
+-# Sources excluded from the project tree: cron runs and tool/subagent children
+-# are not user conversations. Subagent/compression children are already dropped
+-# by list_sessions_rich(include_children=False); cron has its own section.
+-_PROJECT_TREE_EXCLUDED_SOURCES = ["cron"]
++# Sources excluded from the project tree: cron runs, and kanban dispatcher
++# workers, are not user conversations. Subagent/compression children are
++# already dropped by list_sessions_rich(include_children=False); cron has its
++# own section, and kanban runs are read on the board.
++_PROJECT_TREE_EXCLUDED_SOURCES = ["cron", "kanban"]
+ 
+ 
+ def _project_tree_row(r: dict) -> dict:
+-- 
+2.54.0
+
+
+From 805c483ca56a65984b21baf7d06ea82ba9faec3d Mon Sep 17 00:00:00 2001
+From: Brooklyn Nicholson <brooklyn.bb.nicholson@gmail.com>
+Date: Fri, 31 Jul 2026 13:49:36 -0500
+Subject: [PATCH 4/5] test(kanban): cover worker session tagging and retag
+
+---
+ .../test_kanban_worker_session_source.py      | 106 ++++++++++++++++++
+ 1 file changed, 106 insertions(+)
+ create mode 100644 tests/hermes_cli/test_kanban_worker_session_source.py
+
+diff --git a/tests/hermes_cli/test_kanban_worker_session_source.py b/tests/hermes_cli/test_kanban_worker_session_source.py
+new file mode 100644
+index 0000000000000000000000000000000000000000..e6ea37ead513d97a7d08cafd0d85073d399abdf6
+--- /dev/null
++++ b/tests/hermes_cli/test_kanban_worker_session_source.py
+@@ -0,0 +1,106 @@
++"""Kanban worker runs must not surface as user conversations.
++
++Workers spawn as `hermes chat -q "work kanban task <id>"`, which used to land in
++state.db as an untitled `cli` row — the desktop sidebar then rendered one entry
++per attempt, labeled with the worker's own prompt.
++"""
++
++import os
++
++import pytest
++
++from hermes_state import SessionDB
++
++
++@pytest.fixture()
++def db(tmp_path, monkeypatch):
++    monkeypatch.setenv("HERMES_HOME", str(tmp_path))
++    database = SessionDB(db_path=tmp_path / "state.db")
++    yield database
++    database.close()
++
++
++def test_worker_spawn_tags_session_source_kanban(monkeypatch, tmp_path):
++    """The dispatcher tags the worker's env so its session is a `kanban` row."""
++    from hermes_cli import kanban_db as kb
++
++    captured = {}
++
++    class _Proc:
++        pid = 4321
++
++    def _fake_popen(cmd, **kwargs):
++        captured["env"] = kwargs["env"]
++        return _Proc()
++
++    monkeypatch.setattr("subprocess.Popen", _fake_popen)
++    monkeypatch.setattr(kb, "_retag_legacy_worker_sessions", lambda _root: None)
++    monkeypatch.setattr(kb, "worker_logs_dir", lambda board=None: tmp_path / "logs")
++
++    task = kb.Task(
++        id="t_b21733fb",
++        title="ship it",
++        body=None,
++        assignee="default",
++        status="in_progress",
++        priority=0,
++        created_by=None,
++        created_at=0,
++        started_at=None,
++        completed_at=None,
++        workspace_kind="scratch",
++        workspace_path=None,
++        claim_lock=None,
++        claim_expires=None,
++        tenant=None,
++    )
++    workspace = str(tmp_path / "ws")
++    os.makedirs(workspace, exist_ok=True)
++
++    kb._default_spawn(task, workspace)
++
++    assert captured["env"]["HERMES_SESSION_SOURCE"] == "kanban"
++
++
++def test_kanban_rows_stay_out_of_the_session_list(db):
++    """A `kanban` row is filtered by the same exclude the sidebar sends."""
++    db.create_session(session_id="chat", source="desktop")
++    db.append_message(session_id="chat", role="user", content="hey")
++    db.create_session(session_id="worker", source="kanban")
++    db.append_message(session_id="worker", role="user", content="work kanban task t_b21733fb")
++
++    listed = db.list_sessions_rich(exclude_sources=["cron", "kanban", "subagent", "tool"])
++
++    assert [row["id"] for row in listed] == ["chat"]
++
++
++def test_retag_reclaims_legacy_worker_rows(db, tmp_path):
++    """Rows written before the tag existed are identified by workspace cwd.
++
++    Two rows, not one: the count has to survive ``set_meta`` reusing the same
++    cursor, which would otherwise report the meta write's rowcount instead.
++    """
++    workspaces = tmp_path / "kanban" / "workspaces"
++    db.create_session(session_id="legacy", source="cli", cwd=str(workspaces / "t_b21733fb"))
++    db.create_session(session_id="legacy2", source="cli", cwd=str(workspaces / "t_c0ffee"))
++    db.create_session(session_id="mine", source="cli", cwd=str(tmp_path / "www" / "repo"))
++
++    assert db.retag_kanban_worker_sessions(str(workspaces)) == 2
++
++    sources = {row[0]: row[1] for row in db._conn.execute("SELECT id, source FROM sessions")}
++    assert sources == {"legacy": "kanban", "legacy2": "kanban", "mine": "cli"}
++
++
++def test_retag_runs_once_per_database(db, tmp_path):
++    """The state_meta gate keeps the retag off every subsequent spawn."""
++    workspaces = tmp_path / "kanban" / "workspaces"
++    db.create_session(session_id="legacy", source="cli", cwd=str(workspaces / "t_a"))
++    db.retag_kanban_worker_sessions(str(workspaces))
++
++    # A row that a *new* worker would never write as `cli`; if the gate leaked,
++    # a later sweep would grab it too.
++    db.create_session(session_id="later", source="cli", cwd=str(workspaces / "t_b"))
++
++    assert db.retag_kanban_worker_sessions(str(workspaces)) == 0
++    row = db._conn.execute("SELECT source FROM sessions WHERE id = 'later'").fetchone()
++    assert row[0] == "cli"
+-- 
+2.54.0
+
+
+From c2872cf53b6529ae0cb7f44ac4d78718b0695e48 Mon Sep 17 00:00:00 2001
+From: Brooklyn Nicholson <brooklyn.bb.nicholson@gmail.com>
+Date: Fri, 31 Jul 2026 14:03:32 -0500
+Subject: [PATCH 5/5] fix(kanban): key the worker-session retag per board, not
+ per database
+
+The retag gate was global, so once one board reclaimed its legacy rows a
+second board on the same state.db never got swept. Key the state_meta gate
+on the workspaces root and skip reopening state.db on every spawn via an
+in-process set. Align the dispatcher-spawn test with the worker's own
+`kanban` source tag and cover the per-board gate.
+---
+ hermes_cli/kanban_db.py                         | 12 ++++++++++--
+ hermes_state.py                                 | 13 +++++++------
+ tests/hermes_cli/test_kanban_db.py              |  8 ++++++++
+ .../test_kanban_worker_session_source.py        | 17 ++++++++++++++++-
+ 4 files changed, 41 insertions(+), 9 deletions(-)
+
+diff --git a/hermes_cli/kanban_db.py b/hermes_cli/kanban_db.py
+index f9ec2e200142ea7f8ff2efdc6eb27b43f9c4e46f..5b688a31aa31b7f8d45e8e1d70292e5c62d50301 100644
+--- a/hermes_cli/kanban_db.py
++++ b/hermes_cli/kanban_db.py
+@@ -8841,12 +8841,19 @@ def _resolve_worker_cli_toolsets(hermes_home: Optional[str]) -> Optional[list[st
+         return None
+ 
+ 
++_retagged_workspace_roots: set[str] = set()
++
++
+ def _retag_legacy_worker_sessions(workspaces_root_path: str) -> None:
+     """Reclaim pre-tag worker rows in state.db so they leave the session lists.
+ 
+-    Best-effort and gated to run once per database — a dispatcher tick must
+-    never fail because a session DB was busy or missing.
++    Best-effort and gated — the durable ``state_meta`` gate lives in
++    ``retag_kanban_worker_sessions``; the in-process set keeps a busy
++    dispatcher from reopening state.db on every spawn just to read it. A
++    dispatcher tick must never fail because a session DB was busy or missing.
+     """
++    if workspaces_root_path in _retagged_workspace_roots:
++        return
+     try:
+         from hermes_state import SessionDB
+ 
+@@ -8855,6 +8862,7 @@ def _retag_legacy_worker_sessions(workspaces_root_path: str) -> None:
+             db.retag_kanban_worker_sessions(workspaces_root_path)
+         finally:
+             db.close()
++        _retagged_workspace_roots.add(workspaces_root_path)
+     except Exception as exc:
+         _log.debug("kanban worker: legacy session retag skipped (%s)", exc)
+ 
+diff --git a/hermes_state.py b/hermes_state.py
+index a35e5efd6e314e0be4f6019bfbdb5c09c6da9a1b..16473d9e3b3ce853325ffec53f73ff02659bd765 100644
+--- a/hermes_state.py
++++ b/hermes_state.py
+@@ -7758,16 +7758,17 @@ class SessionDB(SessionSearchMixin, SessionSchemaMixin, SessionPortabilityMixin)
+         too. Identified by cwd under the board's workspaces root — a path only
+         the dispatcher ever runs a session in.
+ 
+-        Runs once per database (``state_meta`` gate) and returns the number of
+-        rows retagged.
++        Gated per workspaces root (``state_meta``) so each board reclaims its
++        own rows exactly once. Returns the number of rows retagged.
+         """
+-        if self.get_meta("kanban_worker_source_retagged") == "1":
+-            return 0
+-
+         prefix = str(workspaces_root).rstrip("/\\")
+         if not prefix:
+             return 0
+ 
++        gate = f"kanban_worker_source_retagged:{prefix}"
++        if self.get_meta(gate) == "1":
++            return 0
++
+         def _do(conn):
+             cursor = conn.execute(
+                 "UPDATE sessions SET source = 'kanban' "
+@@ -7777,7 +7778,7 @@ class SessionDB(SessionSearchMixin, SessionSchemaMixin, SessionPortabilityMixin)
+             # Read rowcount before set_meta reuses this cursor for its INSERT,
+             # which would otherwise overwrite it with the meta write's count.
+             retagged = cursor.rowcount or 0
+-            self.set_meta("kanban_worker_source_retagged", "1", cursor=cursor)
++            self.set_meta(gate, "1", cursor=cursor)
+             return retagged
+ 
+         return self._execute_write(_do)
+diff --git a/tests/hermes_cli/test_kanban_db.py b/tests/hermes_cli/test_kanban_db.py
+index b25d12c774b60a861ab135341a57f9e773ec5a2a..7de9b4c0b7c72a49f29fc527102ca17db0b2c5aa 100644
+--- a/tests/hermes_cli/test_kanban_db.py
++++ b/tests/hermes_cli/test_kanban_db.py
+@@ -792,6 +792,9 @@ class TestSharedBoardPaths:
+     ):
+         # The dispatcher must pin board paths while stripping any unrelated
+         # HERMES_SESSION_* identity inherited from the long-lived gateway.
++        # The one exception is HERMES_SESSION_SOURCE, which the dispatcher
++        # re-sets to its own `kanban` tag AFTER the strip — a value it owns,
++        # never one inherited from whatever the gateway last routed.
+         default_home = tmp_path / ".hermes"
+         default_home.mkdir()
+         self._set_home(monkeypatch, tmp_path, default_home)
+@@ -842,6 +845,11 @@ class TestSharedBoardPaths:
+         assert env["HERMES_KANBAN_TASK"] == "t_dispatch_env"
+         assert env["HERMES_KANBAN_BRANCH"] == "wt/t_dispatch_env"
+         for key in sc._VAR_MAP:
++            if key == "HERMES_SESSION_SOURCE":
++                # Re-set by the dispatcher, so what matters is that it carries
++                # the worker's own tag rather than the inherited routing value.
++                assert env[key] == "kanban"
++                continue
+             assert key not in env
+ 
+ 
+diff --git a/tests/hermes_cli/test_kanban_worker_session_source.py b/tests/hermes_cli/test_kanban_worker_session_source.py
+index e6ea37ead513d97a7d08cafd0d85073d399abdf6..b35dcc1781ae4be3d072e98c554942e7ebe1b7a4 100644
+--- a/tests/hermes_cli/test_kanban_worker_session_source.py
++++ b/tests/hermes_cli/test_kanban_worker_session_source.py
+@@ -91,7 +91,7 @@ def test_retag_reclaims_legacy_worker_rows(db, tmp_path):
+     assert sources == {"legacy": "kanban", "legacy2": "kanban", "mine": "cli"}
+ 
+ 
+-def test_retag_runs_once_per_database(db, tmp_path):
++def test_retag_runs_once_per_workspaces_root(db, tmp_path):
+     """The state_meta gate keeps the retag off every subsequent spawn."""
+     workspaces = tmp_path / "kanban" / "workspaces"
+     db.create_session(session_id="legacy", source="cli", cwd=str(workspaces / "t_a"))
+@@ -104,3 +104,18 @@ def test_retag_runs_once_per_database(db, tmp_path):
+     assert db.retag_kanban_worker_sessions(str(workspaces)) == 0
+     row = db._conn.execute("SELECT source FROM sessions WHERE id = 'later'").fetchone()
+     assert row[0] == "cli"
++
++
++def test_retag_gate_is_per_board(db, tmp_path):
++    """A second board's workspaces root still gets its own sweep.
++
++    The gate is keyed on the root, so reclaiming board A must not convince the
++    dispatcher that board B's legacy rows were already handled.
++    """
++    board_a = tmp_path / "kanban" / "boards" / "a" / "workspaces"
++    board_b = tmp_path / "kanban" / "boards" / "b" / "workspaces"
++    db.create_session(session_id="a1", source="cli", cwd=str(board_a / "t_a"))
++    db.create_session(session_id="b1", source="cli", cwd=str(board_b / "t_b"))
++
++    assert db.retag_kanban_worker_sessions(str(board_a)) == 1
++    assert db.retag_kanban_worker_sessions(str(board_b)) == 1
+-- 
+2.54.0
+
