@@ -1,0 +1,80 @@
+name: Hermes Forward Sync
+
+on:
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: hermes-forward-sync
+  cancel-in-progress: false
+
+jobs:
+  generate-review-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Sarthi
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Check for an open synchronization PR
+        id: existing
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          open_count="$(gh pr list \
+            --repo "$GITHUB_REPOSITORY" \
+            --head "automation/hermes-forward-sync" \
+            --state open \
+            --json number \
+            --jq 'length')"
+          if [[ "$open_count" == "0" ]]; then
+            echo "open_pr=false" >> "$GITHUB_OUTPUT"
+          elif [[ "$open_count" =~ ^[1-9][0-9]*$ ]]; then
+            echo "open_pr=true" >> "$GITHUB_OUTPUT"
+            echo "A Hermes synchronization PR is already open; leaving reviewer changes untouched."
+          else
+            echo "Unexpected pull request count: $open_count" >&2
+            exit 1
+          fi
+
+      - name: Generate upstream review artifacts
+        id: sync
+        if: steps.existing.outputs.open_pr != 'true'
+        shell: bash
+        run: python scripts/hermes_sync.py
+
+      - name: Commit and push the synchronization branch
+        if: steps.existing.outputs.open_pr != 'true' && steps.sync.outputs.updated == 'true'
+        env:
+          UPSTREAM_SHA: ${{ steps.sync.outputs.upstream_sha }}
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -C automation/hermes-forward-sync
+          git add .github/hermes-sync/pending
+          git commit -m "chore: prepare Hermes sync ${UPSTREAM_SHA:0:12}"
+          git push --force origin HEAD:automation/hermes-forward-sync
+
+      - name: Open draft synchronization PR
+        if: steps.existing.outputs.open_pr != 'true' && steps.sync.outputs.updated == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          gh pr create \
+            --repo "$GITHUB_REPOSITORY" \
+            --base main \
+            --head automation/hermes-forward-sync \
+            --draft \
+            --title "chore: review Hermes upstream changes" \
+            --body-file .github/hermes-sync/pending/REPORT.md

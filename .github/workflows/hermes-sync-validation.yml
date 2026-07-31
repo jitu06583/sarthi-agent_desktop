@@ -1,0 +1,31 @@
+name: Hermes Sync Validation
+
+on:
+  pull_request:
+    paths:
+      - ".github/hermes-sync/**"
+      - ".github/workflows/hermes-forward-sync.yml"
+      - ".github/workflows/hermes-sync-validation.yml"
+      - "scripts/hermes_sync.py"
+      - "tests/scripts/test_hermes_sync*.py"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out pull request
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run focused tests
+        run: python -m unittest discover -s tests/scripts -p 'test_hermes_sync*.py' -v
+
+      - name: Compile Python sources
+        run: python -m py_compile scripts/hermes_sync.py tests/scripts/test_hermes_sync.py tests/scripts/test_hermes_sync_workflow.py
