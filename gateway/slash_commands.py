@@ -3827,7 +3827,7 @@ class GatewaySlashCommandsMixin:
             # Search filters at SQL level, so over-fetch before the visibility
             # cut: origin-invisible matches would otherwise consume the page.
             limit=50 if search_query else 10,
-            exclude_sources=["tool"],
+            exclude_sources=["kanban", "tool"],
         )
         if not cross_origin:
             # Scope the listing to the caller's own origin on every adapter so

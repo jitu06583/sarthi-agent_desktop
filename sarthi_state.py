@@ -16,6 +16,7 @@ Key design decisions:
 
 import asyncio
 import json
+import os
 import logging
 import random
 import re
@@ -5399,6 +5400,8 @@ class SessionDB:
         query: str,
         limit: int = 20,
         include_archived: bool = True,
+        source: str = None,
+        exclude_sources: List[str] = None,
     ) -> List[Dict[str, Any]]:
         """Search surfaced sessions by exact/prefix/substring session id.
 
@@ -5419,6 +5422,8 @@ class SessionDB:
         # in-Python exact/prefix/substring ranking below has enough candidates
         # to order, then truncate.
         candidates = self.list_sessions_rich(
+            source=source,
+            exclude_sources=exclude_sources,
             limit=max(limit * 4, limit),
             offset=0,
             include_archived=include_archived,
@@ -6636,6 +6641,80 @@ class SessionDB:
                 (key, value),
             )
         self._execute_write(_do)
+
+    def retag_kanban_worker_sessions(self, workspaces_root: str) -> int:
+        """Retag legacy dispatcher-owned worker rows from ``cli`` to ``kanban``.
+
+        Old workers did not set ``SARTHI_SESSION_SOURCE``, so their stored runs
+        appeared as ordinary CLI conversations.  The migration is deliberately
+        conservative: a row must be below the board's workspaces root *and*
+        contain the dispatcher-owned ``work kanban task t_...`` user prompt.
+        That second condition preserves genuine user-started CLI conversations
+        that happen to use a managed worktree.
+
+        The update is idempotent and intentionally has no durable one-shot gate:
+        imported or restored legacy rows can therefore be reclaimed on a later
+        dispatcher process start.  No session/message data is deleted.
+        """
+        prefix = str(workspaces_root or "").strip().rstrip("/\\")
+        if not prefix:
+            return 0
+
+        canonical_root = os.path.normcase(
+            os.path.abspath(os.path.normpath(prefix))
+        )
+
+        def _is_under_root(cwd: str) -> bool:
+            if not cwd:
+                return False
+            candidate = os.path.normcase(
+                os.path.abspath(os.path.normpath(str(cwd)))
+            )
+            try:
+                return os.path.commonpath((canonical_root, candidate)) == canonical_root
+            except ValueError:
+                # Different Windows drives (or otherwise incomparable paths).
+                return False
+
+        # Candidate discovery uses deterministic keyset pagination.  Filtering
+        # by board path happens in Python for cross-platform path semantics, so
+        # an arbitrary SQL LIMIT here could otherwise let another board's rows
+        # permanently starve this board's candidates.
+        task_prompt_glob = "work kanban task t_" + "[0-9a-f]" * 8
+        changed = 0
+        last_id = ""
+        page_size = 500
+        while True:
+            with self._lock:
+                candidates = self._conn.execute(
+                    "SELECT sessions.id, sessions.cwd FROM sessions "
+                    "WHERE sessions.source = 'cli' AND sessions.id > ? "
+                    "AND ("
+                    "  SELECT messages.content FROM messages "
+                    "  WHERE messages.session_id = sessions.id "
+                    "    AND messages.role = 'user' "
+                    "  ORDER BY messages.id ASC LIMIT 1"
+                    ") GLOB ? ORDER BY sessions.id ASC LIMIT ?",
+                    (last_id, task_prompt_glob, page_size),
+                ).fetchall()
+            if not candidates:
+                break
+            last_id = str(candidates[-1][0])
+            batch = [row[0] for row in candidates if _is_under_root(row[1])]
+            if not batch:
+                continue
+
+            def _update(conn, ids=batch):
+                placeholders = ",".join("?" for _ in ids)
+                cursor = conn.execute(
+                    f"UPDATE sessions SET source = 'kanban' "
+                    f"WHERE source = 'cli' AND id IN ({placeholders})",
+                    ids,
+                )
+                return int(cursor.rowcount or 0)
+
+            changed += self._execute_write(_update)
+        return changed
 
     def apply_telegram_topic_migration(self) -> None:
         """Create Telegram DM topic-mode tables on explicit /topic opt-in.

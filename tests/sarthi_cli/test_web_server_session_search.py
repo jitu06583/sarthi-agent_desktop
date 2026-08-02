@@ -1,6 +1,7 @@
 import asyncio
 
 from sarthi_cli import web_server
+from sarthi_state import SessionDB
 
 
 class _FakeSessionDB:
@@ -14,9 +15,18 @@ class _FakeSessionDB:
 
     closed = False
 
-    def search_sessions_by_id(self, query, limit=20, include_archived=True):
+    def search_sessions_by_id(
+        self,
+        query,
+        limit=20,
+        include_archived=True,
+        source=None,
+        exclude_sources=None,
+    ):
         assert query == "20260603"
         assert include_archived is True
+        assert source is None
+        assert set(exclude_sources) == {"kanban", "tool"}
         return [
             {
                 "id": "20260603_090200_exact",
@@ -27,9 +37,25 @@ class _FakeSessionDB:
             }
         ]
 
-    def search_messages(self, query, limit=20):
+    def search_messages(
+        self,
+        query,
+        source_filter=None,
+        exclude_sources=None,
+        limit=20,
+    ):
         assert query == "20260603*"
+        assert source_filter is None
+        assert set(exclude_sources) == {"kanban", "tool"}
         return [
+            {
+                "session_id": "hidden_worker_content",
+                "snippet": "worker content",
+                "role": "user",
+                "source": "kanban",
+                "model": "worker-model",
+                "session_started": 300,
+            },
             {
                 "session_id": "20260603_090200_exact",
                 "snippet": "duplicate content hit should not replace ID hit",
@@ -88,3 +114,34 @@ def test_desktop_session_search_merges_id_matches_before_content_matches(monkeyp
             },
         ]
     }
+
+
+def test_session_list_defaults_hide_internal_sources_but_explicit_source_does_not():
+    assert set(web_server._session_list_exclusions(None, None)) == {
+        "kanban",
+        "tool",
+    }
+    assert set(web_server._session_list_exclusions(None, "cron")) == {
+        "cron",
+        "kanban",
+        "tool",
+    }
+    assert web_server._session_list_exclusions("kanban", None) == []
+
+
+def test_id_search_filters_internal_sources_before_limit(tmp_path):
+    db = SessionDB(db_path=tmp_path / "state.db")
+    try:
+        db.create_session("match-visible-acp", "acp")
+        for index in range(50):
+            db.create_session(f"match-hidden-kanban-{index:03d}", "kanban")
+
+        rows = db.search_sessions_by_id(
+            "match",
+            limit=2,
+            include_archived=True,
+            exclude_sources=["kanban", "tool"],
+        )
+        assert [row["id"] for row in rows] == ["match-visible-acp"]
+    finally:
+        db.close()

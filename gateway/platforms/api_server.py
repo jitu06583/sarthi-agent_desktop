@@ -2195,6 +2195,7 @@ class APIServerAdapter(BasePlatformAdapter):
         include_children = _coerce_request_bool(request.query.get("include_children"), default=False)
         sessions = db.list_sessions_rich(
             source=source,
+            exclude_sources=None if source else ["kanban", "tool"],
             limit=limit,
             offset=offset,
             include_children=include_children,

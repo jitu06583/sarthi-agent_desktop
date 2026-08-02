@@ -1195,6 +1195,37 @@ class TestWebServerEndpoints:
         assert captured["list"] == 3
         assert captured["count"] == 3
 
+    def test_session_list_apis_hide_internal_workers_and_keep_acp_visible(self):
+        from sarthi_state import SessionDB
+
+        db = SessionDB()
+        try:
+            for session_id, source in (
+                ("human-cli", "cli"),
+                ("human-acp", "acp"),
+                ("hidden-kanban", "kanban"),
+                ("hidden-tool", "tool"),
+            ):
+                db.create_session(session_id=session_id, source=source)
+        finally:
+            db.close()
+
+        for endpoint in ("/api/sessions", "/api/profiles/sessions"):
+            response = self.client.get(f"{endpoint}?limit=100&offset=0")
+            assert response.status_code == 200
+            ids = {row["id"] for row in response.json()["sessions"]}
+            assert {"human-cli", "human-acp"} <= ids
+            assert "hidden-kanban" not in ids
+            assert "hidden-tool" not in ids
+
+        diagnostic = self.client.get(
+            "/api/sessions?source=kanban&limit=100&offset=0"
+        )
+        assert diagnostic.status_code == 200
+        assert {row["id"] for row in diagnostic.json()["sessions"]} == {
+            "hidden-kanban"
+        }
+
     def _create_session_with_heavy_fields(self, session_id: str) -> None:
         from sarthi_state import SessionDB
 

@@ -513,7 +513,7 @@ def _transfer_active_session_slot(
 # TUI backend itself creates ("tui", plus whatever a client passes as its
 # own ``source``) and the CLI's own sessions are NOT gateway-owned.
 _NON_GATEWAY_SOURCES = frozenset({
-    "", "tui", "cli", "webui", "desktop", "cron", "subagent", "test",
+    "", "tui", "cli", "webui", "desktop", "cron", "kanban", "subagent", "test",
     "local", "acp", "webhook", "api_server", "msgraph_webhook",
 })
 
@@ -5391,18 +5391,14 @@ def _(rid, params: dict) -> dict:
         # sources (``tool`` sub-agent runs) rather than allow-listing a
         # fixed set of platform names that goes stale whenever a new
         # platform is added or a user names their own source.
-        deny = frozenset({"tool"})
-
         limit = int(params.get("limit", 200) or 200)
-        # Over-fetch modestly so per-source filtering doesn't leave us
-        # short; the compression-tip projection in ``list_sessions_rich``
-        # can also merge rows.
-        fetch_limit = max(limit * 2, 200)
-        rows = [
-            s
-            for s in db.list_sessions_rich(source=None, limit=fetch_limit, order_by_last_active=True, compact_rows=True)
-            if (s.get("source") or "").strip().lower() not in deny
-        ][:limit]
+        rows = db.list_sessions_rich(
+            source=None,
+            exclude_sources=["kanban", "tool"],
+            limit=limit,
+            order_by_last_active=True,
+            compact_rows=True,
+        )
         return _ok(
             rid,
             {
@@ -5442,16 +5438,14 @@ def _(rid, params: dict) -> dict:
     if db is None:
         return _ok(rid, {"session_id": None})
     try:
-        deny = frozenset({"tool"})
-        # Over-fetch by a generous bounded amount so heavy sub-agent
-        # users (lots of recent ``tool`` rows) don't get a false
-        # "no eligible session" answer.  ``session.list`` uses a
-        # similar over-fetch strategy.
-        rows = db.list_sessions_rich(source=None, limit=200, order_by_last_active=True, compact_rows=True)
+        rows = db.list_sessions_rich(
+            source=None,
+            exclude_sources=["kanban", "tool"],
+            limit=1,
+            order_by_last_active=True,
+            compact_rows=True,
+        )
         for row in rows:
-            src = (row.get("source") or "").strip().lower()
-            if src in deny:
-                continue
             return _ok(
                 rid,
                 {
@@ -11190,10 +11184,11 @@ def _(rid, params: dict) -> dict:
         return _err(rid, 5061, str(e))
 
 
-# Sources excluded from the project tree: cron runs and tool/subagent children
-# are not user conversations. Subagent/compression children are already dropped
-# by list_sessions_rich(include_children=False); cron has its own section.
-_PROJECT_TREE_EXCLUDED_SOURCES = ["cron"]
+# Sources excluded from the project tree: cron runs and internal worker/tool
+# sessions are not user conversations. Subagent/compression children are
+# already dropped by list_sessions_rich(include_children=False); cron has its
+# own section.
+_PROJECT_TREE_EXCLUDED_SOURCES = ["cron", "kanban", "tool"]
 
 
 def _project_tree_row(r: dict) -> dict:

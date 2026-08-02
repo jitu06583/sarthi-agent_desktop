@@ -7,6 +7,10 @@ break them.
 
 from __future__ import annotations
 
+from contextlib import contextmanager
+
+from sarthi_state import SessionDB
+from tui_gateway import server
 from tui_gateway import project_tree as pt
 
 _SID = 0
@@ -56,6 +60,49 @@ def _resolver(mapping):
 
 def _lane_ids(project):
     return [g["id"] for repo in project["repos"] for g in repo["groups"]]
+
+
+def test_project_tree_inputs_hide_internal_workers_and_keep_acp(
+    tmp_path, monkeypatch
+):
+    db = SessionDB(db_path=tmp_path / "state.db")
+    try:
+        for session_id, source in (
+            ("human-cli", "cli"),
+            ("human-acp", "acp"),
+            ("hidden-kanban", "kanban"),
+            ("hidden-tool", "tool"),
+        ):
+            db.create_session(
+                session_id=session_id,
+                source=source,
+                cwd=str(tmp_path / "repo"),
+            )
+            db.append_message(session_id, "user", "hello")
+
+        @contextmanager
+        def _empty_projects_connection():
+            yield object()
+
+        from sarthi_cli import projects_db
+
+        monkeypatch.setattr(projects_db, "connect_closing", _empty_projects_connection)
+        monkeypatch.setattr(projects_db, "list_projects", lambda _conn: [])
+        monkeypatch.setattr(projects_db, "get_active_id", lambda _conn: None)
+        monkeypatch.setattr(server.git_probe, "warm_roots", lambda _cwds: None)
+
+        sessions, projects, discovered, active_id = server._project_tree_inputs(
+            db,
+            100,
+            include_discovered=False,
+        )
+    finally:
+        db.close()
+
+    assert {session["id"] for session in sessions} == {"human-cli", "human-acp"}
+    assert projects == []
+    assert discovered == []
+    assert active_id is None
 
 
 # ---------------------------------------------------------------------------

@@ -580,15 +580,26 @@ def test_config_set_requires_confirmation_then_writes(_isolate_sarthi_home):
     assert read_raw_config()["console"]["test"] is True
 
 
-def test_sessions_list_and_stats_use_isolated_session_store(_isolate_sarthi_home):
+def test_sessions_list_and_stats_use_isolated_session_store(
+    _isolate_sarthi_home, monkeypatch, tmp_path
+):
+    import sarthi_state
     from sarthi_state import SessionDB
 
-    db = SessionDB()
+    db_path = tmp_path / "console-state.db"
+    db = SessionDB(db_path=db_path)
     try:
         db.create_session("chat-session", source="cli", model="test/model")
         db.create_session("tool-session", source="tool", model="test/model")
+        db.create_session("kanban-worker", source="kanban", model="test/model")
     finally:
         db.close()
+
+    monkeypatch.setattr(
+        sarthi_state,
+        "SessionDB",
+        lambda: SessionDB(db_path=db_path),
+    )
 
     engine = SarthiConsoleEngine()
     listed = engine.execute("sessions list --limit 10")
@@ -597,7 +608,8 @@ def test_sessions_list_and_stats_use_isolated_session_store(_isolate_sarthi_home
     assert listed.status == "ok"
     assert "chat-session" in listed.output
     assert "tool-session" not in listed.output
-    assert "Total sessions: 2" in stats.output
+    assert "kanban-worker" not in listed.output
+    assert "Total sessions: 3" in stats.output
     assert "Listable sessions: 1" in stats.output
 
 

@@ -23,7 +23,7 @@ class TestIsGatewayOwnedSource:
         assert _is_gateway_owned_source(" Telegram ") is True
 
     def test_tui_owned_sources_are_not(self):
-        for src in ("tui", "cli", "webui", "desktop", "cron", "subagent",
+        for src in ("tui", "cli", "webui", "desktop", "cron", "kanban", "subagent",
                     "test", "acp", ""):
             assert _is_gateway_owned_source(src) is False, src
 

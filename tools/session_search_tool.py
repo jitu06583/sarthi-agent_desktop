@@ -37,7 +37,7 @@ from typing import Any, Dict, List, Optional, Union
 # Third-party integrations tag their sessions with SARTHI_SESSION_SOURCE=tool;
 # delegate subagent runs are tagged "subagent" — neither belongs in the
 # user's session history.
-_HIDDEN_SESSION_SOURCES = ("subagent", "tool")
+_HIDDEN_SESSION_SOURCES = ("kanban", "subagent", "tool")
 
 # Automation sources that are kept searchable but DEMOTED below interactive
 # sessions in discover ranking. Cron jobs run on a schedule and accumulate

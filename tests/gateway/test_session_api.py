@@ -170,6 +170,27 @@ async def test_session_crud_and_message_history(adapter, session_db):
 
 
 @pytest.mark.asyncio
+async def test_session_list_hides_internal_workers_unless_source_is_explicit(
+    adapter, session_db
+):
+    session_db.create_session("human-acp", "acp")
+    session_db.create_session("hidden-kanban", "kanban")
+    session_db.create_session("hidden-tool", "tool")
+
+    app = _create_session_app(adapter)
+    async with TestClient(TestServer(app)) as cli:
+        default = await cli.get("/api/sessions?limit=20")
+        assert default.status == 200
+        default_ids = {row["id"] for row in (await default.json())["data"]}
+        assert default_ids == {"human-acp"}
+
+        diagnostic = await cli.get("/api/sessions?source=kanban&limit=20")
+        assert diagnostic.status == 200
+        diagnostic_ids = [row["id"] for row in (await diagnostic.json())["data"]]
+        assert diagnostic_ids == ["hidden-kanban"]
+
+
+@pytest.mark.asyncio
 async def test_session_messages_follow_compression_tip(adapter, session_db):
     source_id = session_db.create_session("source-session", "api_server")
     session_db.append_message(source_id, "user", "before compression")

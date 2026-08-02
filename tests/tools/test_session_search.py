@@ -111,6 +111,19 @@ class TestHiddenSources:
     def test_tool_source_hidden(self):
         assert "tool" in _HIDDEN_SESSION_SOURCES
 
+    def test_kanban_worker_source_hidden_but_acp_remains_visible(self, db):
+        db.create_session("worker", source="kanban")
+        db.append_message("worker", role="user", content="work kanban task t_a")
+        db.create_session("acp-chat", source="acp")
+        db.append_message("acp-chat", role="user", content="human acp request")
+
+        result = json.loads(session_search(db=db))
+        ids = [row["session_id"] for row in result["results"]]
+
+        assert "kanban" in _HIDDEN_SESSION_SOURCES
+        assert "worker" not in ids
+        assert "acp-chat" in ids
+
 
 class TestFormatTimestamp:
     def test_unix_timestamp(self):

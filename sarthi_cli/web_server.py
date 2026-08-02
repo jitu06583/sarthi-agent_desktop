@@ -4017,6 +4017,7 @@ async def get_action_status(name: str, lines: int = 200):
 # them; ``GET /api/sessions/{id}`` detail reads stay complete. List callers
 # that genuinely need the full rows can pass ``?full=1``.
 _SESSION_LIST_HEAVY_FIELDS = ("system_prompt", "model_config")
+_DEFAULT_HIDDEN_SESSION_SOURCES = ("kanban", "tool")
 
 
 def _strip_session_list_rows(sessions: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -4024,6 +4025,20 @@ def _strip_session_list_rows(sessions: List[Dict[str, Any]]) -> List[Dict[str, A
         for key in _SESSION_LIST_HEAVY_FIELDS:
             s.pop(key, None)
     return sessions
+
+
+def _session_list_exclusions(
+    source: Optional[str], exclude_sources: Optional[str]
+) -> List[str]:
+    """Resolve list exclusions while preserving explicit source diagnostics."""
+    values = [s.strip() for s in (exclude_sources or "").split(",") if s.strip()]
+    if source and source.strip():
+        return values
+    seen = {value.lower() for value in values}
+    for hidden in _DEFAULT_HIDDEN_SESSION_SOURCES:
+        if hidden not in seen:
+            values.append(hidden)
+    return values
 
 
 @app.get("/api/sessions")
@@ -4077,7 +4092,7 @@ def get_sessions(
             # ``exclude_sources`` (comma-separated) drops classes. The desktop
             # uses these to split recents (exclude=cron) from the cron-jobs
             # section (source=cron) into two independent lists.
-            exclude_list = [s for s in (exclude_sources or "").split(",") if s.strip()]
+            exclude_list = _session_list_exclusions(source, exclude_sources)
             sessions = db.list_sessions_rich(
                 source=source or None,
                 exclude_sources=exclude_list or None,
@@ -4178,7 +4193,7 @@ def get_profiles_sessions(
     # the cron-jobs section passes source=cron — two independent lists so
     # newest cron sessions can't starve the recents page.
     source_filter = source or None
-    exclude_list = [s for s in (exclude_sources or "").split(",") if s.strip()]
+    exclude_list = _session_list_exclusions(source_filter, exclude_sources)
     # Over-fetch per profile so the merged+sorted window is correct for the
     # requested page. Capped so a huge profile can't blow up the response.
     per_profile = min(max(limit + offset, limit), 500)
@@ -4253,7 +4268,12 @@ def get_profiles_sessions(
 
 
 @app.get("/api/sessions/search")
-async def search_sessions(q: str = "", limit: int = 20, profile: Optional[str] = None):
+async def search_sessions(
+    q: str = "",
+    limit: int = 20,
+    profile: Optional[str] = None,
+    source: Optional[str] = None,
+):
     """Search sessions by ID plus full-text message content using FTS5.
 
     Direct session-id matches are surfaced first, then FTS message-content
@@ -4270,6 +4290,8 @@ async def search_sessions(q: str = "", limit: int = 20, profile: Optional[str] =
         db = _open_session_db_for_profile(profile)
         try:
             safe_limit = max(1, min(int(limit or 20), 100))
+            source_filter = source.strip() if source and source.strip() else None
+            hidden_sources = set() if source_filter else {"kanban", "tool"}
 
             # Walk parent_session_id to the compression root, memoized so a
             # chain of compression segments only costs one walk. We deliberately
@@ -4362,7 +4384,14 @@ async def search_sessions(q: str = "", limit: int = 20, profile: Optional[str] =
             # logs, or another Sarthi surface. FTS can't find those unless the
             # id happens to appear in message text. search_sessions_by_id is
             # SQL-bounded, so this stays cheap even with thousands of sessions.
-            for row in db.search_sessions_by_id(q, limit=safe_limit, include_archived=True):
+            id_fetch_limit = max(safe_limit * 5, 50)
+            for row in db.search_sessions_by_id(
+                q,
+                limit=id_fetch_limit,
+                include_archived=True,
+                source=source_filter,
+                exclude_sources=list(hidden_sources) or None,
+            ):
                 sid = row.get("id")
                 preview = (row.get("preview") or "").strip()
                 snippet = preview or f"Session ID: {sid}"
@@ -4391,11 +4420,21 @@ async def search_sessions(q: str = "", limit: int = 20, profile: Optional[str] =
             # Over-fetch so lineage dedup can still surface `limit` distinct
             # conversations even when several hits collapse onto one root.
             fetch_limit = max(safe_limit * 5, 50)
-            matches = db.search_messages(query=prefix_query, limit=fetch_limit)
+            matches = db.search_messages(
+                query=prefix_query,
+                source_filter=[source_filter] if source_filter else None,
+                exclude_sources=list(hidden_sources) or None,
+                limit=fetch_limit,
+            )
 
             for m in matches:
                 if len(seen) >= safe_limit:
                     break
+                match_source = str(m.get("source") or "").strip().lower()
+                if source_filter and match_source != source_filter.lower():
+                    continue
+                if match_source in hidden_sources:
+                    continue
                 add_lineage_result(
                     m["session_id"],
                     {

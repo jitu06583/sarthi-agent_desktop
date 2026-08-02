@@ -9,6 +9,7 @@ const SOURCE_LABELS: Record<string, string> = {
   discord: 'Discord',
   email: 'Email',
   gateway: 'Gateway',
+  kanban: 'Kanban',
   local: 'Local',
   matrix: 'Matrix',
   mattermost: 'Mattermost',
@@ -40,8 +41,11 @@ const SOURCE_ALIASES: Record<string, string[]> = {
 // platform. A handoff *from* one of these isn't a platform origin worth a badge.
 // Exported so the recents fetch can keep these in the main list while the
 // messaging fetch excludes them.
-export const LOCAL_SESSION_SOURCE_IDS = ['cli', 'codex', 'desktop', 'gateway', 'local', 'tui']
+export const LOCAL_SESSION_SOURCE_IDS = ['cli', 'codex', 'desktop', 'gateway', 'kanban', 'local', 'tui']
 const LOCAL_SOURCE_IDS = new Set(LOCAL_SESSION_SOURCE_IDS)
+
+export const INTERNAL_SESSION_SOURCE_IDS = ['kanban', 'subagent', 'tool']
+const INTERNAL_SOURCE_IDS = new Set(INTERNAL_SESSION_SOURCE_IDS)
 
 // External messaging platforms that each get their own self-managed sidebar
 // section (fetched separately from local recents). Mirrors the gateway platform
@@ -75,6 +79,13 @@ export function isMessagingSource(source: null | string | undefined): boolean {
   const id = normalizeSessionSource(source)
 
   return id != null && MESSAGING_SOURCE_IDS.has(id)
+}
+
+/** Internal execution sessions that must not appear as human conversations. */
+export function isInternalSessionSource(source: null | string | undefined): boolean {
+  const id = normalizeSessionSource(source)
+
+  return id != null && INTERNAL_SOURCE_IDS.has(id)
 }
 
 export function normalizeSessionSource(source: null | string | undefined): string | null {

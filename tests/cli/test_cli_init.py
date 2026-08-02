@@ -496,6 +496,10 @@ class TestHistoryDisplay:
         assert "Recent sessions" in output
         assert "Checking Running Sarthi Agent" in output
         assert "20260401_201329_d85961" in output
+        assert set(cli._session_db.list_sessions_rich.call_args.kwargs["exclude_sources"]) == {
+            "kanban",
+            "tool",
+        }
 
     def test_sessions_list_subcommand_lists_recent_sessions(self, capsys):
         """/sessions list is an explicit alias for the no-arg list view."""
