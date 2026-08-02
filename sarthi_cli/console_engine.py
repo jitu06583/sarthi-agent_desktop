@@ -1571,7 +1571,7 @@ def _sessions_list(_engine: SarthiConsoleEngine, args: list[str]) -> str:
     db = SessionDB()
     try:
         sessions = db.list_sessions_rich(
-            exclude_sources=["tool"],
+            exclude_sources=["kanban", "tool"],
             limit=ns.limit,
             order_by_last_active=True,
         )
@@ -1587,7 +1587,7 @@ def _sessions_stats(_engine: SarthiConsoleEngine, args: list[str]) -> str:
     db = SessionDB()
     try:
         total = db.session_count()
-        listable = db.session_count(exclude_children=True, exclude_sources=["tool"])
+        listable = db.session_count(exclude_children=True, exclude_sources=["kanban", "tool"])
         messages = db.message_count()
         lines = [
             f"Total sessions: {total}",

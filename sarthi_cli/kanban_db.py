@@ -7465,6 +7465,13 @@ def dispatch_once(
     boards tick in parallel. See :func:`_dispatch_tick_lock` for the
     cross-process / cross-platform mechanics.
     """
+    # Run metadata-only legacy cleanup independently of spawning and before
+    # taking the board dispatch lock. SessionDB performs its own short,
+    # page-bounded transactions; a large profile history must not stall the
+    # board's cross-process single-writer lock.
+    if not dry_run:
+        _retag_board_assignee_sessions(conn, board)
+
     try:
         db_path = kanban_db_path(board=board)
     except Exception:
@@ -8166,6 +8173,62 @@ def _resolve_worker_cli_toolsets(sarthi_home: Optional[str]) -> Optional[list[st
         return None
 
 
+def _retag_legacy_worker_sessions(
+    workspaces_root_path: str,
+    profile_home: str,
+) -> None:
+    """Best-effort reclaim of legacy worker rows for one profile and board.
+
+    Worker conversations live in the assignee profile's ``state.db``, not the
+    dispatcher's database. The migration is idempotent and deliberately runs
+    per spawn so rows restored while a dispatcher is alive are reclaimed.
+    """
+    if not profile_home or not os.path.isabs(profile_home):
+        return
+    profile_db = Path(profile_home).expanduser() / "state.db"
+    try:
+        from sarthi_state import SessionDB
+
+        db = SessionDB(db_path=profile_db)
+        try:
+            db.retag_kanban_worker_sessions(workspaces_root_path)
+        finally:
+            db.close()
+    except Exception as exc:
+        _log.debug("kanban worker: legacy session retag skipped (%s)", exc)
+
+
+def _retag_board_assignee_sessions(
+    conn: sqlite3.Connection,
+    board: Optional[str],
+) -> None:
+    """Best-effort legacy migration for every profile represented on a board."""
+    try:
+        rows = conn.execute(
+            "SELECT DISTINCT assignee FROM tasks "
+            "WHERE assignee IS NOT NULL AND TRIM(assignee) != ''"
+        ).fetchall()
+        if not rows:
+            return
+        from sarthi_cli.profiles import normalize_profile_name, resolve_profile_env
+
+        root = str(workspaces_root(board=board))
+        for row in rows:
+            try:
+                profile = normalize_profile_name(str(row["assignee"]))
+                profile_home = resolve_profile_env(profile)
+            except Exception as exc:
+                _log.debug(
+                    "kanban dispatcher: profile %r legacy retag skipped (%s)",
+                    row["assignee"],
+                    exc,
+                )
+                continue
+            _retag_legacy_worker_sessions(root, profile_home)
+    except Exception as exc:
+        _log.debug("kanban dispatcher: legacy session retag skipped (%s)", exc)
+
+
 def _default_spawn(
     task: Task,
     workspace: str,
@@ -8194,6 +8257,31 @@ def _default_spawn(
 
     prompt = f"work kanban task {task.id}"
     env = dict(os.environ)
+    # Detached workers must never inherit a chat/UI/ACP return address from the
+    # dispatcher.  Strip every session-context bridge key before assigning the
+    # worker-owned source below.
+    from gateway.session_context import _VAR_MAP
+
+    for key in _VAR_MAP:
+        env.pop(key, None)
+    for key in (
+        "SARTHI_GATEWAY_SESSION",
+        "SARTHI_DESKTOP",
+        "SARTHI_EXEC_ASK",
+        "SARTHI_INTERACTIVE",
+        "SARTHI_DESKTOP_TERMINAL",
+        "SARTHI_TUI_PASS_SESSION_ID",
+    ):
+        env.pop(key, None)
+    # A dispatcher profile home is never a valid fallback for an assignee. If
+    # profile resolution fails below, let the child CLI resolve ``-p`` itself
+    # instead of reading/writing the dispatcher's state and credentials.
+    env.pop("SARTHI_HOME", None)
+    # Dispatcher workers are internal runs, not conversations the user started.
+    # Own the Sarthi source tag explicitly and discard the upstream compatibility
+    # name so an inherited parent environment cannot misroute the child.
+    env["SARTHI_SESSION_SOURCE"] = "kanban"
+    env.pop("HERMES_SESSION_SOURCE", None)
 
     # Inject SARTHI_HOME so the worker reads the profile-scoped config.yaml
     # (fallback_providers, toolsets, agent settings, etc.) instead of the root
@@ -8264,6 +8352,11 @@ def _default_spawn(
     # but unusual symlink / Docker layouts are caught here too.
     env["SARTHI_KANBAN_DB"] = str(kanban_db_path(board=board))
     env["SARTHI_KANBAN_WORKSPACES_ROOT"] = str(workspaces_root(board=board))
+    if env.get("SARTHI_HOME"):
+        _retag_legacy_worker_sessions(
+            env["SARTHI_KANBAN_WORKSPACES_ROOT"],
+            env["SARTHI_HOME"],
+        )
     # Board slug — the final defense-in-depth pin. If the worker ever
     # resolves kanban paths without the DB / workspaces env vars, the
     # board slug still forces it to the right directory.

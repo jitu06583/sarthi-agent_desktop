@@ -7421,13 +7421,16 @@ def test_session_activate_switches_live_session_without_closing_siblings(monkeyp
 
 
 def test_session_most_recent_returns_first_non_denied(monkeypatch):
-    """Drops `tool` rows like session.list does, returns the first hit."""
+    """Drops internal tool/kanban rows and keeps a human TUI row."""
 
     class _DB:
-        def list_sessions_rich(self, *, source=None, limit=200, order_by_last_active=False, compact_rows=False):
+        def list_sessions_rich(
+            self, *, source=None, exclude_sources=None, limit=200,
+            order_by_last_active=False, compact_rows=False
+        ):
+            assert set(exclude_sources) == {"kanban", "tool"}
             return [
-                {"id": "tool-1", "source": "tool", "title": "noise", "started_at": 100},
-                {"id": "tui-1", "source": "tui", "title": "real", "started_at": 99},
+                {"id": "tui-1", "source": "tui", "title": "real", "started_at": 98},
             ]
 
     monkeypatch.setattr(server, "_get_db", lambda: _DB())
@@ -7441,10 +7444,55 @@ def test_session_most_recent_returns_first_non_denied(monkeypatch):
     assert resp["result"]["source"] == "tui"
 
 
+def test_session_list_hides_kanban_but_keeps_acp(monkeypatch):
+    class _DB:
+        def list_sessions_rich(
+            self, *, source=None, exclude_sources=None, limit=200,
+            order_by_last_active=False, compact_rows=False
+        ):
+            assert set(exclude_sources) == {"kanban", "tool"}
+            return [
+                {"id": "acp-1", "source": "acp", "title": "Multica task", "started_at": 99},
+            ]
+
+    monkeypatch.setattr(server, "_get_db", lambda: _DB())
+
+    resp = server.handle_request({"id": "1", "method": "session.list", "params": {}})
+
+    assert [row["id"] for row in resp["result"]["sessions"]] == ["acp-1"]
+
+
+def test_session_list_and_most_recent_filter_before_pagination(monkeypatch, tmp_path):
+    from sarthi_state import SessionDB
+
+    db = SessionDB(db_path=tmp_path / "state.db")
+    try:
+        db.create_session("human-acp", "acp")
+        for index in range(201):
+            db.create_session(f"worker-{index:03d}", "kanban")
+        monkeypatch.setattr(server, "_get_db", lambda: db)
+
+        listed = server.handle_request(
+            {"id": "1", "method": "session.list", "params": {"limit": 100}}
+        )
+        assert [row["id"] for row in listed["result"]["sessions"]] == ["human-acp"]
+
+        recent = server.handle_request(
+            {"id": "2", "method": "session.most_recent", "params": {}}
+        )
+        assert recent["result"]["session_id"] == "human-acp"
+    finally:
+        db.close()
+
+
 def test_session_most_recent_returns_null_when_only_tool_rows(monkeypatch):
     class _DB:
-        def list_sessions_rich(self, *, source=None, limit=200, order_by_last_active=False, compact_rows=False):
-            return [{"id": "tool-1", "source": "tool", "started_at": 1}]
+        def list_sessions_rich(
+            self, *, source=None, exclude_sources=None, limit=200,
+            order_by_last_active=False, compact_rows=False
+        ):
+            assert set(exclude_sources) == {"kanban", "tool"}
+            return []
 
     monkeypatch.setattr(server, "_get_db", lambda: _DB())
 
@@ -7461,7 +7509,10 @@ def test_session_most_recent_folds_db_exception_into_null_result(monkeypatch):
     'no answer' (Copilot review on #17130)."""
 
     class _BrokenDB:
-        def list_sessions_rich(self, *, source=None, limit=200, order_by_last_active=False, compact_rows=False):
+        def list_sessions_rich(
+            self, *, source=None, exclude_sources=None, limit=200,
+            order_by_last_active=False, compact_rows=False
+        ):
             raise RuntimeError("db locked")
 
     monkeypatch.setattr(server, "_get_db", lambda: _BrokenDB())

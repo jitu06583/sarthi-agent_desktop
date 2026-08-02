@@ -6794,7 +6794,7 @@ class SarthiCLI(CLIAgentSetupMixin, CLICommandsMixin):
                 include_all_sources=False,
                 include_unnamed=True,
                 limit=limit,
-                exclude_sources=["tool"],
+                exclude_sources=["kanban", "tool"],
             )
         except Exception:
             return []

@@ -1,5 +1,10 @@
 """Tests for the shared session-listing helpers (sarthi_cli/session_listing.py)."""
 
+import os
+import subprocess
+import sys
+from pathlib import Path
+
 import pytest
 
 from sarthi_cli.session_listing import (
@@ -97,3 +102,64 @@ class TestQuerySessionListingSearch:
 
     def test_plain_listing_still_hides_unnamed(self, db):
         assert self._ids(db, source="telegram") == ["sess_an94"]
+
+
+def test_sessions_cli_hides_internal_workers_unless_source_is_explicit(tmp_path):
+    from sarthi_state import SessionDB
+
+    home = tmp_path / ".sarthi"
+    home.mkdir()
+    db = SessionDB(db_path=home / "state.db")
+    try:
+        for session_id, source in (
+            ("human-cli", "cli"),
+            ("human-acp", "acp"),
+            ("hidden-kanban", "kanban"),
+            ("hidden-tool", "tool"),
+        ):
+            db.create_session(session_id=session_id, source=source)
+    finally:
+        db.close()
+
+    root = Path(__file__).resolve().parents[2]
+    env = os.environ.copy()
+    env["SARTHI_HOME"] = str(home)
+    env["PYTHONPATH"] = os.pathsep.join(
+        part for part in (str(root), env.get("PYTHONPATH", "")) if part
+    )
+    command = [
+        sys.executable,
+        "-m",
+        "sarthi_cli.main",
+        "sessions",
+        "list",
+        "--limit",
+        "100",
+    ]
+
+    default = subprocess.run(
+        command,
+        cwd=root,
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=60,
+        check=False,
+    )
+    assert default.returncode == 0, default.stderr
+    assert "human-cli" in default.stdout
+    assert "human-acp" in default.stdout
+    assert "hidden-kanban" not in default.stdout
+    assert "hidden-tool" not in default.stdout
+
+    diagnostic = subprocess.run(
+        [*command, "--source", "kanban"],
+        cwd=root,
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=60,
+        check=False,
+    )
+    assert diagnostic.returncode == 0, diagnostic.stderr
+    assert "hidden-kanban" in diagnostic.stdout

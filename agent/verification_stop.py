@@ -92,6 +92,7 @@ _NON_MESSAGING_SESSION_SURFACES = frozenset(
         "gateway",
         "local",
         "tui",
+        "kanban",
         "tool",
         "api_server",
         "webhook",

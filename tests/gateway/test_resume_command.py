@@ -435,6 +435,22 @@ class TestHandleSessionsCommand:
     """Tests for GatewayRunner._handle_sessions_command."""
 
     @pytest.mark.asyncio
+    async def test_sessions_query_excludes_internal_kanban_workers(self):
+        captured = {}
+
+        class _DB:
+            def list_sessions_rich(self, **kwargs):
+                captured.update(kwargs)
+                return []
+
+        event = _make_event(text="/sessions")
+        runner = _make_runner(session_db=_DB(), event=event)
+
+        await runner._handle_sessions_command(event)
+
+        assert set(captured["exclude_sources"]) == {"kanban", "tool"}
+
+    @pytest.mark.asyncio
     async def test_sessions_command_lists_current_platform_sessions(self, tmp_path):
         from sarthi_state import SessionDB
         db = SessionDB(db_path=tmp_path / "state.db")

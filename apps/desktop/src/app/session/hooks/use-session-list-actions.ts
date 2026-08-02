@@ -3,6 +3,8 @@ import { useCallback, useRef } from 'react'
 import { getCronJobs, listAllProfileSessions, type SessionInfo } from '@/sarthi'
 import { sameCronSignature } from '@/lib/session-signatures'
 import {
+  INTERNAL_SESSION_SOURCE_IDS,
+  isInternalSessionSource,
   isMessagingSource,
   LOCAL_SESSION_SOURCE_IDS,
   MESSAGING_SESSION_SOURCE_IDS,
@@ -35,7 +37,7 @@ import {
 // self-managed sidebar section (refreshMessagingSessions). Excluding both here
 // keeps "Load more" paging through interactive local chats instead of
 // interleaving gateway threads that bury them.
-const SIDEBAR_EXCLUDED_SOURCES = ['cron', 'subagent', 'tool', ...MESSAGING_SESSION_SOURCE_IDS]
+const SIDEBAR_EXCLUDED_SOURCES = ['cron', ...INTERNAL_SESSION_SOURCE_IDS, ...MESSAGING_SESSION_SOURCE_IDS]
 // The messaging slice is the inverse: drop cron + every local source so only
 // external-platform conversations remain, then split per platform in the UI.
 const MESSAGING_EXCLUDED_SOURCES = ['cron', ...LOCAL_SESSION_SOURCE_IDS]
@@ -175,9 +177,10 @@ export function useSessionListActions({ profileScope }: UseSessionListActionsArg
       const result = await listAllProfileSessions(limit, 1, 'exclude', 'recent', sessionProfile, {
         excludeSources: SIDEBAR_EXCLUDED_SOURCES
       })
+      const visibleSessions = result.sessions.filter(s => !isInternalSessionSource(s.source))
 
       if (refreshSessionsRequestRef.current === requestId) {
-        setSessions(prev => mergeSessionPage(prev, result.sessions, sessionsToKeep()))
+        setSessions(prev => mergeSessionPage(prev, visibleSessions, sessionsToKeep()))
         setSessionsTotal(typeof result.total === 'number' ? result.total : result.sessions.length)
         setSessionProfileTotals(result.profile_totals ?? {})
       }
@@ -209,10 +212,11 @@ export function useSessionListActions({ profileScope }: UseSessionListActionsArg
     })
 
     const keep = sessionsToKeep(key)
+    const visibleSessions = result.sessions.filter(s => !isInternalSessionSource(s.source))
 
     setSessions(prev => [
       ...prev.filter(s => !inKey(s)),
-      ...mergeSessionPage(prev.filter(inKey), result.sessions, keep)
+      ...mergeSessionPage(prev.filter(inKey), visibleSessions, keep)
     ])
 
     const total = result.profile_totals?.[key] ?? result.total ?? result.sessions.length
