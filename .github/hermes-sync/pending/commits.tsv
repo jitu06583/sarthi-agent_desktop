@@ -1,0 +1,645 @@
+sha	author_date	author	subject
+a6c0803f59c98e394e391266c78a54b71d29031f	2026-07-29T02:27:53-03:00	joaomarcos	fix(web_server): stop Codex OAuth worker from finishing after cancel
+540ca0d0369324dd9cb87fc52cf68bd2b15f027d	2026-07-29T03:14:37-03:00	joaomarcos	chore: retrigger CI
+7b5997f11195cbbcef15e0ce8fb1a7f277e9fd1e	2026-07-29T16:41:39-03:00	joaomarcos	fix(codex): don't retry after a valid response.completed on drain error
+b0785fc1a19afa84ba693ccd5f8a82c79da2f729	2026-07-31T02:43:12-03:00	joaomarcos	Merge remote-tracking branch 'origin/main' into HEAD
+5aa7594993a4a2c475481c9f61c56651817ac250	2026-07-31T03:35:08-03:00	joaomarcos	Merge remote-tracking branch 'origin/main' into fix-73914-atomic-cancel
+e444d165807f489b5c1ab8e4a612c8d09c2e67a2	2026-07-31T17:43:37-04:00	Austin Pickett	fix(vision): make desktop image uploads reachable from profile Docker sandboxes (#69575) (#75671)
+696c2e82655f05f21fd67408b35f5cc8a31b42a2	2026-07-31T22:49:07-05:00	Brooklyn Nicholson	feat(desktop): open Plugins from the command palette
+8555c6d67a71bf4c54689aa884422a60ec173a5b	2026-07-31T22:55:28-05:00	brooklyn!	Merge pull request #75822 from NousResearch/bb/cmdk-plugins
+6b3d8cf2f17e559f2e644ce3e722c9ceba906ac6	2026-07-31T23:00:57-05:00	Brooklyn Nicholson	fix(desktop): open the review pane from the branch and diff counts only
+6debeb083662ba1d4ce9620e8b617b1a210cbbcc	2026-07-31T23:04:44-05:00	Brooklyn Nicholson	fix(gateway): announce backend-reclaimed sessions to their clients
+2b039d90e3b9742c4284cf089a65c03d63892387	2026-07-31T23:04:44-05:00	Brooklyn Nicholson	test(gateway): cover the session.reclaimed broadcast contract
+9824e9585cfe8697395c60f4b37518e37a0bcf10	2026-07-31T23:04:45-05:00	Brooklyn Nicholson	fix(desktop): drop cached state for a reclaimed session
+54ddc96b6901b1cb92f638fe55a51c195936e300	2026-07-31T23:09:23-05:00	Brooklyn Nicholson	fix(desktop): keep the coding strip's layout byte-identical
+4579838fd31b6abe51d02ef92827a7139755a508	2026-07-31T23:11:32-05:00	brooklyn!	Merge pull request #75836 from NousResearch/bb/session-reap-notify
+89f920901b0715b38e7b475eaa756f55e070dbc0	2026-07-31T17:08:06-07:00	Teknium	feat(mcp): warn on hidden whitespace in MCP config values
+7fb5d2bc39bd2132dca7926c86f2a3644a383378	2026-07-26T17:10:55-07:00	teknium1	fix(process): decode background process output with incremental UTF-8 decoders
+cfc5dd6aaa40b74152efcc16afd2fc633204d930	2026-04-05T17:01:47-04:00	CK iRonin.IT	feat(stash): multi-item stash with browsable panel
+a55a52c72f0a7d09af11786f2e7eb4a1cc572a7e	2026-07-26T14:34:38-07:00	teknium1	feat(cli): complete the Ctrl+S prompt stash — keybinding, state machine, tests
+5686ea43d4651091332dde2f795dff851d8ed1b1	2026-07-26T15:00:50-07:00	teknium1	test(stash): drop source-text keybinding assertions (banned antipattern)
+9704ed86c13d0b14a1fe9294636ef6b91fb3e934	2026-07-26T14:34:14-07:00	teknium1	feat(cli): ! shell mode — run a command without spending a model turn
+f21332f07384cf1582be2b96e7e64dbc18fba0b8	2026-07-28T22:38:29-07:00	mromano3	ci(security): include photon sidecar + whatsapp bridge lockfiles in OSV scan
+950fe236d0e08d0739d6a2bd90290c30ebcf5272	2026-07-26T17:16:47-07:00	teknium1	fix(security): extend secret redaction to GitLab token families
+dc87d155867b64d1565afd327156e9d5a348f286	2026-07-26T17:08:49-07:00	teknium1	feat(terminal): raise Docker sandbox /dev/shm to 1g by default (configurable)
+564e9b90afe788083d4b766a012ff4b84d359d9b	2026-07-30T19:03:32Z	Victor Kyriazakos	fix(providers): recognize OpenAI data-residency hosts via one shared predicate
+33a2f29a6334b91539aef22f954a8f9ba2390884	2026-07-30T19:03:32Z	Victor Kyriazakos	fix(runtime): fall back to the provider's declared transport, not chat_completions
+173a73e19192f403060b574240c1855f98fcde4d	2026-07-30T19:03:32Z	Victor Kyriazakos	fix(models): honor model.base_url in OpenAI discovery, cache identity, and listing authority
+008f1efe087feebd4ec76677c2f8f78908ae5f0f	2026-07-30T19:03:33Z	Victor Kyriazakos	refactor(providers): delegate is_official_openai_host to base_url_host_matches
+e08870f62c5904461a9249ec978b8aa0b40cc3d0	2026-07-31T23:43:35-05:00	brooklyn!	Merge pull request #75831 from NousResearch/bb/coding-row-hitbox
+de46fb03655db5ac083bfabaea4eb1656eeaab92	2026-07-31T23:48:56-05:00	Brooklyn Nicholson	fix(desktop): make the terminal toggle work wherever the terminal sits
+4802d2d88d92bff9812d0544fd983b4daacea407	2026-07-31T23:49:11-05:00	Brooklyn Nicholson	fix(desktop): keep a hidden zone header hidden
+aca571ef49368f74fb6e004a77fd58b92f9d80ba	2026-07-31T23:49:28-05:00	Brooklyn Nicholson	feat(desktop): let a tool panel shrink to its collapsed header
+16431b8ab282d7579a5971c7278ca18bd077fe16	2026-07-31T23:49:28-05:00	Brooklyn Nicholson	test(desktop): cover the tool-panel toggle and hidden-header regressions
+991f5f1e9e192ee8039ad5245401798a925fb380	2026-07-31T13:07:28-06:00	Gille	fix(kanban): deliver notifications from non-dispatch gateways
+654915f187d45c1e29e618fb419abb43adee6a5f	2026-07-31T11:53:17+08:00	AKAZIK-py	fix(moa): unwrap completed responses in the auxiliary streaming path
+52705e496fedf54fe6de8f4f514b352e95e2e28c	2026-07-31T11:53:17+08:00	AKAZIK-py	test(moa): cover call_llm(stream=True) completed-response unwrap at the outermost seam
+c23ff21d7ce80f7ec531ccbccc243236ecd89689	2026-07-31T11:53:17+08:00	AKAZIK-py	fix(moa): carry completed responses through the managed Relay path
+8e191af0fb1def683f49feb40fd73149cd5750b0	2026-07-31T21:50:00-07:00	knocksen	fix(moa): stream completed aggregator responses safely
+716d274f5814c930d670f814de54ae21ad81cf7a	2026-07-31T21:51:00-07:00	knocksen	test(moa): cover direct provider streaming for Codex-shim aggregators
+743c4906d928f650f367d5b8161dc2b0a3acdae1	2026-07-31T21:51:17-07:00	knocksen	fix(moa): restore a valid preset after fallback model drift
+48ded07155ef379d2e0d5e70b729a2943b1b4744	2026-07-29T20:07:56-06:00	Kyle	fix(codex): handle completed auxiliary responses
+35724244025a183418c236097a4de1f79868c23b	2026-07-31T23:59:36-05:00	Brooklyn Nicholson	fix(desktop): put Toggle terminal on the ⌘K on/off pattern
+1a2eee0d637c98c36c4ddf3863e1175c33d3b8db	2026-08-01T00:06:42-05:00	Brooklyn Nicholson	feat(desktop): paint the integrated terminal with the transcript background
+6f756272f8e240793ebb64f030a315ae5c807e43	2026-08-01T00:06:48-05:00	Brooklyn Nicholson	fix(desktop): stop the agent terminal falling back to a white background
+75fb139977f24810efab8f8aba254bfa77d426bc	2026-08-01T00:09:43-05:00	Brooklyn Nicholson	fix(desktop): make the logs pane summon-only via the command palette
+b0d1e803a997aff314e7ed709d92bfc241c893c7	2026-08-01T00:16:09-05:00	brooklyn!	Merge pull request #75869 from NousResearch/bb/terminal-theme-bg
+e25aa3a3387d88145d2184c95442cc1b891bc356	2026-08-01T00:18:59-05:00	brooklyn!	Merge pull request #75873 from NousResearch/bb/logs-cmdk-only
+0454b370d1d9283f944643c0bff92a4e9bbd0b67	2026-08-01T00:21:11-05:00	brooklyn!	Merge pull request #75862 from NousResearch/bb/cmdk-on-off
+24f346ee7770c8d3a7ffded11a4c500fb953f4b4	2026-08-01T00:27:17-05:00	Brooklyn Nicholson	fix(gateway): fail prompt.submit when session storage hits a full disk
+69902c203e2b83f21cba9a596b5b8a5b1638eab0	2026-08-01T00:27:17-05:00	Brooklyn Nicholson	fix(desktop): toast when a send fails because the disk is full
+a7c26bbb5cf3e83f653b9debd6962d2a839f5c27	2026-07-28T09:06:54+01:00	Yorkstone Supplies (sycamoregroupltd)	fix(deps): pin patched httplib2 for google extra
+37e42808e73fefda2c239efe26f428176a44776b	2026-07-29T09:16:48+01:00	Yorkstone Supplies (sycamoregroupltd)	fix(security): pin httplib2==0.32.0 in setup.py REQUIRED_PACKAGES (GHSA-j5g9-f88f-gfj3)
+859573d283f3eb9a47ab1585631b9f3be37a4868	2026-07-31T21:34:44-07:00	Teknium	test: import LAZY_DEPS directly and make httplib2 pin a floor invariant
+087b2230c4651743541078fcd1827e6d1f9be8d1	2026-07-31T21:43:10-07:00	teknium1	fix(desktop): accept scheme-less host:port in the remote gateway URL field
+6e8691f432127e4b798b0421a1ba0462ef5dfdd7	2026-07-30T16:42:40+08:00	xenodmc	fix(update): fallback to ancestor-PID check for Windows update lock handoff
+ed77a347307e2e9c7f967ae146c4d3148a63433d	2026-07-31T21:42:55-07:00	Teknium	fix(update): make the ancestor-PID lock handoff cross-platform via psutil
+ada3663ce72f9d49d42a16a48986626b7b39dcdd	2026-07-31T11:53:17+08:00	AKAZIK-py	fix(moa): unwrap completed responses in the auxiliary streaming path
+8fde4ff9d8a83bdc9357d8305563a243721d00e9	2026-07-31T11:53:17+08:00	AKAZIK-py	test(moa): cover call_llm(stream=True) completed-response unwrap at the outermost seam
+fdfddb55cbf0ef14330472021c6f3062aba44b49	2026-07-31T11:53:17+08:00	AKAZIK-py	fix(moa): carry completed responses through the managed Relay path
+df8e42877b4980ccace8d475b3da81c453c5f175	2026-07-31T22:30:47-07:00	Teknium	Merge pull request #75852 from NousResearch/fix/moa-completed-response-streaming-cluster
+7779409a767385055d865bc68ae0ba7635fbc61f	2026-07-23T19:02:42-07:00	dstkwll	fix(copilot): recover from stale/degraded token 400 AND expired IDE-token 401
+1737741730c3d537bcb95ea28b985ca8852d572c	2026-07-31T21:59:55-07:00	Teknium	fix(copilot): follow-ups for salvaged PR #58743
+2f2d90344c8dfa6898d23371db5fb80aa638f7d3	2026-07-31T22:05:02-07:00	Teknium	fix(copilot): add explicit UTF-8 encoding to JWT store read/write
+29eac371d1b0c4eba9f2952f98dc0649f1b7a27d	2026-07-30T20:26:46-06:00	Gille	fix(context): persist NVIDIA DeepSeek endpoint limit
+4e6299af48a9b0a71bdad1a0dc4d750c770befbe	2026-07-31T19:07:33+05:30	praneshnikhar	fix(credential_pool): use source-path-based write-through to root (#74339)
+35b44e0d5f3fd5caa7157f76f72467c6a92c279f	2026-08-01T09:22:31+05:30	praneshnikhar	fix(auth): apply same source-path write-through fix to non-pool xAI path
+ae8131ba1ba9340facb84a9cbdf4ed330476986f	2026-07-31T21:50:06-07:00	Teknium	chore: map contributor praneshnikhar
+0fd0db1a8c1d2a2d58853f8937cce1519f840b55	2026-07-17T19:14:32+03:00	Xipong	fix(agent): preserve /steer through turn-budget enforcement
+abd10ba7c90f6b64dd77f661eeff6fa16c8dd837	2026-07-20T17:08:25+03:00	Xipong	test(agent): cover malformed steer budget path
+0af8fb05bfd634d2d96ce2cbc0d2826f148c3942	2026-07-30T16:41:28+03:00	Xipong	fix(delegation): prevent child HERMES_SESSION_ID leak into parent process env
+b0040414987c7fa6566bf3df8c9470cab791fafe	2026-07-31T15:05:26-04:00	spfcraze	fix(cron): close GitHub auth-header exemption abuse in prompt scanner
+3b1dfca207235c913c3ead15cd85477d671c56d6	2026-07-31T21:59:36-07:00	Teknium	chore: map contributor spfcraze
+2ace68ad378ed0375f9f10e39bcfad7bff628b5f	2026-07-27T08:03:44+08:00	Zeraphim	fix(background-review): reject unresolved failures as skills
+e050ca97ff60d03a2110fb2dd129ff77723d5edd	2026-07-31T05:08:55+08:00	Zeraphim	test(background-review): reanchor unresolved-failure coverage
+11f4c213a5605e125a2871fee0df27f56701a02f	2026-07-31T22:01:47-07:00	Teknium	chore: map contributor Zeraphim
+99cfa8f06392588bc3bffd3f9ff70c097fa16e1d	2026-07-31T19:20:18+07:00	Baophan00	fix(config): guard against scalar overwrite of mapping sections (#74995)
+a017297cf140c58f5f4e2a4f8879506daf10f29e	2026-07-31T20:05:44+07:00	Baophan00	fix(config): respect --force for bare model key overwrite
+67d4800d670d4beca3843dbafd48973158affc86	2026-07-31T22:04:35-07:00	Teknium	docs(config): document --force destructive-replace semantics
+de6a672168fe29a2204edc27112f79bdb9386052	2026-07-15T15:07:03+08:00	dongjiang	fix(skills-hub): include owner in ClawHub source URLs and add retry on 429 (#51236)
+dd15a28250b543d231f66fd22a0fcdc7b6ac3f61	2026-07-31T22:06:28-07:00	Teknium	chore: map contributor dongjiang1989
+cc0146f2de447faa10badef8585c1da6cb04a7a2	2026-07-15T15:53:57+08:00	dongjiang	fix(cli): dispatch /indicator to set the busy-indicator style (#50618)
+484e451cb5c261ff59d53a80f7599087550b4a74	2026-07-31T22:19:25-07:00	Teknium	fix(tui): rebind extracted config handler to shared indicator constants
+d649973751cd7fb28a5d0204441521d88862861e	2026-07-31T00:11:37+08:00	chenbin	fix(desktop): skip hermes-setup binary on macOS/Linux
+0ee9723b52c7b5483e58084f687ff6a7f470eccd	2026-07-31T08:17:55Z	zakhounet	fix(desktop): make the non-Windows updater bypass an explicit policy
+16e66e721fbd92bd0d658366936d69758e5d168f	2026-07-30T22:47:40+03:00	Kewe63	fix(desktop): break renderer-led reinstall loop on transient backend stalls
+f9522fdcefeab490aa478e26162a8af8ef347641	2026-07-31T21:50:32-07:00	Teknium	chore: map salvage contributor emails (zakhounet, Kewe63)
+9507f4382e912d200919ee6c511319f0a300a2c2	2026-07-30T13:32:37+08:00	iso2kx	fix(update): stop the venv-side launcher of each paused Windows gateway
+05504bd9f090e1825ce08d4ddd10ab9a7edf75d4	2026-07-30T13:32:37+08:00	iso2kx	test(gateway): make test_gateway collectable on Windows
+0bec37aefc454849b0016c887d4bfb9257be737a	2026-07-30T13:32:38+08:00	iso2kx	fix(desktop): don't report pausable gateways as venv-update blockers
+a31fe8db6eb701ba7a9226a19e9f09ae651a6c00	2026-07-30T13:32:38+08:00	iso2kx	fix(update): stop gateway holders the guard finds after the pause
+f3edd0e5383810231bbdc15fab8cb88a1560c662	2026-07-31T11:46:47+08:00	iso2kx	fix(desktop): use the canonical gateway matcher for the preflight exemption
+d358edd9169e5adec8910ed8e1c80e5810b6b092	2026-07-31T11:46:47+08:00	iso2kx	fix(update): snapshot venv launchers before the gateway drain
+31032b4f51a0b254b751a838f927f34baee1bd03	2026-07-31T01:27:02-04:00	MaxFreedomPollard	fix(auth): a transient read failure is not corruption
+65e9ece964988b03c777ea6a563f438cad42f2e1	2026-07-31T01:10:34-04:00	MaxFreedomPollard	fix(curator): restore the real skills tree when a rollback extract dies part-way
+eeaba3a88db906dc1bc7e86946644adbce4bbe75	2026-07-31T01:59:54-04:00	MaxFreedomPollard	fix(gateway): do not claim a destructive-slash opt-out that was not saved
+221be76e36de4f2c0c9395126a71552abe7b4a9f	2026-07-31T02:09:52-04:00	MaxFreedomPollard	fix(sessions): briefly wait out a live compression lock instead of killing the turn
+3dee0634c1436635fbcf51c87a7f32b4101a41b9	2026-07-31T02:26:06-04:00	MaxFreedomPollard	fix(cli): dispatch /background inline instead of queuing it behind the turn
+7729c183b4a2f70c3b583eee6f93e7149a4081f8	2026-07-31T02:33:56-04:00	MaxFreedomPollard	test: restore four silently shadowed definitions and guard against more
+87f5c5351a2c56e27dc271d7a865a874c18b0bfd	2026-07-31T01:15:34-04:00	MaxFreedomPollard	fix(yuanbao): await the forwarded-records loading heartbeat
+d52a1c25e03b4edccb974618d3b53752516b6a54	2026-07-29T16:30:28-03:00	joaomarcos	fix(auth): resolve fallback api keys through secret_scope, not raw env
+854007d1c30e7c868040bc1bbcd5dcee6c991cfe	2026-07-31T03:13:38-03:00	joaomarcos	fix(auth): route remaining main-agent fallback key reads through secret_scope
+99f773b136fc954f9276e21c903efd8403393a9c	2026-07-29T16:36:17-03:00	joaomarcos	fix(routing): guard persisted api_mode against provider mismatch in explicit resolution
+d1cdfcd38ab319a6b8916833ff1b34b1132799e9	2026-07-31T22:35:44-07:00	Teknium	Merge pull request #74348 from JoaoMarcos44/fix/ia-03-codex-post-terminal-retry
+0d87e5d71b374b45edcbf37dc6a21ed9e4445023	2026-07-31T00:03:44-03:00	joaomarcos	fix(api): enforce pagination bounds on session/message list routes
+3e356612632dce19cd371af99f8c21b4c9c752ba	2026-07-31T19:05:46+07:00	Baophan00	fix(gateway): /steer fallback uses _enqueue_fifo to preserve FIFO head (#75164)
+5286fe19813c2281aeea2329556360ba3654ec70	2026-07-31T20:10:08+07:00	Baophan00	fix(disk-cleanup): exclude project directories from test-pattern auto-deletion (#75403)
+6f400d2a2076915c36d33783c3a613a308dad7c0	2026-07-31T20:59:19+07:00	Baophan00	fix(disk-cleanup): re-validate stale test entries and protect new dirs from sweep
+57a807373d498a90513d3946a320ae7210733659	2026-07-31T10:26:54+03:00	Drexuxux	fix(telegram): send_image uploads still went out on the short read timeout
+4a1bff642ae6f588d6b7f7cbc4797b7c989f99c7	2026-07-31T20:22:19+03:00	Drexuxux	fix(cli): heal a bare custom provider to its config key, not its display name
+c74f4c5335ac784937689976941cc695a67dc914	2026-08-01T00:36:21-05:00	brooklyn!	Merge pull request #75890 from NousResearch/bb/disk-full-toast
+750ef49c07727f76fc60c67ece6c35f50b02e9ad	2026-07-31T22:43:38+07:00	Baophan00	fix(config): route _SECRET-suffixed keys to .env
+95cff54586601bd5c58c59d041f773825119d02b	2026-07-31T23:23:53+07:00	Baophan00	test(config): add _SECRET suffix case to env-routing parametrization
+75aeba09e0b6002c9dd771de873144a653b567d6	2026-07-31T22:36:44-07:00	Teknium	Merge pull request #73914 from JoaoMarcos44/fix/codex-oauth-cancel-race-ia01
+fa9e967a2dc9245f4ba2509ce149e1ae7bb869ec	2026-07-16T10:43:24+02:00	GodsBoy	fix(gateway): scope session lists before limiting
+4aa029bfabd366186a9927fd74f48c60b1fb71dd	2026-07-31T00:54:35+08:00	Chen Jin	fix(install): expose hermes-agent and hermes-acp launchers on PATH
+95eae03883e2c8d2839b005e5b7cfad9b31045c6	2026-07-29T18:11:57+03:00	Drexuxux	fix(gateway): offload /model context-length resolution off the event loop
+a0b29343b4df876d1c75044c618777f60eff0de9	2026-07-31T21:52:32-07:00	Teknium	fix(gateway): offload preflight-compression warning enrichment; behavioral offload tests
+a42e3e8ba49c1f533d145359a5ff25615aa6278b	2026-07-29T19:21:51-03:00	webtecnica	fix(distribution): respect distribution_owned allowlist in _copy_dist_payload
+ee5a66ae3e80a141a0146999eb6ec6d6b6d2b98a	2026-07-31T21:58:18-07:00	Teknium	fix(distribution): path-aware allowlist; preserve legacy copy-everything when omitted
+fae0c4f5f4d556a38c889ee1bef5dac4859e7944	2026-07-31T22:00:06-07:00	Teknium	fix(hindsight): create embedded profile env file owner-only (0600)
+e3bc51703469bbb26e8d1e9b7b5ec6e26176c364	2026-07-31T00:34:47Z	Israel Lot	fix(agent): stop double-counting api_content in the token estimator
+5c45d9c20886ed591d8efa33e25345c33ffac473	2026-07-31T01:38:17Z	Israel Lot	fix(agent): mirror substitute_api_content's guard in the estimator shadow
+6b6435a8748859cc256c7b1d1b4bf1a195d99197	2026-07-30T20:39:08+08:00	wz-heng	feat(cache): enable DeepSeek caching on OpenCode
+0d9892379cd77e4d658319f1b14d30c5aad6c767	2026-07-31T22:34:46-07:00	Teknium	docs(kanban): document profile-owned notification delivery in multi-gateway setups
+9ceb0858abfd1d3c3b32bd6f76e98d14ed7a2fbd	2026-07-20T17:37:22+03:00	Xipong	fix(codex): defang reserved Harmony tokens in requests
+031b0a6786a0f57dcbc6256f2ea84a3f14d16a5c	2026-08-01T00:58:32-05:00	Brooklyn Nicholson	fix(desktop): pin @assistant-ui/react back to 0.14.24
+41e4b96233fabf837b8efac06e29938a77580892	2026-08-01T00:58:32-05:00	Brooklyn Nicholson	fix(desktop): restore reactive message and composer runtime hooks
+5826450d17f0e0ce1e836f91d22882410f33e716	2026-08-01T01:03:53-05:00	Brooklyn Nicholson	fix(desktop): declare @assistant-ui/core as a direct dependency
+b5ca19118e698e9f2a24a0f52fc49a326f840ff3	2026-08-01T11:25:37+05:30	Yuanang Yang	fix(mcp): guard against duplicate spawns and stale connecting entries (#58862)
+a11d0bdb01ce30d1d05b393adf8edaca1270327b	2026-07-31T22:55:46-07:00	Teknium	fix(tests): remove stale shadowed test definitions in test_doctor.py
+1f5040bdd0f99a28469eeaf3898687ee4cb4ddd2	2026-08-01T01:13:03-05:00	brooklyn!	Merge pull request #75918 from NousResearch/bb/pin-assistant-ui-0.14
+a1f70343fd568e1c6418aa7b1f850528b0498cf4	2026-08-01T03:33:35+08:00	x7peeps	fix(agent): clamp tail-cut boundary and summary-scan indices to prevent IndexError
+d2098331e70101500b4d05c5871d2b49b967d504	2026-07-31T21:58:53-07:00	Teknium	test(agent): add compress()-level E2E regression for short tool-suffix OOB (#75588)
+8e9702d2278f358d5500e00d0004faaba5ff78d5	2026-07-29T22:46:09+05:30	Shakti Prasad Mohapatra	fix: persist session hygiene compression cooldown to state DB
+021d1914789f6ff156ef0304b4c6cf3135fcd0f1	2026-07-31T22:03:41-07:00	Teknium	test(gateway): real-DB restart regression for persisted hygiene cooldown (#74136)
+3127ddcb64631094868fb00b72ff8044564f435d	2026-07-31T19:11:31+02:00	Doud-FR	fix(agent): preserve a non-empty user query after compression
+530503a6a56516ce813716d489705e7dc3576489	2026-07-28T18:15:57+07:00	JonthanaHanh	fix: exclude reasoning_details from preflight token estimate
+3b9cf56affb9f0ce9e0149159086f8ad7569b8e6	2026-07-31T22:06:39-07:00	Teknium	fix(agent): exclude reasoning_details envelope from tail-budget walk (#73298)
+6989a797459f2c7e0029dbc909873cefb16d0dc6	2026-07-31T22:23:29-07:00	Teknium	chore: contributor email mappings (rkfshakti, x7peeps)
+609cd28b179e8e12d7f7d6558ea8f323d6ce467b	2026-08-01T01:17:41-05:00	Brooklyn Nicholson	feat(tui): rank the slash menu by the skills you actually use
+40ec9834b2af2b5700510d131d55f2b6dee540ce	2026-08-01T01:17:41-05:00	Brooklyn Nicholson	fix(tui): keep slash completion alive after a leading command
+73b8847d7bab62aa7aaaaeefbbcd65e11235bbd6	2026-08-01T01:17:45-05:00	Brooklyn Nicholson	fix(desktop): toggle every pane off the tree, not off its own boolean
+3ba67fd7bd0837c76835a5c7d347d6319e924079	2026-07-31T20:17:22+07:00	Baophan00	fix(config): preserve scalar model id when setting model sub-keys
+05103c6bdeb8a90dd000a98572cbdeb13b19b99b	2026-07-31T23:22:28+07:00	Baophan00	test(config): add regression test for scalar model sub-key preservation
+a266155cc440cacf68faf891eca3e0885a1a8829	2026-07-31T13:54:41-07:00	Jeremy	fix(cli): untrack sqlite connections only after close succeeds
+2aaeee2ee50ee46ae24de7249765eb466298a87d	2026-07-30T23:00:00-04:00	spfcraze	fix(agent): invalidate flush-scan cursor when finalizer pops db marker
+d5463e5f6d6d53d0dffb07dff64ecf5373a899df	2026-07-31T21:53:53-07:00	Teknium	fix(agent): invalidate flush-scan cursor at the defrag marker-pop sibling site
+14eca89779e5d005b4f38a1dbbbeca2c044e7f51	2026-07-31T21:56:30-07:00	Dannoob	fix(state): retry transient 'no more rows available' across all sqlite3.Error classes
+b6ca4fc856c8e8bc3bc922ed48957af853fa3dfa	2026-07-31T21:59:20-07:00	RelaxJonh	fix(state): heal session_model_usage PK unconditionally to restore token/cost accounting
+e008b62a72074a802ac4b60c1f2046ac5ea20016	2026-07-31T22:24:16-07:00	Teknium	fix(state): route no-more-rows retries through the shared patience helper; add contributor mappings
+64dd8659127df0e36817df6a7b4f2f182fd9cd80	2026-07-28T18:30:42+02:00	Eugeniusz Gilewski	fix(deps): repair Google transitive security floors (#72108)
+4773e965c0bbcaed624e001588f7f56d21a87fee	2026-08-01T11:31:59+05:30	kshitijk4poor	chore: add hans@groupg.org → hansai-art to AUTHOR_MAP
+15b0b954137b6c08c77eb06246e332e39fb3b476	2026-08-01T01:23:59-05:00	Brooklyn Nicholson	refactor(desktop): one edge-faded scroller for the whole app
+0b8a3582c6bc622f77a12bc862942cdca174f118	2026-08-01T01:24:05-05:00	Brooklyn Nicholson	fix(desktop): cap the changed-files card and fade its overflow
+feaa32503353cf2c01a94580a6588f0c263b0de4	2026-08-01T01:25:33-05:00	Brooklyn Nicholson	Merge origin/main into bb/toggle-terminal-persist
+80c86c4949901e5f87ecc648c8fff9393f411689	2026-08-01T01:26:46-05:00	Brooklyn Nicholson	fix(desktop): make the Windows app icon match native icon size
+d41d9e4faa4ab389de82d8f5dfdc055ddb2cc039	2026-08-01T01:31:30-05:00	brooklyn!	Merge pull request #75935 from NousResearch/bb/card-retire
+41e55679ee695f4d8d4e699e66ad0ca2dc489942	2026-08-01T01:32:36-05:00	brooklyn!	Merge pull request #75848 from NousResearch/bb/toggle-terminal-persist
+e5243101186f6b5e081d3098140988bc862b1f9e	2026-08-01T01:33:05-05:00	Brooklyn Nicholson	fix(desktop): render the ico truly full-bleed
+df09a90cd6f43d4cbba490fc6663eb5edc616a35	2026-07-31T20:27:46+07:00	Baophan00	fix(config): refuse to write when config.yaml has YAML syntax errors
+595be544c0402156ff8265a66c390299ce8d9273	2026-07-31T23:23:11+07:00	Baophan00	test(config): add regression tests for broken-YAML config preservation
+4be138eb0362be5716156ff3ac73d3d192d8dc07	2026-07-29T21:54:47-03:00	webtecnica	fix(config): skip URL alias without extra_headers instead of returning early (#74465)
+85148f79f78af6c5dafdf0fa4e7545ec7f7a1731	2026-08-01T01:41:24-05:00	brooklyn!	Merge pull request #75937 from NousResearch/bb/win-icon-size
+1d97c035ef102802be2c3e02829747cdb1d4f486	2026-08-01T01:49:32-05:00	Brooklyn Nicholson	fix(desktop): drag-select and ⌘C work on user bubbles again
+90e6fe4f55d6ac46f1ed66a1f4a1b90a223541af	2026-08-01T01:49:32-05:00	Brooklyn Nicholson	fix(desktop): terminal selection mirror yields to chat copy
+d1c40a731da9097f1cd4fc0d59eb45e8584bf873	2026-08-01T01:56:43-05:00	brooklyn!	Merge pull request #75949 from NousResearch/bb/fix-copy-with-reactions
+3572d4bca14307dabbfa04a5ab9326f4ef957b4f	2026-08-01T11:47:42+05:30	kshitij	fix(mcp): ensure MCP discovery completes before agent build in non-interactive sessions
+18627ff00995dc53d916e8a15f327f7ef4ba7673	2026-08-01T02:01:44-05:00	brooklyn!	Merge pull request #75931 from NousResearch/bb/tui-slash-priority
+e5ba319a5ce89442b7568be4d59f7e7a4d09b2a6	2026-08-01T12:36:57+05:30	kshitijk4poor	chore: add contributor email mappings for @Prontsevich
+dae4cf6bb6b76f98f62d6512a0d8aacf1cbfda4e	2026-07-31T19:18:46+07:00	xxxigm	fix(telegram): let pairing-bound DMs past early auth with allowlist
+29b3adf902fe278ad797d9b0341a783779fafc18	2026-07-31T19:18:46+07:00	xxxigm	test(telegram): cover allowlist + unauthorized_dm_behavior pair pass-through
+151e72a5fc808cd7f122f6894132f3ab2e63de06	2026-08-01T12:31:12+05:30	kshitij	refactor: simplify pairing check return and drop over-defensive getattr
+ba756333347d6212d5dd04b1c5ae3895d289ac84	2026-08-01T02:10:56-05:00	Brooklyn Nicholson	fix(desktop): never show the thinking indicator anywhere but the thread tail
+eb545ddea9f5b6b59011eef0e743ca1be826b1f1	2026-08-01T02:15:02-05:00	Brooklyn Nicholson	feat(desktop): ⌘-click closes a terminal rail tab
+c450fb931d4610c0aeb6946e9a3a18c6e0470d8e	2026-08-01T02:15:02-05:00	Brooklyn Nicholson	feat(desktop): switching sessions re-selects the terminal tab in its cwd
+bfc014e3a8a462290c5114a9e7f6959559a3b9bf	2026-08-01T02:18:12-05:00	brooklyn!	Merge pull request #75966 from NousResearch/bb/dither-tail-only
+57b1eb8c4d2e0c3d76c6b8d64dd531ac02aeced7	2026-08-01T02:22:30-05:00	brooklyn!	Merge pull request #75975 from NousResearch/bb/terminal-session-link
+5b4c57a7ffed913ee69ba00c487f0fbe137a1c14	2026-08-01T02:32:28-05:00	Brooklyn Nicholson	feat(desktop): shared path display collapses home to ~
+3707741d9f77de340c2eaf1b1332ca62f9ebe262	2026-08-01T02:32:28-05:00	Brooklyn Nicholson	fix(desktop): statusbar cwd follows the focused session
+883076ccd774061e376d11ba4dfb0d86b7cfd239	2026-08-01T02:32:28-05:00	Brooklyn Nicholson	feat(desktop): ⌘N/⌘T keep the focused session's project
+d109138ef5bdad2231d6be311c1cb6ec117b2631	2026-08-01T11:17:03+05:30	HeLLGURD	fix(mcp): avoid replaying historical events on startup (#13414)
+47d7b7fb1dbf5a39e91bc71cc381934f06fb3ca6	2026-08-01T02:45:47-05:00	Brooklyn Nicholson	fix(desktop): keep review/files rails at their declared size
+5657c4a54113e28ffc3989937e406975460751af	2026-08-01T02:46:40-05:00	Brooklyn Nicholson	fix(desktop): sort display-path import for eslint
+3d5f3967d56ad4e4d28e3541bfd8301a39c96c50	2026-08-01T13:20:30+05:30	kshitij	Merge pull request #75984 from kshitijk4poor/chore/contributor-emails-prontsevich
+1a25214364a39ede3534b01d5ebb9d752d183a6f	2026-08-01T02:52:43-05:00	brooklyn!	Merge pull request #75998 from NousResearch/bb/pane-size-remember
+9b1d8341b23292dce2fac670418913a61de3b2da	2026-08-01T02:53:44-05:00	brooklyn!	Merge pull request #75988 from NousResearch/bb/cwd-focus-and-display
+89f0b63da48bb41fa95fed854d9bdba48afbed5f	2026-05-26T23:37:43+03:00	Sergey Prontsevich	perf(mcp): non-blocking startup via background MCP discovery + TUI fast path
+640de6562e040bebdc7f0400e905f49e8f564a2f	2026-07-13T21:19:30+03:00	Sergey Prontsevich	fix(acp): add bounded wait + late-refresh for configured MCP servers
+23c13589dd03c9b8647d04cec85982ce171e5c35	2026-08-01T12:56:55+05:30	kshitijk4poor	fix(acp): serialize late MCP refresh with turn start + self-sufficient agent-build wait
+40e0e7ad56f7faac24c757b11d3ef6f0f9b83de4	2026-08-01T13:04:10+05:30	kshitijk4poor	docs(acp): correct late-refresh docstring — post-first-turn tools land via between-turns refresh
+7d54cb26723664de2d6c07fa6960b5a801e5b5d6	2026-08-01T14:05:29+05:30	kshitijk4poor	chore: add contributor email mapping for @rodboev
+e9d52d2bdadd3ce124a05d03893ae6b6f50ffea6	2026-08-01T13:41:31+05:30	BB-light	fix(caching): honor prompt_caching.cache_ttl disable in config
+c4e8613bbab04209ca7126679655dae27e9c5ad7	2026-08-01T14:20:17+05:30	kshitij	Merge pull request #76031 from kshitijk4poor/chore/contributor-email-rodboev
+f09c56c003c03de08c01d08084bc48e44810701b	2026-07-17T08:47:37+08:00	hans	fix(gateway): dedup model-switch markers so they don't accumulate in history
+9fc12bf7a4bc232698a14acfb18621523a711ceb	2026-07-31T14:16:45-04:00	Rod Boev	perf(prompt-caching): preserve tool-loop cache boundaries (#20880)
+34c11fa6894b6b5f843e3356151a72adbf33095d	2026-07-24T22:13:58-04:00	ajzrva-sys	fix(terminal): honor explicit config keys over stale env
+a1ff62a139aca2c5dd13a2c312731371475a583b	2026-08-01T14:10:29+05:30	kshitijk4poor	fix: context-length fallback logging, batch trajectory durability, pool cleanup
+4c2d0c7fd86daed75987921272d639e80f3b89b1	2026-08-01T14:52:14+05:30	kshitijk4poor	refactor: dedupe fallback warning per model, drive pool-cleanup tests through real run()
+e078c8c6ef9bf739257404d35a9a935a1720c893	2026-08-01T14:59:28+05:30	kshitijk4poor	fix: widen fallback warning to the sibling custom-endpoint 256K path
+7ae4a5efbaaf4173bae556963418551d07269b75	2026-08-01T15:14:13+05:30	kshitij	fix(prompt-caching): consolidate static-prefix split, guard empty volatile suffix
+af06308425a01805584fff9cdf0e909657aa5266	2026-08-01T15:17:50+05:30	kshitij	refactor(prompt-caching): collapse triplicated destination-plan and label parsing
+e7340ea28159196caa93a90810c448fab2eedd4a	2026-08-01T15:20:30+05:30	kshitij	perf(prompt-caching): make PromptCachePlan.marker_count lazy
+536754919d433f1da96990642d40f6d3395e9db6	2026-08-01T15:20:30+05:30	kshitij	fix(auxiliary): replan cache sections on the async fallback path too
+84952e89f922415f47b6e483105e1fcae95ace7f	2026-08-01T15:42:43+05:30	kshitijk4poor	chore: map tron@chriswykel.com -> Wpnx330 (PR #68334 salvage)
+13ad903a3c6a95714dcc26fca00ebaf6acebf143	2026-07-20T16:44:05+02:00	carlotestor	perf(redact): eliminate exponential backtracking in config-key patterns
+321cbcc2e2d702c0acf177f57720f4c5628c3bcb	2026-08-01T15:43:34+05:30	kshitij	test(redact): add YAML ReDoS test, strengthen existing test with keyword
+5b3c66a04f26569474cc2ef85dfe09dceb3b4fc9	2026-08-01T15:52:35+05:30	kshitij	chore: add carlotestor to contributor email directory
+d50858584c699836f11fbd75b0f27a2e32daad67	2026-08-01T15:00:02+05:30	fyzanshaik	fix(tui): preserve queued image ownership
+8daf03063dae8a78ac056cdf64247417863bbe78	2026-07-20T21:02:33-04:00	TRON	fix(compression): add pre-LLM feasibility check to skip costly no-op summaries
+85e0073902eb1809d8fea7593efa478fae62dbfc	2026-08-01T15:55:08+05:30	kshitijk4poor	refactor(compression): fold simplify-pass findings into feasibility skip
+baecc840e5fbefdca8826ca82472101f60ba50e1	2026-08-01T15:51:40+05:30	kshitij	fix(update): catch partially-updated trees that parse but can't import
+aa5d4fd6eed8c278d31f3ed1e7c9749c20c8fc2d	2026-08-01T15:54:35+05:30	kshitij	fix(update): probe the venv interpreter, not the driving one
+822571fa8ea38d61462c12b867b624e77edd54fd	2026-08-01T15:58:53+05:30	kshitij	fix(update): don't roll back a good update over uninstalled deps
+bf18710a546b42740fcc01ab85ad0d3d23c1a34f	2026-08-01T16:01:13+05:30	kshitij	fix(update): make the git-path import check non-destructive
+15cb86eba3fec5541ac57b7073d9a7e1b55ad3d2	2026-08-01T16:03:02+05:30	kshitij	refactor(update): one definition of "first-party module"
+83314ca381653ca66d0510499c81271171a7b022	2026-08-01T16:18:55+05:30	kshitij	fix(update): make the ZIP replace atomic across all entries + dedupe venv layout
+c1f36f52931dcd6d695290660e44d57259f4cc07	2026-08-01T16:24:53+05:30	kshitij	fix(update): extend atomicity to top-level files, clean up failed staging
+66ba36ec81f3923cb285441d528158ab232bcfec	2026-08-01T16:36:13+05:30	kshitij	fix(update): let callers pass the platform verdict to the venv helpers
+bbe93ab8a86874b8d0b9c812e4e622b26b92708f	2026-08-01T16:49:42+05:30	kshitij	fix(update): restore mid-swap backup before clearing leftovers in staging
+b675fb2b3e19117889c337cc2ab12e238c604e77	2026-08-01T17:11:00+05:30	kshitij	docs: correct os.replace claim and complete the hand-rolled site list
+470cf66b039c73bdd2c21d43094ce41a4db74eae	2026-08-01T17:18:01+05:30	kshitij	fix(update): discard staging litter when the commit phase fails
+fed098bbf0c104edbe232002901c43491b0c6155	2026-08-01T09:28:31-07:00	Ben Barclay	fix(gateway): use connector-owned no-clobber guard for relay thread rename + trace logs (#75912)
+a71f20dd18153420fa5a72ac1554e1a8412a644b	2026-08-01T11:37:44-05:00	Brooklyn Nicholson	feat(desktop): copy the branch-bar worktree path on hover
+d5e135a51353c2dbc489d5c2583158b22d8efd7b	2026-08-01T12:47:00-04:00	ethernet	fix(nix): update electron headers sha
+cb1e059a989acade79c44a4b2103ed495037f1e1	2026-07-31T23:33:34-07:00	Teknium	fix(agent): reader/writer path roles in parallel batch planner — search_files no longer races batched writes
+5eeafc8d250a02bb8008beae084d5a440b6d2085	2026-07-31T23:30:25-07:00	Teknium	fix(security): cache OSV malware preflight verdicts and stop double component discovery (#75485)
+8e06b30cd8b8b767f2e857be9360068c9585cee2	2026-08-01T02:00:35Z	chelsealong	fix(desktop): refuse a second update hand-off while one is already live
+64c1db961f6c7b0fa514777b33f3b2c56e559b3e	2026-08-01T02:10:33Z	chelsealong	fix(desktop): close the same handoff race in bootstrap recovery
+467c312280b01179ed74197feeccfda348790ceb	2026-07-31T22:45:51-07:00	Teknium	chore: map salvage contributor email (chelsealong)
+50d4d25ca2245c806babbb10a05f758245a0e393	2026-07-31T23:00:49-07:00	Teknium	fix(tests): stub the auth function doctor actually calls + restore dropped parametrize cases
+a22d6516df23873247c2f89c586a8e512d79fa9f	2026-07-27T23:09:05+05:30	PRATHAMESH75	fix(gateway): don't re-home a non-git session onto a repo it only visited
+8babfe95b4510e36f2121e595211b1cdf2dee4c9	2026-07-31T23:26:31-07:00	Teknium	fix(gateway): only follow settles into same-repo worktrees; never override an explicit cwd
+81c0691e1756437355865f7862ad5d0874f2ec0a	2026-08-01T00:04:55-07:00	Teknium	fix(gateway): per-profile Discord/Telegram allow-deny gates under multiplex_profiles
+c05f0bb81df4c52d41cfe07f91d90bfdf1d4946a	2026-08-01T00:50:19-07:00	Teknium	test: importorskip discord.py in the slash-gate isolation test
+30878411b8e36f43484f8bb07f6ac48be3bebcea	2026-07-31T23:46:37-07:00	Teknium	fix(gateway): stop stale streamed finalize from suppressing the complete Telegram response
+d2fa4590effcd675ba54147369f5efa856057a27	2026-07-12T08:43:40-07:00	John Lussier	fix: block persistent self-restart jobs
+31dc4f0912004e5c2c6e9e174130eff051f9767d	2026-07-12T08:57:32-07:00	John Lussier	fix: close indirect lifecycle guard bypasses
+d8b041e58b97aff00f4e42216f9f63801ea3206e	2026-07-16T18:10:25-07:00	John Lussier	fix(gateway): resolve sweeper review for indirect lifecycle guard
+56cf87432b720da71c0cf57a6cfcafa6e729f418	2026-07-31T23:29:30-07:00	Teknium	fix(gateway): add submit/bootstrap to lifecycle guard Branch B and label-independent detection
+090d146479260ee7d9253e282226af528141a55c	2026-07-31T23:25:23-07:00	Teknium	fix(desktop): stop pullRemotePins from reverting fresh local pin toggles
+f40f4711ed493e945d2946aab3a75793e5d08ea5	2026-07-31T23:26:35-07:00	konsisumer	fix(install): support non-pid-1 container entrypoints
+003af7f85ce2ebe24b38556d735a0d7678a4a8dd	2026-07-31T23:26:35-07:00	Teknium	fix(docker): update runtime tests and docs for the entrypoint dispatcher
+87bc710609f8b89b6e6b4aa418dde8ee30ec6873	2026-07-22T22:12:20+08:00	Fangliquan	fix(agent): scope parallel batches from V4A patch headers
+7e271d96fc59e804cfd910125f6a9ebd586bc0f9	2026-08-01T15:36:35-05:00	brooklyn!	Merge pull request #76290 from NousResearch/bb/coding-cwd-copy
+c5be6e7792c7541a91b1396698a09952c5e24991	2026-08-01T20:45:40Z	hermes-seaeye[bot]	fmt(js): `npm run fix` on merge (#76404)
+a09ad04653f61fe224110b9dd304afea7b608f03	2026-08-01T15:45:42-05:00	Brooklyn Nicholson	refactor(desktop): share the composer's floating pill treatment
+9175b05b40f2831afa365eed71f835186b9203c6	2026-08-01T15:46:36-05:00	Brooklyn Nicholson	fix(desktop): ship example plugin off by default
+d7c24f264631d48bd4018a1c1023d02837bf27f7	2026-08-01T15:58:47-05:00	brooklyn!	Merge pull request #76409 from NousResearch/bb/example-plugin-off-by-default
+f88ed6c71768cdc7ea3bfa8cf62d16654792fd2a	2026-08-01T13:09:47-04:00	ethernet	fix: fix @nousresearch/ui version, update to npm 12
+0b69a6ac021c454ef6496d943ccd61d241e51dda	2026-08-01T16:09:56-05:00	Brooklyn Nicholson	feat(kanban): let a task pin its own thinking depth
+f0ed0aebbca787ea68975dc20d60309338f4b996	2026-08-01T16:10:03-05:00	Brooklyn Nicholson	feat(kanban): expose the per-task reasoning effort over REST
+b35c34d58cbff05b096b363df1eb6874967b41b8	2026-08-01T16:10:13-05:00	Brooklyn Nicholson	refactor(desktop): make the composer's model picker a reusable primitive
+602fc5f9f5aded91102ea3003931dbe40a6103ea	2026-08-01T16:10:25-05:00	Brooklyn Nicholson	feat(kanban): pick a task's model and thinking depth from the board
+d5d3086b41b6cf3c304d37dc9064520b4b33cba4	2026-08-01T16:19:37-05:00	Brooklyn Nicholson	fix(desktop): let the model catalog own curation, not each host
+defee936e99420a55bd111269a2710ad5f1af255	2026-08-01T16:25:13-05:00	Brooklyn Nicholson	fix(desktop): keep the composer's model menu pixel- and behaviour-identical
+afdf8f9cc5abb00b6429132f139235815b9d7314	2026-08-01T13:10:03-07:00	Teknium	fix(model-picker): stop Copilot token-exchange retry backoff from stalling /model open
+131aee9260fdb787c4e347c6cf93e08822b5ca8c	2026-06-20T19:21:22+08:00	baoyu0	feat(desktop): add configurable terminal font family (terminal.font_family in config.yaml)
+0399711bec1865e8afa00ceddf24009b90549f76	2026-07-25T02:00:17+08:00	Zeraphim	feat(desktop): add terminal font picker
+261c67b2f8526bac3555cbfb6e186e68ecaca7a9	2026-07-30T20:18:58+08:00	Zeraphim	fix(desktop): cover pending agent terminal font cleanup
+ff8df5822b072f4c8b4c3bb3e6573814ebf0ca95	2026-08-01T13:42:22-07:00	Teknium	fix(desktop): derive font-setting save base from the config cache, not a mirrored ref
+53b8f44e75925d165df17809d050dd970a98e023	2026-07-30T17:16:14+10:00	Flownium	feat(desktop): add notch wake indicator
+4ebdbadef801021fa4335a49f887349495f1ab79	2026-07-31T15:27:03+10:00	Flownium	fix(desktop): close wake indicator with main window
+d6be88fbc87ebda9f899c227cabb71e9a0ed11a4	2026-07-30T10:53:11Z	Cad from Arca	fix(desktop): map SSH profiles to remote profiles
+621975de859763d0a87a5b001c0c04aaa6e15460	2026-07-23T06:51:20+09:00	Sora-bluesky	fix(dashboard): anchor the SSH token dir to $HOME/.hermes, not the active profile
+e2c6f2ebc4468e7e7839d611c2b0393e08a2cd3c	2026-08-01T11:49:16Z	Cad from Arca	test(desktop): cover mapped non-default SSH profile
+6d3cb23d24fa7f58daf7552d4f33347e943a4aa7	2026-08-01T11:53:12Z	Cad from Arca	fix(desktop): reject reserved remote profile names
+5cb19d7af5bb5b247ec4e340bb11f30ba438a2cc	2026-08-01T12:00:20Z	Cad from Arca	fix(desktop): keep Windows SSH runtime at machine root
+f3cb7c0e01b2b315372cdf7590fe898ba27475df	2026-08-01T12:03:42Z	Cad from Arca	style(desktop): satisfy mapped-profile test lint
+8b8ebc26bb5a433c1975615c7c8e4a0182d94f36	2026-08-01T13:33:18-07:00	Teknium	chore: map contributors arcabotai, Sora-bluesky
+8c172726c80c8057047c4492908233b7dfed6277	2026-07-29T18:51:18-04:00	spfcraze	fix(patch): anchor V4A Begin/End Patch markers to full lines
+fcd5e2cc61f4f3418e68c4eb81f690b15e33f66d	2026-08-01T13:33:00-07:00	dsad	fix(file-tools): resolve local V4A patch paths before apply
+414e5af114d8d94e5eb14e6f73c0fd9ce9010093	2026-08-01T16:34:46-05:00	Brooklyn Nicholson	fix(desktop): the composer hint stops acting like text you typed
+9772e3b189ccb8ed7d7916b2fb2808a5e3d9a614	2026-08-01T14:35:15-07:00	Teknium	perf(model-picker): serve stale model caches instantly, refresh in background
+ff6ed7c491ba285178a2fdc0975d619aefae7035	2026-08-01T14:35:35-07:00	Teknium	fix(update): detect EOL-only churn via numstat, not name-only
+a5f94e93ad810cb2f3e59f923cb7f86fc385c900	2026-08-01T13:37:52-07:00	dsad	fix(acp): bind session_id in session context for subprocess isolation
+97971643abf4643cc93f638c1b3553f10a7e52d2	2026-08-01T16:55:01-05:00	brooklyn!	Merge pull request #76417 from NousResearch/bb/kanban-model-picker
+93ec02bf79d6d11ff0d998adec5809f73eec0514	2026-08-01T16:56:48-05:00	Brooklyn Nicholson	fix(desktop): keep the hint off the text during IME composition
+cc0af6b9e8b4682ac54d67d115198f6b12343784	2026-07-31T22:32:18-07:00	Teknium	ci: skip Desktop E2E + Docker build on tests-only PRs (python_prod lane)
+d7522118efa196c474eebbfa80d1b1c9094707ef	2026-08-01T14:48:24-07:00	Teknium	fix(cli): route keyless first run into provider onboarding instead of a broken chat
+a98c8eeed1911a8406355a19274d30a193b72635	2026-07-11T21:06:02-05:00	KaliShodan	fix(gateway): isolate deferred platform imports from os.environ leaks
+eec6d3efde7a9e71dd0f95a7358a7a55b5922349	2026-07-11T22:20:19-05:00	Jaret Bottoms	fix(teams): suppress SDK import-time dotenv instead of clearing environ
+38453baeee4046d742b0d315918442bd6640acc6	2026-08-01T14:53:38-07:00	Teknium	fix(setup): warn loudly when the wizard finishes without a working provider
+9467e99ac533c338c7db2d566e4295feaa2c0f4f	2026-08-01T14:54:18-07:00	Teknium	docs(site): redirect /quickstart and /installation short paths
+9d08c95464c90bd47e2159f97d63bd3f3d4cf65e	2026-08-01T15:09:02-07:00	Teknium	fix(tools): dedup eviction task_id + workdir cwd leak
+021a076880ccb545c5bf2d5d3ecd73ae0b0b9289	2026-08-01T15:14:34-07:00	Teknium	fix(file-ops): prevent non-UTF-8 corruption and symlink data-loss
+c0b0c886263abe3f32abfbca26b585b97081ff59	2026-08-01T15:20:40-07:00	Teknium	fix(fuzzy-match): stop context_aware from silently replacing wrong content
+62f00319db1713ffcfbb049a163836072a573cd4	2026-08-01T15:25:49-07:00	Teknium	fix(patch-parser): tolerate CRLF patch bodies and Move-then-Update
+7f4d155159e2a5d4098bb2f27d3fccb01ff84c3d	2026-08-01T15:30:53-07:00	Teknium	fix(tools): validate timeout, reject whitespace old_string, narrow /private/var block
+6b519255eaf5ab86b784d1cb8ba08f8df7182a18	2026-08-01T16:27:13-07:00	Teknium	fix(update): provision a managed Node runtime when system npm fails engines.npm
+968b66338c9fe41d6e78f122a00bb0e41a9a3575	2026-07-30T22:17:12+09:00	keepConcentration	fix(env): clear inherited Hermes keys missing from profile .env (ACP leak)
+61b2fa7937ff212352f053add15bfe210832cfde	2026-07-31T15:35:21+09:00	keepConcentration	fix(env): strip export prefix in dotenv key scan for cleanup (review fix)
+fe5a718c4ec762ff4c1ae966fb11b659b05928fb	2026-08-01T16:12:12-07:00	Teknium	fix(env): narrow startup env scrub to profile-managed ACP keys
+18e0683bfc9e843da72387998f9683f2bada0dde	2026-08-01T16:13:48-07:00	joaomarcos	fix(auth): route anthropic adapter credential reads through the profile secret scope
+ed1170cd8ba17740910315cce4711806290a9224	2026-08-01T16:15:31-07:00	webtecnica	fix(config): make get_env_value scope-aware — the last scope-blind credential reader
+8e2997125f95c809d3ff060713727bc919022e1e	2026-08-01T16:20:09-07:00	Teknium	chore: map salvaged contributor emails (keepConcentration, JoaoMarcos44)
+38c09e5d739fd91b8f7d281ff92e3e321312cb3c	2026-08-01T16:09:18-07:00	Teknium	fix(tool-executor): emit tool results on hard interrupt to keep alternation
+3f497e2b4f92ef83f45a98c02f7cb47c12ee069e	2026-08-01T17:08:29-07:00	Ben Barclay	fix(gateway): relay thread-rename must carry the parent-channel discriminator (#76465)
+3bed7d4ae7bc9139dd9e26cd54fc70e8bc699226	2026-08-01T19:03:46-04:00	ethernet	fix(desktop,install): keep bundled Node ahead of system Node on Windows
+f5130f02328079a8f1958f803e5c90a32213ec5d	2026-08-01T20:48:28-04:00	ethernet	fix: pin uv python to 3.11
+aaa6a973781fd5e034c5782ba161c1be123be969	2026-08-01T20:02:43-05:00	Brooklyn Nicholson	fix(managed_uv): keep project uv config on the candidate locked sync
+cb2311fe2b51c650b0aa2f634c618300f3ffcddf	2026-08-01T20:08:36-05:00	brooklyn!	Merge pull request #76493 from NousResearch/bb/sqlite-repair-locked
+baec57de6653bc7cc5ce30606ab88a9fc9de4a10	2026-08-01T20:14:06-05:00	brooklyn!	Merge pull request #76429 from NousResearch/bb/composer-placeholder
+25d0bcd424d541be72a66ed195cde163fe2a7a97	2026-08-01T20:51:51-04:00	ethernet	fix(runtime): resolve Hermes-managed Node and uv before bare PATH
+aa4ce7a507f0135623dcc02bc1b536c327348a5f	2026-08-01T20:53:36-04:00	ethernet	feat: add .nvmrc w/ node 26
+713a983e4aa8824ce9efbceb3b32c1cd962e0a7d	2026-08-01T21:04:48-04:00	ethernet	feat(runtime)!: require Node 26 across all installers, heal, and upgrade paths
+b13148d354c9ac28d36325616d8fd8a7b9e15ad5	2026-08-01T21:14:42-04:00	ethernet	feat(runtime): heal outdated managed Node trees up to the target major
+5ba2564ca0ef3aba4f8b024712f2ad018ddedf66	2026-08-01T15:45:42-05:00	Brooklyn Nicholson	feat(desktop): act on composer directive chips from a hover pill
+777512b76041ec5b724991bdae01f7cf3cf68947	2026-08-02T01:23:45Z	hermes-seaeye[bot]	fmt(js): `npm run fix` on merge (#76498)
+0c3551849f0e5fed3c893fcd90478dd52653943f	2026-08-01T21:24:55-04:00	ethernet	fix(gateway): probe the target user's Node tree when generating a system unit
+2ad0ea4d3f2320473676092e7d660f4eb5cdb99a	2026-08-01T21:28:58-04:00	ethernet	fix(docker): drop corepack and add libatomic1 for the Node 26 bump
+eca996aa33f59f69ca758e9fde95fc52659a62eb	2026-08-01T20:29:14-05:00	brooklyn!	Merge pull request #76401 from NousResearch/bb/composer-link-open
+a041526efe650511d4ef4fe28d70defd971c3bb7	2026-08-01T18:42:53-07:00	Ben Barclay	feat(gateway): key Discord auto-thread sessions on prospective_thread_id (#76513)
+5b3b761404d49111c85cf7fb84cd8b73a0b6b598	2026-08-01T20:43:01-05:00	Brooklyn Nicholson	fix(desktop/windows): don't pre-write the update marker for stale installers
+e1ccd674c0950912c86cc1f794eb6ccecc72d126	2026-08-01T20:43:08-05:00	Brooklyn Nicholson	fix(desktop): apply the stale-installer marker guard to both hand-offs
+22df1840d6f8fac0aa103282175dac01a4c94ff8	2026-08-01T21:43:47-04:00	ethernet	fix(desktop): restore localStorage in jsdom tests under Node 26
+ee276a7982507a3901e36bb53f9b8a7c16273646	2026-08-01T20:51:23-05:00	brooklyn!	Merge pull request #76517 from NousResearch/bb/win-update-lock-handoff
+6fdc64efcd718bf2d2389b2ff663ca4a2c9e27e9	2026-08-01T22:00:26-04:00	ethernet	fix(install): install npm 12 into the vendored Node 26 tree
+97f13602c1ab823add47f2f5f4282b9e2ee1eb49	2026-08-01T22:02:30-04:00	ethernet	fix(install): install npm 12 into the vendored Node tree on Windows
+3e0720dd8e767688a5af2db83b325ef28f10cc62	2026-08-01T22:16:54-03:00	webtecnica	fix(npm): relax engine range for Node 22 / npm 11 (#76486)
+abb84c4cdfe5085d515d9f03dbff9beaac2fc6a3	2026-08-01T21:22:00-05:00	Brooklyn Nicholson	fix(install): upgrade npm on the managed-Node reuse path too
+8de9c16b7cf044e500864bca1cf0c4a3db4746b9	2026-08-01T21:27:26-05:00	Brooklyn Nicholson	Merge branch 'main' into ethie/bundled-node-path-windows-layout
+f979e47eba6e5f6d850ea2fd868f3b3bf46d2b27	2026-08-01T21:46:19-05:00	Brooklyn Nicholson	fix(desktop): the branch-bar path copy confirms in place
+c7b4b4e178d3c24feee60054964066718287875e	2026-08-01T21:52:39-05:00	brooklyn!	Merge pull request #76536 from NousResearch/bb/composer-path-copy
+85c8956ec7f2b4607509980794995e1c5e21e292	2026-08-01T22:09:56-05:00	brooklyn!	Merge pull request #76459 from NousResearch/ethie/bundled-node-path-windows-layout
+8bfd5af3bc24199cc747172f27e7e9da15bece45	2026-08-02T03:33:09Z	hermes-seaeye[bot]	fmt(js): `npm run fix` on merge (#76547)
+8e08a4a16e24144949c066521afddde12d5d31dd	2026-08-01T22:56:52-05:00	Brooklyn Nicholson	fix(install): restore installs — engines floor no shipping toolchain can meet
+c51c92a21830abf4729874464f018b8c85b0b9eb	2026-08-01T23:04:24-05:00	Brooklyn Nicholson	fix(update): survive a hermes_constants cached from before the update
+8ced76d619795dc67fc823560a2f9493355b1e22	2026-08-01T23:15:37-05:00	brooklyn!	Merge pull request #76562 from NousResearch/bb/npm-engine-outage
+63ff4b87b6d00176c63b34e1555fe370944e7ce3	2026-08-01T23:28:28-05:00	Brooklyn Nicholson	fix(install): sync the lockfile engines mirrors with the manifests
+927662e48f34f4e57055bff0e1673691dd853f13	2026-08-01T23:32:54-05:00	brooklyn!	Merge pull request #76575 from NousResearch/bb/desktop-lockfile-engines
+ff01e2f6d72c2c4fc343e28b5333752854bbf47f	2026-08-02T11:15:47+05:30	kshitijk4poor	chore: add contributor email mapping for 686f6c61
+58e85f43143e9d9bd27e1d88078bcd2985386b21	2026-08-01T13:11:28-06:00	Gille	fix(browser): replace expired cloud sessions
+0044876a1169a7fc70d7c55ff9a5f49ca427870b	2026-08-02T10:57:32+05:30	kshitij	fix(browser): guard against concurrent expired-session replacement race
+f0c87da61874bf8f06e920d9a378986fc6d5d285	2026-08-02T11:30:56+05:30	kshitij	Merge pull request #76618 from kshitijk4poor/chore/author-map-686f6c61
+6035f50477d2732135d85726dd4c42e733d7f21f	2026-07-31T14:30:13+08:00	fangliquanflq	chore(contributors): add contributor map fangliquan@qq.com
+ddfc6342ad153751f734ae86dfaa3104c2e56b1b	2026-08-01T04:54:38Z	fangliquanflq	fix(gateway): revoke WhatsApp sole allowlist entry without restart
+810c8777e1529111f933e84c88ecd09846ae82c4	2026-08-02T11:07:25+08:00	fangliquanflq	fix(gateway): preserve WhatsApp allowlist config precedence on live checks
+b35f219aedde2f25d55b1173c0af8954bb152816	2026-08-02T03:21:21Z	fangliquanflq	fix(gateway): apply WhatsApp identity aliases to cloud pairing revoke
+f5ca0e2f0bb01011d09870c58289e12efd4dd101	2026-08-02T04:16:10Z	fangliquanflq	fix(gateway): honor empty WhatsApp allow_from over env grants
+8a29703a1b1256971e143852958e98032decaf9a	2026-08-01T13:07:17+02:00	686f6c61	fix(agent): honor prompt_caching.cache_ttl=off on stub policy paths
+67db87009ef2e952f2884c7a7e1ece6bcdff91c6	2026-08-01T13:41:08+02:00	686f6c61	test(agent): drop unused pytest import from cache-disable tests
+8e1a351e827d1319c5a582418259df0794e6c050	2026-08-01T14:15:23+02:00	686f6c61	fix(agent): preserve None cache_disabled when MoA has no agent
+8ee51747fe52fefe428e3d174a43bd2001e5bdde	2026-08-01T14:30:30+02:00	686f6c61	fix(agent): consolidate cache-disable stubs with blank_cache_policy_stub
+88a629b9dcd2fb12af5cda3334642cc15d16f072	2026-08-02T11:19:50+05:30	kshitijk4poor	refactor(agent): share the cache_ttl disable predicate across init and stub paths
+026707a516070bcd5265115be09aeda83d695e99	2026-08-02T11:43:06+05:30	beardedeagle	fix(tts): per-sentence prefetch pipeline with PortAudio resilience
+fa60bc5a9064a6af6354f56f0cc3d47763f3e053	2026-08-02T11:46:30+05:30	kshitij	fix(tts): apply 7 review fixes to prefetch pipeline
+582606f176f5467deb96bb949e0879a8e18f31dd	2026-08-02T11:46:40+05:30	kshitij	test(tts): reconcile test file with main and add regression tests
+ed2ae200da866b4decf97b89e094327275838300	2026-08-02T11:53:32+05:30	kshitij	chore(contributors): add contributor map sswdarius@gmail.com
+f86693c2f9c073cb38694aef009ef7b6ab8bc3f5	2026-08-02T11:53:32+05:30	dsad	fix(tui): fail closed when prompt.submit cannot persist history truncation
+c19c63d9e6dc35f5a5fef22d4aea1d7d32d20eab	2026-08-01T01:08:56-03:00	webtecnica	fix(agent): make auxiliary auto-chain fallback configurable and free-only (#75803)
+077317a0f6d17b4e030e42344ded663a4818315e	2026-08-02T11:57:35+05:30	kshitij	simplify: collapse aux config reads, trim comments, use load_config_readonly
+14478ee4271600f0843a45a1926ce4cc5c794eb6	2026-08-02T11:57:57+05:30	kshitij	chore: AUTHOR_MAP webtecnica@gmail.com → webtecnica (#75838)
+226e27035b73e940151e757daab26c5c53ea45ad	2026-08-01T23:09:06-07:00	Teknium	ci: temporarily disable Desktop E2E — red on every PR since Aug 1 engines churn (#76627)
+651c5160b7503506beb7107835069bdec629eaee	2026-07-30T13:34:27-05:00	Jonny Kovacs	fix(gateway): run manual /compress under the profile secret scope
+153442dd5b0d98cca8e44d53b80bbd9494dcea0d	2026-07-22T12:43:24+08:00	sergioperezcheco	fix(matrix): honor profile secret scope for recovery key under multiplex
+76cf19fee1f470061c4364321fdca30184f212e5	2026-07-29T05:36:49-04:00	tachyon-r	fix(tools): isolate model tools by multiplex profile
+3d9a146d81eb15e5d952903ec6ce30aebe248f40	2026-07-30T12:45:00-04:00	tachyon-r	fix(browser): scope Camofox session identity
+6ab390a4764050bfed7f6ecb9d88c8e1d6377547	2026-07-30T09:35:51+07:00	Bao	fix(gateway): hydrate cold profile secret sources
+4f4ea9a6ded9a16c046ec1a8a54ea82a1a210bea	2026-07-31T19:23:18+08:00	x7peeps	fix(whatsapp): route WHATSAPP_* env reads through secret scope for multiplex profiles
+5438e9c6293a53414f99a01e0aa7b08cf14350ef	2026-08-01T21:15:58-07:00	Teknium	fix(whatsapp): default-profile UnscopedSecretError fallback + full bridge env set
+52308ff455c50ef2c75f4097af14378362d2d5fc	2026-08-01T21:14:07-07:00	Teknium	fix(env): seed .op.env bootstrap into cold-profile hydration
+845031ad81e4d4d2c53a7905015bc7d9d604cef1	2026-08-01T21:17:07-07:00	Teknium	chore: map salvaged contributor emails (CocaKova, sergioperezcheco, x7peeps)
+7138b9587a26be8f4b75ab71a09f4d50bd8c18d2	2026-08-01T16:07:43+02:00	Christopher	fix(security): scope passthrough env to routed profile
+fc61608a17d613c70dfdbef107d5d10aea626541	2026-08-01T16:57:32+02:00	Christopher	fix(security): isolate explicit Docker passthrough snapshots
+75e85ef6ba9a485ba73bdcc7aca3420bea1c5a31	2026-08-01T15:46:38+08:00	x7peeps	fix(tool/skills): refuse to overwrite category bucket during skill install (issue #75983)
+881ac52423ad76c3b4925bc0f3390cb91b49866b	2026-08-02T13:10:30+05:30	kshitijk4poor	fix: widen category guard — hybrid skill-dir nesting and file collisions
+0f2da9687f654a2f0d8be671d88c57e851204d58	2026-08-02T13:18:32+05:30	kshitijk4poor	refactor: share category detection and prune vendored SKILL.md hits
+fbf26e3845344c256e5832658bb23fbda0ebf195	2026-08-02T12:34:09+05:30	HexLab	fix(auth): actionable CAPTCHA-aware guidance on Nous device-auth timeout
+840fb55a8aaeb69bfcd6f34a80e57f9a5bcd44ce	2026-08-02T13:22:55+05:30	kshitijk4poor	fix(auth): enrich device-auth timeout at the source to cover the dashboard poller
+2314abcbb0effe03cddf8df6098e66513f756ea1	2026-08-01T23:22:27-03:00	webtecnica	fix(cron): run job without blocking the calling turn (#76502)
+8fd1a68106ccbed7f8d9dc85b1f5b2e69484e548	2026-08-02T13:41:54+05:30	kshitijk4poor	refactor(cron): harden the run heartbeat (review follow-ups)
+0cd26ce9a514b1edb7c2fdc74f288805650b136c	2026-08-02T13:52:15+05:30	kshitijk4poor	refactor(cron): log the heartbeat ceiling stop + test it
+80e4fb5995ec3f1c3bfbef4851b1c0900dd4664e	2026-08-01T10:35:54-03:00	joaomarcos	fix(gateway): reap only the background processes an abandoned turn created
+a35691781a3a7b684975a12b8de1f9f0f3531e23	2026-08-01T11:43:53-03:00	joaomarcos	fix(gateway): close cross-turn reap race and cover API-server disconnect
+1b886822deaf01a596493209a43a52197e974600	2026-08-01T12:29:59-03:00	joaomarcos	test(gateway): cover the run_generation guard and API-server disconnect reap
+eb4772ec2f1d788b85952e9dda7793437f39624e	2026-08-02T14:09:44+05:30	kshitijk4poor	fix(gateway): guard empty task_id reaps and prefer the finished worker's result
+8f0f55eaacf13fe6465f490d5a20681edbf5397e	2026-08-02T14:09:56+05:30	kshitijk4poor	fix(api-server): epoch-gate abandoned-run reaps and cover the /v1/runs sibling
+cd6585abf88df4556cfdcfbc02a240a77ec7ee76	2026-08-02T14:10:05+05:30	kshitijk4poor	refactor(process-registry): fold kill_started_since into kill_all via exclude_ids
+981a5986469df4cd6d95d3c675ebb908edf060a6	2026-08-02T01:09:22-07:00	briandevans	fix(cli): stop hermes import-agent from destroying an unreadable config.yaml
+e75336d5977f50047259389384fe3d5a83d13c82	2026-08-02T01:17:57-07:00	briandevans	fix(cli): preserve symlinked config.yaml in the migration script's atomic write
+9d6ef41a53d2886e5e33ab4f85e244df88f68299	2026-08-02T14:45:28+05:30	kshitijk4poor	refactor(cli): review follow-ups for the config.yaml import guard
+0a62610f10cc34d696b2239b2c69fa1ba0f1ca63	2026-08-02T14:50:19+05:30	kshitijk4poor	fix(cli): swallow fsync errors in the openclaw EXDEV fallback
+4b3f0148d1c70ce35bfcf8b7888b05d2d10962a7	2026-08-02T20:04:04+05:30	kshitijk4poor	chore: add contributor email mapping for nkreadly07
+26e0b1c12c2bbc2d1ef4640df18abff2d737445a	2026-08-02T20:04:22+05:30	kshitij	Merge pull request #76837 from kshitijk4poor/chore-nkreadly07-email
+3d20f106ca69f02af6a207ab7ddc8891a3b7c303	2026-06-03T01:34:48-07:00	Zeheng Huang	perf(cli): fast-path global version startup
+d3832a24bcd44536f48846a239f92b41e93d10dd	2026-07-10T18:44:38+05:30	kshitijk4poor	fix: fast-version follow-ups — PROJECT_ROOT NameError + renamed output label
+e4257c171ad4d7941dbac772aae40bd8898ebcfe	2026-07-10T18:56:25+05:30	kshitijk4poor	refactor: single chokepoint for the pre-import version fast path
+01ca8be20729ce2c2bd364b0c823bad89a623b1a	2026-08-01T14:59:35-04:00	spfcraze	perf(discord): build reply references from ids instead of fetch_message
+c4d67c3add8e08684c0807d28319fd04a964202b	2026-08-02T19:42:08+05:30	kshitij	refactor(discord): extract shared reply-reference helpers; fix PartialMessage comment
+947310437b2548d75e4a4e384deaad068bf8ca47	2026-08-01T11:59:39-04:00	spfcraze	perf(cron): batch advance_next_run for the due-dispatch loop
+6e786e927ff0746ddb55509c57bae6de979e47ea	2026-08-02T19:30:15+05:30	kshitij	refactor(cron): drop dead advance_next_run import; wrapper tolerates duplicate ids
+8f91e249e45ed75fde966822423183a5fc2f5620	2026-08-01T10:46:21-04:00	spfcraze	perf(state): add messages(session_id, id) index for window/ordering queries
+89f74d58f6ba0aeeaaa02afb0d58041952b231ea	2026-08-01T07:04:16-04:00	spfcraze	perf(memory): hoist loop-invariant HRR encodes out of retrieval loops
+a2f95e4c0e0df2ffe8a55bd4033f0885d427fc86	2026-08-02T19:47:58+05:30	kshitij	test(memory): hoisted-retriever fixture uses a real tmp db, not :memory:
+cf803603dc8b0a4dbe9b0f62c7700aede08841bf	2026-07-31T23:40:52-04:00	spfcraze	perf(agent): memoize send-path tool-call argument canonicalization
+e8656bedfede4e519b54159c435dcecdbf571351	2026-08-02T20:02:32+05:30	kshitij	fix(agent): byte budget for the canon-args memo
+48e825456769be705d29f294f65e6fae587e9ab9	2026-08-01T09:35:34-04:00	spfcraze	perf(tools): use load_config_readonly on the approval guard path
+024f3e044bfd89ee226afc604fffac1c2005f7ec	2026-08-02T19:45:15+05:30	kshitij	docs(approval): _get_approval_config returns the live cache sub-dict
+57197cd48d84c31080745bba85f49b0f1b21d3b4	2026-07-30T13:13:46+10:00	joelbrilliant	fix(dashboard): preserve maintenance writes on read polling
+9bcc326207e724a44e0aaccfbab16aa7af2445f7	2026-07-30T13:36:39+10:00	joelbrilliant	test(dashboard): gate WAL preservation check by runtime
+e38055a85e242dd999809155bf4f7d472508102d	2026-08-02T21:26:42+05:30	kshitijk4poor	fix(state): close the read-only connection when the FTS probe fails
+bd856a02f269cb50b3c723a9087ace28b1fd9734	2026-07-18T22:18:23-05:00	Hermes agent	[verified] fix(state): throttle repeated VACUUM rewrites
+4e0a77558073a2e8401d0e4051b9f31a57ef5bfb	2026-07-19T02:45:58-05:00	Hermes agent	fix(state): make VACUUM interval configurable
+9c6e85688c8cde8ed7b2c06fbb32d513b31a8d0c	2026-08-02T21:35:32+05:30	kshitij	chore: map RyderFreeman4Logos@gmail.com to aider4ryder
+b2d5995fc6fa1f8ee11b895f3adf4995f8f23bbf	2026-07-30T17:50:48+03:00	Adolanium	fix(state): do not stamp empty FTS after interrupted optimize-storage demote
+2febb5823c0ec187971f78547b38d63d01ba5d6d	2026-08-02T19:55:22+05:30	kshitijk4poor	perf(state): probe empty FTS index with EXISTS instead of COUNT(*)
+1e2e69db989066047e5fce2cc0a0c24b24633c9f	2026-08-02T21:29:33+05:30	kshitijk4poor	perf(state): truncate FTS index with 'delete-all' instead of plain DELETE
+ec4f8419c0af61f92e8b85a69ba42294ccc938ba	2026-08-02T21:36:39+05:30	kshitij	Merge pull request #76903 from kshitijk4poor/chore/attrib-aider4ryder
+f09011048361b0005d8e37b5ef4f0f1bfe215574	2026-08-02T21:43:26+05:30	kshitij	chore: contributor email mappings for Soju06 and JabberELF
+dc91ec931c9f446b29255061d3bae98720b09633	2026-08-02T21:43:44+05:30	kshitij	Merge pull request #76907 from kshitijk4poor/chore/attrib-soju06-jabberelf
+d080dc24a8f5e225550ba860eb474816df6c42a2	2026-07-26T05:39:26+03:00	evgyur	fix(gateway): skip topic recovery for non-DM messages
+f1da9d0d66a311df442e647aa7e803a8c9f6f38c	2026-07-10T19:35:03-07:00	LeonSGP43	fix(docker): skip redundant stage2 chown walks
+4983c576b1ed118d56ddf98feed468f4b3a7042c	2026-08-02T21:49:58+05:30	kshitijk4poor	fix(docker): gate the remaining every-boot chown walks (cron, pairing)
+0d9f17ffd433f9661ac57661b9ad9915d670f657	2026-08-02T22:01:54+05:30	kshitijk4poor	chore: add contributor email mapping for ZachariahChu
+9060e3c2d3d3f7f3a21c297b5617e06ff9237085	2026-08-02T22:02:12+05:30	kshitij	Merge pull request #76921 from kshitijk4poor/chore-zachariahchu-email
+5d1875fe3adce2130344b6dbf49706ecbffab22b	2026-08-02T22:07:59+05:30	kshitij	chore: map rkt.2@hotmail.com to sparkeros
+68a7839d8ba809b216357bc2f40ff80aeadc54e6	2026-08-02T22:08:14+05:30	kshitij	Merge pull request #76927 from kshitijk4poor/chore/attrib-sparkeros
+a50bd2ae3fb5528d262529a6eea3fe4477639007	2026-08-02T22:08:46+05:30	kshitijk4poor	chore: add contributor email mapping for JeffStone69
+ca10ac5c18691c30d3bda13a49fc06c55927a357	2026-08-02T22:08:56+05:30	kshitij	Merge pull request #76929 from kshitijk4poor/chore-jeffstone-email
+9929743b729a24e6f25494ff8a7fbdf900396a9a	2026-07-17T11:09:24+10:00	JeffStone69	fix(auth): memoize resolve_nous_access_token to collapse startup burst
+06b4f64c31d1ba20006c5ef8dea446af9b9b7c45	2026-08-02T22:08:31+05:30	kshitijk4poor	fix(auth): memoize the valid-token fast path too, add memo tests
+d15b638a88141e2ed6e948f218f7d2027d28f98b	2026-08-02T12:26:52+05:30	Shaun Prince	fix(compression): let explicit interrupts cancel safely
+4ea379ca2e08b56a590e35b328de4fb4d74e2b6d	2026-08-02T21:50:20+05:30	kshitijk4poor	fix(gateway): timed-out turn abandonment is an explicit hard stop
+de0ce24c2e5660bf74d69cfd888e91d648cae54d	2026-07-26T20:29:45+08:00	ZachariahChu	perf(cli): cap /model picker custom-endpoint probe at 1.5s
+45c15d33e5ed7f42c6b4778ab8d34b40ad27cc86	2026-08-02T22:01:42+05:30	kshitijk4poor	test: update fetch_api_models call-shape assertions for explicit timeout
+fe497d8722eb43780ada1185db6d4012f65de885	2026-08-02T01:07:00-07:00	Teknium	test(update): make EOL-churn dirtiness deterministic under racy-git stat caching
+696fae8e78c0c93fe4ab1bdbaf7c56127ccfb11e	2026-07-23T19:29:59+08:00	Fangliquan	fix(agent): strip UTF-8 BOM when loading profile .env into secret scope
+55abf206bff4ed8890da5f35a3e9e119ab9d4c12	2026-07-30T19:34:45-04:00	spfcraze	fix(agent): unescape quoted .env values in secret_scope.load_env_file
+3fb066c37287a008d6e7b524c083eedb44c6692c	2026-08-02T00:51:09-07:00	Teknium	fix(agent): dotenv-compatible inline-comment stripping in load_env_file
+f7efe3d76663d608578ff78f2f4aee674f41b1d2	2026-08-02T00:50:20-07:00	Teknium	fix(weixin): Slack-pattern secret scoping for WEIXIN_* credential reads
+44640149f75075a58baaa9e6fbf58e18c6f148b3	2026-08-02T00:52:50-07:00	Teknium	fix(secrets): allowlist API_SERVER listener settings as global deployment env
+062d44bba7973aa911d086be2be495c8db980744	2026-08-02T00:53:16-07:00	Ray	fix(xai): fail closed in xai_http.get_env_value — honor get_secret's verdict
+d7404f197c6af7ec5a586865de4e028f2fa55389	2026-08-02T00:53:55-07:00	Teknium	fix(secrets): Slack-pattern scoped credential reads — IRC, LINE, Teams, Mattermost
+6333180c9ad4a4385966316fcfef46369bb7dff1	2026-08-02T00:53:55-07:00	Teknium	fix(secrets): Slack-pattern scoped credential reads — ntfy, Home Assistant, SMS, DingTalk
+f4b268b7852694abc8207cbf5dacebcc1cff9942	2026-08-02T00:53:55-07:00	Teknium	fix(secrets): Slack-pattern scoped credential reads — Feishu, WeCom, Photon, Buzz
+7d4c8f9a541318d4b81cabdb483c36017932af0e	2026-08-02T00:53:55-07:00	Teknium	fix(secrets): scoped BLUEBUBBLES_PASSWORD + API_SERVER_KEY init read; add parametrized regression tests
+224e59df5293d7095064cc0320ef5bca7aa862ae	2026-07-07T21:31:18+03:00	Da7-Tech	fix(qqbot): resolve credentials under the active profile secret scope
+e8c5cb57104229cc1bac8490d9089c1036fcd5f0	2026-07-16T06:13:43+03:00	Da7-Tech	fix(qqbot): scope the authz, startup-validation, and direct-send QQ reads
+4804c585ac1a3e03c109b33bfcb00d5090808785	2026-07-16T06:39:33+03:00	Da7-Tech	test(qqbot): pin the scoped platform user-allowlist authz read
+ed9986873de2e700990bd4bea49de586f76b7202	2026-08-02T00:50:08-07:00	Teknium	test(qqbot): mark environ-opt-in isolation case xfail pending authz_mixin gate PR
+f08f403157d36d2c31b6329ca79740fe085f7158	2026-07-05T19:22:13Z	shikanga-hermes	fix(email): honor profile secret scope for email adapter env reads
+ff89f1b8629d1508a72827176cc8749752fbe26d	2026-08-02T00:52:17-07:00	Teknium	fix(email): Slack-pattern helper for unscoped default-profile adapter + scope ports/trust flag
+6dec4bfc886b4af4733749b78049fc91de583967	2026-07-27T02:28:41+03:00	Frowtek	fix(tui_gateway): install the parent profile's secret scope on session.branch
+e4306ac5e20f5495203d7c46d830ab40099053ea	2026-08-02T00:54:30-07:00	Teknium	chore(contributors): map salvaged PR author emails (#60420, #59076)
+dbbfcff56d9ba3ceeba371dd3057e58f58e8bdf4	2026-08-02T00:49:19-07:00	Teknium	fix(secrets): route authz gate and pairing allowlist reads through the profile secret scope
+359ff01c239c41a69c32dea3c176d6ff70a06a03	2026-08-02T00:51:18-07:00	Teknium	fix(secrets): scope-aware standalone-send and startup credential reads in platform adapters
+5c6cc38010478a0604bc304a1d25884aed18e1f4	2026-08-02T00:52:55-07:00	Teknium	fix(secrets): scope-aware credential reads in core tool/gateway/web-server paths
+ca5ce1110b80e420876188a75c9e8f671566bd67	2026-08-02T00:54:06-07:00	Teknium	fix(secrets): route auxiliary-client provider key reads through the profile secret scope
+5239b4d6d58577f8e4262f337576f5653b7a2464	2026-08-02T00:54:21-07:00	Teknium	fix(secrets): scope-aware Azure credential presence reads in identity diagnostics
+2c9bbda072d98e828788f4e27d175a14a11ffdd8	2026-08-02T00:56:09-07:00	Teknium	test(secrets): consolidated tier-1 migration regression suite
+50c4afe40ad09c1650756f1017b28b733c9cd4a4	2026-07-14T04:01:00Z	Soju06	perf(gateway): single-row routing UPSERT fast path for metadata-only saves
+54eafee30b83e644abd950355e70f468ee01b8db	2026-08-02T21:55:31+05:30	kshitij	refactor(gateway): single allocator for the shared routing counter
+958ffd108525c7c469b463217bb67a740f0ff3e7	2026-05-22T23:41:30+08:00	JabberELF	perf(memory): store holographic vectors as float32
+7a450ca5ce4682a0b20ecc31eca04af6cbd78206	2026-07-13T19:53:51+08:00	JabberELF	fix(memory): resolve dim=1 float32/float64 blob ambiguity
+94b10eccf5d444a272bbd52d8e662d8f8aec843c	2026-07-11T21:04:05+03:00	And	feat(memory/hindsight): order background prefetch after pending retains
+1be353bf9c1eae871f55597810e2c65bbd6472d1	2026-07-13T02:30:05+03:00	And	fix(memory/hindsight): gate prefetch on server-side retain completion, not just queue drain
+9bbd956b739d9997751d0b33bcac4274f35d00a6	2026-08-02T21:54:40+05:30	kshitij	fix(memory/hindsight): evict timed-out retain ops + coarser status polls
+74b28c8910ebb369ef2a0d278cd28c934d533e61	2026-08-02T00:56:31-07:00	Teknium	fix(secrets): scope memory plugin credential reads (hindsight/honcho/supermemory/mem0/retaindb)
+a23ede5569176d14b80f6411732d181c0fc80261	2026-08-02T00:56:31-07:00	Teknium	fix(secrets): scope image_gen plugin credential reads (openai/deepinfra/krea)
+2438305a220055196f6091c78f2ed4f4e4f6baa0	2026-08-02T00:56:31-07:00	Teknium	fix(secrets): scope browser plugin credential reads (browser_use/browserbase/firecrawl)
+ebd61ce5ac930c6a73e182556be8930521dab833	2026-08-02T00:56:31-07:00	Teknium	fix(secrets): scope tier-3 credential reads (teams_pipeline, deepinfra models, FAL/XAI/VERCEL/DAYTONA/GITHUB presence, HERMES_API_KEY display)
+99533f70b163a90f8e7cb61063beb4ea650180ee	2026-08-02T00:56:31-07:00	Teknium	fix(secrets): resolve google_meet realtime key via secret scope at spawn time
+da43a8527b47f4cff6a1e6ab93eabb44febd435e	2026-07-17T07:29:25-07:00	Ryder Freeman	feat(mem): config-driven allocator trim with telemetry and lifecycle coverage
+3fad8fdc45b9150173829464b8f075c3cb5171a0	2026-08-02T22:20:25+05:30	kshitij	polish(mem): readonly config read, debug-level trim logs, loud frame test
+c575351d9ac50f8e976a6c910e07eedd49e09e32	2026-08-02T22:41:02+05:30	kshitij	fix(mem): 5s force floor so delegate-batch closes don't stack trims
+acfb40c9c773ecc123eeeab4ef2589bdb3d064a8	2026-05-13T22:09:04-05:00	Kent	perf(tools): negative-result cache for read_file + search misses
+4fa8d7bb67dbc7c48332ac042e133ee27c5cdf07	2026-08-02T22:31:18+05:30	kshitij	fix(tools): staleness + tracking-parity fixes for the not-found cache
+9b50a99b395b46ec7cb97ed823f59b717aca18a1	2026-08-02T22:41:40+05:30	kshitij	refactor(tools): existence stat outside the global tracker lock
+013779924fc5e682a2833ae35689be0645d11b19	2026-07-23T16:35:30+08:00	Josh Tsai	fix(agent): fail fast on custom-provider /models auth errors
+9d7c2d450ccc6e08c769a0e4908d50841711429c	2026-05-09T01:50:11+01:00	AMATH	fix: _check_disk_usage_warning runs full rglob on every terminal call
+69f68e5f609aae90d43e8be936fa9c66da0cd10f	2026-08-02T23:03:10+05:30	kshitij	chore: map jesse.casco@gmail.com to FixItFoundry
+710b02663ed1f47f78c018da2356060f03f9611e	2026-08-02T23:03:27+05:30	kshitij	Merge pull request #76966 from kshitijk4poor/chore/attrib-fixitfoundry
+47fa4385df76b4f6937c48e3d155223b1086c373	2026-07-25T20:28:43+08:00	lost9999	fix(serve): cache /api/status profile-gateway topology scan
+af077ef0396726f4daab467bf559e28a5f2abe10	2026-07-16T17:51:23+03:00	Frowtek	fix(api_server): run the cron-fire token verifier off the event loop
+94a0a062146a8094ff6b3630f34de1cc3c7fc138	2026-08-02T23:14:35+05:30	kshitijk4poor	chore: add contributor email mapping for wayne1992127
+2bf2bc141df4b53fc9ca5274dc07b55424e082c6	2026-08-02T23:14:44+05:30	kshitij	Merge pull request #76976 from kshitijk4poor/chore-wayne-email
+9eb8e20c684730e0853b3fcabe63ce8d88dd04c3	2026-06-30T17:08:34+07:00	AlexFucuson9	fix: use lazy logging with %s formatting in logger calls
+d5cf89f3b275a6c5c0e86d497f1746f86fa9de42	2026-08-02T23:01:18+05:30	annguyenNous	fix(tool-executor): use lazy logging format in debug calls
+2a2e6ee2a4bea45a9978deae81a3dce366198085	2026-08-02T23:13:12+05:30	RelaxJonh	fix(gateway): reap orphans on stop_profile_gateway (#75936)
+fe9bdd17e305b54b826977013f70629af59f8a77	2026-08-02T23:14:16+05:30	Kshitij Kothari	fix: exclude killed PID from orphan sweep, fix test, add regression test
+579672d87df1875ddd719ea45252af974cccc59f	2026-07-27T23:20:40+08:00	wayne1992127	fix(desktop): keep cold gateway config off event loop
+70a3c2d9c9aa460d82721fb597625c0e61071a93	2026-07-20T13:20:01-04:00	Jesse Casco	perf(discord): stream voice PCM to ffmpeg instead of a temp file
+c2ff2e8b17f5dd0460aa020aaa21deb59d7fe15f	2026-08-02T23:17:21+05:30	kshitij	polish(discord): surface ffmpeg stderr on pcm_to_wav failure
+177f1d7c53e25cc4fa3596dd720de8e6756367b3	2026-08-02T10:55:48-07:00	Teknium	fix: display sub-cent model prices with extended precision instead of $0.00
+857926ccebe94fc49bcd2c88751969dd0f6827e3	2026-08-02T12:08:50-05:00	Quark Assistant	fix(background-review): preserve gateway prompt context
+5b5932886ce6477a0f4a3d25ca465392288d5126	2026-08-02T23:19:56+05:30	kshitijk4poor	fix(background-review): inherit prefill messages + OpenRouter provider pins on non-routed forks
+c5829fbb344b8ca842153393b15e1ad4c749ca51	2026-07-31T17:42:12+08:00	Jason Chai	fix(desktop): account for transcript payload size
+5b73cfcc985c059aaacecb07a77d602b6250fe28	2026-07-31T18:18:58+08:00	Jason Chai	fix(desktop): bound review workspace scans
+fb6446fc9e2cc66ca704d862ba3abc4d888e2afa	2026-08-03T00:12:31+05:30	kshitij	fix(cron): scope cron approval context per session
+0ab4cdc27df97d14e9df769532e65282d20dd7b1	2026-07-23T21:24:21+07:00	JonthanaHanh	fix(codex): adopt refresh_token from auth.json even without access_token (#70097)
+7380b485891f24194af793abf22f0e128cde4264	2026-08-03T00:23:21+05:30	kshitij	fix: widen source guard to include manual:device_code entries
+3db7a405e07058c8d0f6309fb977fc656a8c8580	2026-07-06T02:43:23-05:00	Alejandro Moreno	fix(gateway): key CLI→platform handoff thread on thread id, not parent channel
+d13e8f751049c6015d58f9363d3c3a6872375939	2026-08-03T00:27:32+05:30	kshitij	fix: Discord-specific guard + cron sibling + non-regression tests
+c83ddd6a51ec211458b3145da7139aafb70191d0	2026-08-03T00:28:10+05:30	kshitij	chore: AUTHOR_MAP for amoreno16003
+d0b87dad77944c669b453385bb797d53fa33c4f7	2026-08-02T12:35:50-07:00	Ben Barclay	fix(relay): key auto-thread rename on prospective_thread_id, not per-chat cache (#77052)
+e57a8f5cb90223c75c2e12d7dc0c07b959c20608	2026-07-31T19:46:59-03:00	xrazai	fix(gateway): preserve delegates during session reaping
+9667236ccbee9fb139431b41ab9a43b84818029e	2026-08-02T11:46:23-07:00	Teknium	test(tui_gateway): accept predicate kwarg in _close_session_by_id stub
+43c79cd84a7dcba6172d06f56f5af2f6fb08af4f	2026-07-25T19:00:24-07:00	teknium1	feat(skills): add grounded-citations skill for verifiable sourcing
+3829e34e235991896a4f4ba6bbb402e5a6e24774	2026-07-22T07:26:29-07:00	Teknium	feat(hooks): outbound webhooks — push signed lifecycle events to external HTTP endpoints
+86fd6da1dc64423ea134f7ad41c7862cbd77c172	2026-08-02T14:34:04-07:00	Teknium	fix(hooks): single delivery_id across header+body, never follow redirects
+5b4d20b524c641a3c7a708a5dc8696a4c6a28588	2026-08-02T14:40:07-07:00	Teknium	fix(hooks): flush outbound queue at interpreter exit
+677473273ea5ae4ef662013ca4e80b04b4cc232f	2026-08-02T10:48:24-07:00	Teknium	feat(terminal): output-pattern failure hints for common error classes
+bc334f538019d21d605da85a0ba8b28d56d99506	2026-06-10T04:01:06+08:00	Guoen	Support adapter channel directory enumeration
+7483745da7e4ef8f2fa15d19ca7198d4844a597d	2026-08-02T14:49:38-07:00	Teknium	feat(gateway): simplex channel enumeration + show configured platforms in hermes send --list
+9158b4b60b0e6d9afb5fe7e0c4254e978b88c1b7	2026-08-02T14:53:30-07:00	Teknium	chore: map contributor email for @Guoen0
+af27e60603fc630888733369ff32b6ca5f1d4be4	2026-08-02T11:06:04-07:00	Teknium	feat(file): raise read_file default limit from 500 to 2000 lines
+99d6f55e385bf8d6c4028bc081cd2ba6ee478270	2026-08-02T11:13:38-07:00	Teknium	feat(patch): detect already-applied edits and return success no-op
+a18a2f170c51b4f1a5bc771c96fc1e052686304f	2026-08-02T11:24:30-07:00	Teknium	feat(terminal): echo cwd in result when a command changes the working directory
+837003b1ed6742d2dd3c15b181c0d628c58fb8b6	2026-06-07T19:47:09-07:00	teknium1	feat(a2a): consolidated Agent-to-Agent protocol plugin (closes #514)
+64a50ed50ae4cc9dc8495639311e5be4a6de3ab8	2026-06-07T20:30:55-07:00	teknium1	fix(a2a): default the a2a toolset OFF (opt-in), like spotify
+7d57422936f018943958b3c28a9d2c8a51aceed9	2026-06-07T22:23:35-07:00	teknium1	fix(a2a): client tools take args-as-dict positional; accept agent_name alias
+38318cec1ece7c81f618d8afb6d70d4abfae98af	2026-07-01T14:03:37Z	David Robertson	fix(a2a): wait for final replies before resolving RPCs
+436e5a9cb5afaa2036759d1031814b96513af48a	2026-07-04T21:06:27+10:00	Kevin (OpenClaw Bot)	fix(a2a): integrate all follow-up fixes for #41711
+c6b0e3a80ee4b14828b38a438f6cf1ecb4d06466	2026-07-04T22:07:12+10:00	Kevin (OpenClaw Bot)	feat(a2a): Phase 2+3 — SSE streaming, push notifications, anti-loop, orchestrate
+37481dccf408399e5357b07a929dfec4ceeb2d0a	2026-07-06T14:09:58+10:00	Kevin (OpenClaw Bot)	fix(a2a): security hardening from code review
+41c406e1ab5a6730e7bab4b843be8728b8755491	2026-07-06T14:57:45+10:00	Kevin (OpenClaw Bot)	feat(a2a): v1.0 upgrade + full code review fixes
+fe1aca57708302077192af4a8ca0bb644b373c5b	2026-07-06T15:14:58+10:00	Kevin (OpenClaw Bot)	feat(a2a): file/data Parts + push config full CRUD
+b1819ceb7dbda9b83c7376c71806b6a6120ae451	2026-07-07T14:52:53+10:00	Kevin (OpenClaw Bot)	fix(a2a): align multiplexer with v1 protocol and tenant isolation
+5a8102d71cd9f8c418a79656dfafed26ec7960c1	2026-07-13T16:27:19+10:00	Ben Kamholtz	fix(a2a): JSON-RPC conformance for a2a-sdk 1.1.0 compatibility
+3271cb6907a25fb0dd49fb07ab81c92008f57a53	2026-07-13T18:19:05+10:00	Ben Kamholtz	fix(a2a): override authorization_is_upstream for A2A peers
+81c7e5de48dcccf358b7ca01d405f2339ef485a7	2026-08-02T14:49:06-07:00	Teknium	docs(a2a): website docs page + canonical agent-card.json path in prose
+660237026be1629ebe9a5bbaae3cdcafadd4d647	2026-08-02T14:52:59-07:00	Teknium	chore: map bennybuoy noreply email for a2a salvage attribution
+5797b502887797196f5e3fe35e4deff124c68b85	2026-08-02T11:30:40-07:00	Teknium	feat(search): zero-match probes and multi-path recovery
+e7aa06c3a659b4f10abe33fdef0a751825ae63e3	2026-08-02T11:55:30-07:00	Teknium	feat(search): hidden/gitignored probe on zero-match results
+0b149ca0308e91d85cae58f14204385dd419dc5c	2026-08-02T11:35:15-07:00	Teknium	fix(process): wait timeout result reads as status, not failure
+b1711c6f2e968fab13deadee3bd63a8c44c365ac	2026-08-02T11:38:47-07:00	Teknium	fix(terminal): blocked-command errors carry a concrete recovery recipe
+6f5d6b1f5b832dc8389b728bd25981e46471fba5	2026-08-02T14:03:41-07:00	Teknium	feat(terminal): auto-save parser-limit-blocked payloads as runnable scripts
+820f63e842d15516e2a55a87b51134bfaa360fa5	2026-07-19T15:46:39+02:00	null-runner	[verified] fix(desktop): preserve background delegates across session switches
+719a3da11fee1ece6669d8e929557d62d88e3d05	2026-08-02T14:55:32-07:00	Nicholas Mariani	test(desktop): cover finalizing orphan delegation state
+6101c92dd1d5062fbfca4be926427e4d6b282b01	2026-08-02T14:56:12-07:00	null-runner	test(desktop): follow upstream orphan teardown path
+719c1b03669c37c26f49e2a1e61465a66d05ee11	2026-08-02T14:57:14-07:00	Teknium	test(tui_gateway): route lookup-failure regression through has_live_for_session
+d0e73ff30ce2defd9f0458338ce62fab66967e6b	2026-08-02T14:59:15-07:00	Teknium	fix(tui_gateway): widen reaper delegate keepalive to durable session_key
+75a8d4a59790d1d297c85335cccbac31588e4f41	2026-08-02T14:59:34-07:00	Teknium	chore: map nicholas.mariani@hotmail.it -> null-runner
+5d675a2ca78d16a324e57403498cc4190193ede5	2026-08-02T11:50:10-07:00	Teknium	feat(patch): whitespace-visualized diagnosis on residual no-match errors
+2c8a932f8015eae8568eed20faee52a7b8e4fd32	2026-08-02T12:11:47-07:00	Teknium	feat(file): verify write_file content on disk and say so (verified: true)
+2a3a7e6f53b8c29b525bb9a941b91314927ca1ce	2026-08-02T14:28:04-07:00	Teknium	feat(skills): dedup repeat skill_view calls with an unchanged-content stub
+1cefabc8af5f2a75441b9d05fb5757452ed02cbf	2026-08-02T14:34:02-07:00	Teknium	feat(search): auto-enable multiline mode for newline patterns
+eb6214300693d2f3472d605b76282989d334bce9	2026-08-02T14:39:42-07:00	Teknium	feat(execute_code): recovery hints for known sandbox failure classes
+1c39f1c9f984705e7b5be66f826ebecb9d381629	2026-08-02T15:04:34-07:00	Teknium	feat(ci): auto-fixable contributor attribution — audit_pr_attribution.py + gate points at it
+794d6c434e16d15add4dd7dfe8d8dda665af4f24	2026-08-02T15:27:34-07:00	Teknium	fix(search): restore zero-match probes on the rg engine after auto-multiline early-return
+7713d216f5c64b40280c02f23c796566c1d4cf8f	2026-08-02T15:37:09-07:00	Teknium	test(search): guard zero-match hint wiring on both engines
+1c6d1a23c081014ce70595396c4becc1112426b8	2026-08-02T11:18:56-07:00	Teknium	feat(patch): list match locations in ambiguous old_string errors
+80631c4aeaa34e4c0f3aca987992846593c333b1	2026-08-02T12:06:06-07:00	Teknium	feat(terminal): recoverable truncation — spill full output + report pre-truncation size
+f01c193be4aa034874ab2204c74d20e4e4360259	2026-08-02T11:45:52-07:00	Teknium	refactor(schema): trim terminal and execute_code schema prose ~40%
+c2088efe9efab25b4a3bbe2dd1d2f1051a736834	2026-07-27T23:16:24+05:00	fangliquanflq	feat(gateway): session activity watchdog, stall notify, compress timeout (#72424)
+962e4538dadb29ddb45ef23254d70054bb8b67ab	2026-07-27T23:18:45+05:00	kshitijk4poor	refactor: reuse existing utilities in salvaged PR #72424
+bcbaaa40203704f92cead3a308724112508b14b9	2026-07-27T23:28:06+05:00	kshitijk4poor	fix: propagate logging session context after daemon-pool compress_context
+61e722261ce18e94adf68885f3335ac76ca4a501	2026-07-28T11:08:18+08:00	fangliquanflq	fix(agent): silence detached compression heartbeat after host timeout
+f3c9d4c61096f301e3c6ee1ae17eb063c22a8693	2026-07-28T11:16:00+08:00	fangliquanflq	chore(contributors): map fangliquan@qq.com to fangliquanflq
+240148b440a053316386112c2e7f7a3ab8b20047	2026-07-28T12:29:43+08:00	fangliquanflq	fix(agent): force-persist compression completed past SessionDB rate limit
+06c7f9b26f3fd83a34b179e7e7a709d8e172916e	2026-07-31T16:44:58Z	fangliquanflq	fix(agent): clarify compress_context ceiling is pre-commit only
+2e75aec512ddaf725d09f7b82045da3cc712647c	2026-08-01T01:13:28+08:00	fangliquanflq	fix(agent): restore end_turn in run_conversation finally
+2fb0aa1c0e8d5dc0cda22111f2020ea63ee0cfa4	2026-08-01T11:39:17-07:00	Teknium	fix(agent): enforce bounded, surfaced commit-phase waits past context_total_ceiling_seconds
+024a58ddea8566e5335dabfb82778fa6a672982a	2026-08-01T11:41:20-07:00	Teknium	refactor(agent): pin session activity heartbeat cadence + harden best-effort write
+a05b102d0df8c0f24270dac9f8186651a5284dd9	2026-08-01T11:57:21-07:00	Teknium	test(agent): deflake concurrent-fork suite by skipping live aux feasibility probe
+980aea225e6e8d20cae975d698ff199ba34221c5	2026-08-01T15:21:03-07:00	Teknium	fix(agent): observe commit phase without the fence lock (review F1)
+efdd2298840699f4269a7b8304096c0b2b1af910	2026-08-01T15:21:03-07:00	Teknium	fix(agent): revoke commit admission on every host unwind (review F2)
+971d81f892331bb1641a9d3f389a7b14355eb5bd	2026-08-01T15:21:03-07:00	Teknium	fix(agent): isolate the pooled compression worker from the live transcript (review F3)
+fdeb09a596f231413d88edd67dd376f2aa784a40	2026-08-01T15:21:04-07:00	Teknium	fix(agent): holder-qualified durable lease cancellation, cooldown ordering (review F4)
+36a60c5edc55300079682d06f8c3c796bfa96dd2	2026-08-01T15:21:04-07:00	Teknium	fix(agent): rebind the caller's session ContextVar after out-of-place rotation (review F5)
+abc0db8cde60e32a01d28b2b4ee6b6bb302acafa	2026-08-01T15:21:04-07:00	Teknium	fix(agent): bounded admission + stale-job cancellation for the compress pool (review F6)
+99100843c6a1d92af8ef2d10e45142f0a05ac917	2026-08-01T15:21:04-07:00	Teknium	fix(agent,gateway): charge the idle wait from the last progress event (review S3)
+92c736919d320fcf1ac7e8e69fb5fd01b303cb0d	2026-08-01T15:21:04-07:00	Teknium	fix(state): sub-second busy budget for observational activity writes (review S1)
+89c4e26e23e74fab6cd1141435cb805b9fd9a2a2	2026-08-01T15:21:04-07:00	Teknium	fix(gateway): revalidate stall candidate immediately before /new delivery (review S2)
+038c1ad8724614ea2a76d72c1792ce7b172a708d	2026-08-01T15:21:04-07:00	Teknium	docs(gateway): precise watchdog scope, explicit import-resets-activity contract (review S4)
+fe2fc5724045d40ee35009707d2d80f1b0c84653	2026-08-01T15:28:19-07:00	Teknium	test: skip live aux feasibility probe in worker-isolation regressions
+15267a1d2d7f01bae8e0c7009ff1a15e57a0223c	2026-08-02T15:20:48-07:00	Teknium	fix(agent): reconcile explicit hard-cancel (main d15b638a88) with pooled fence rework
+0277cc48bd15d8d4d7b340f75ecf0947d9a9aaef	2026-08-02T15:26:16-07:00	Teknium	fix(agent): never release the durable compression lease mid-commit (re-review #1)
+58f0fe305d2a16e8ffd10c5eb7ed874da9f7e241	2026-08-02T15:28:41-07:00	Teknium	fix(gateway): bound the stall-notify adapter.send (re-review #2)
+53a5983af07a7507a5b7f6cbc0bb7ef1cd160eac	2026-08-02T15:30:04-07:00	Teknium	chore(state): bump SCHEMA_VERSION to 24 for activity-tracking columns (re-review #3)
+0628e333472f4b8549b9577b09e60b5196c00ff4	2026-08-02T15:32:43-07:00	Teknium	fix(agent): clear archived parent's activity labels after rotation (re-review #4)
+06bdc48c1ff4f2d9c4cce50dc2804fa6ade9e69e	2026-08-02T15:33:17-07:00	Teknium	perf(agent,gateway): back cancel-wait polls off from 1ms to 25ms (re-review #5)
+a0e700c4cf3c9f59a2e6fcd4892d5261985fc6fa	2026-08-02T15:35:59-07:00	Teknium	feat(agent): emit pool_saturated compression-attempt telemetry (re-review #6)
+b2963f8034bcd2e5f6b6c32cef2a11ced187242d	2026-08-02T15:38:52-07:00	Teknium	docs: document agent.session_stall_timeout + compression timeout keys (re-review #7)
+44c362889a1c8f92d20b09da90ee91c35eb8eeb0	2026-08-02T15:39:43-07:00	Teknium	test(agent): deflake progress-extension timing per FLAKY policy (re-review #8)
+58e3dcf3d6731eb54cf6a78796524959bf59cd9c	2026-08-02T15:41:53-07:00	Teknium	chore: round-2 review nits (re-review #9)
+8d755d074818c79f6b7fdc0016f8930ea4872b26	2026-08-02T15:35:20-07:00	Teknium	chore: contributor email mappings from open attribution PRs
+4660673a3c0cc4fa4c02b93e14b24808c640983e	2026-08-02T14:36:47-07:00	Teknium	feat(skills): add fact-checking mode to grounded-citations
+a6defd4f1549da3fe1d08d6f746fc645c64543f0	2026-08-02T15:20:36-07:00	Teknium	fix(skills): match evidence quotes through markdown markup
+e471c7165e945ac09f8f899ddbb259e8d5ad6dba	2026-05-20T17:39:56+08:00	Jiahui-Gu	fix(env): make config.yaml authoritative for terminal.backend (#29186)
+a4a91610b05acc75b4d76c077a5cd89c1ee066ba	2026-08-02T17:18:31-07:00	Teknium	test: cover gateway per-turn reload and flip dump terminal-backend pin
+17bdc99db4e6faa70ea2a9781f8d84c5734174bd	2026-08-02T22:08:09-05:00	Brooklyn Nicholson	feat(desktop): reload a tab from its right-click menu
+f4604f89dec8d225d67d7a68065c1b425fd3732a	2026-08-02T22:14:27-05:00	brooklyn!	Merge pull request #77275 from NousResearch/bb/tab-reload
+aac74be2f11f0fc80a1988bcaacabf40b28a1295	2026-08-02T18:51:19-07:00	Teknium	fix(approval): classify CLI/TUI approval timeouts separately from explicit denials
+9e373b3828e0a505e61dfd50f07e8e5db58ace9b	2026-08-02T22:28:28-05:00	Brooklyn Nicholson	fix(desktop): paste rich text with images as text, not blank attachments
+ef9f6effaffc5c454598a072c7ffba12048783f6	2026-08-02T18:56:38-07:00	Teknium	fix(cli): persist YOLO mode across --resume
+aa8f0d4c8589a4e06b9847ee12be6c3bb6629ca7	2026-08-02T22:35:35-05:00	brooklyn!	Merge pull request #77292 from NousResearch/bb/composer-mixed-paste
+d79a6f0e3e3fabd23a06b92efc7e443ff2652e1f	2026-08-03T03:44:44Z	hermes-seaeye[bot]	fmt(js): `npm run fix` on merge (#77300)
+af6efdcd150d48465340ebd5cdd5805754791c44	2026-08-03T09:39:00+05:30	kshitij	chore: contributor email mappings for egilewski and myk0la-b
+7598bc6c9527ca3abc5471662ddf861e3a6d80d6	2026-08-03T09:39:20+05:30	kshitij	Merge pull request #77319 from kshitijk4poor/chore/attrib-egilewski-myk0la
+68391930d0aa2bd580d8ba9f0e65a8624a15171d	2026-07-22T11:31:22-04:00	Gabriel Lesperance	perf(tui): bound scroll rendering and preserve anchors
+b6cdddd3df10aea7ff60a54b650123239080a801	2026-08-03T09:54:28+05:30	kshitij	chore: AUTHOR_MAP for ckaznocha (matrix crypto PRs)
+1228bfb27046856e4eddab675ed1b3476d7c6655	2026-08-03T09:54:46+05:30	kshitij	Merge pull request #77329 from kshitijk4poor/chore/attrib-ckaznocha
+8f61e61991a48e871d38cf4503bfd5fed928bac2	2026-08-03T09:55:44+05:30	kshitij	chore: add contributor email mapping for LFDMcore (core@lfdm.co) (#77331)
+a93969dbd183d626b35f46671ca2842225b66f6d	2026-08-02T15:41:34-03:00	joaomarcos	fix(tui): snapshot history after pending model switch applies (#76870)
+3b53a3c5606737d5fbcf673b26aa0e67b659324c	2026-08-02T17:40:22-03:00	joaomarcos	chore: drop stale diagnostic report from PR #77021
+9421c5afdf36af145ba775dd4e2d84184c6efa84	2026-07-22T22:42:35+02:00	Eugeniusz Gilewski	perf(agent): precompile response and skill-scan regexes (#33208)
+622c220ebb99681942213c87c20633e0f599ce27	2026-08-03T09:49:14+05:30	kshitij	refactor(agent): rebuild hoisted patterns from shared tag-name tuples
+307ef0061c7aab03184b5987ecfb7b0da876a15a	2026-08-03T09:57:30+05:30	kshitij	chore: add ATran28 to AUTHOR_MAP
+f105db2136361f6e57da32ee712bfa5581752ba1	2026-08-03T09:57:46+05:30	kshitij	Merge pull request #77335 from kshitijk4poor/chore/author-map-atran28
+db3f7e4eb99731ddddc8c091f2e4fd28ff835bc9	2026-08-03T07:58:23+07:00	HexLab98	fix(gateway): defer in-band restart until active turns finish (#77184)
+28d994f26c0db6cf17ec582dad01c1a155a0ec23	2026-08-03T07:58:23+07:00	HexLab98	test(gateway): cover restart after-turn deferral (#77184)
+1fba2dbe85f0c106d26d49b444c692973eb5b943	2026-08-02T12:33:52-07:00	briandevans	fix(tui_gateway): drain in-flight turns before finalizing sessions on compute-host shutdown
+e2391845217a76b5f040c6660e5c8188277815e3	2026-08-02T12:42:53-07:00	briandevans	fix(tui_gateway): bound the shutdown drain sleep by the time left to it
+eb4f514b2d386e80f907e94bc29a192ee49b32ad	2026-08-02T16:34:08-07:00	briandevans	fix(tui_gateway): retain live-turn sessions unfinalized when the drain deadline expires
+0cbedc58f0f527aecec5be8ceea112af82629962	2026-08-03T09:54:59+05:30	kshitij	docs: note atexit re-finalization interaction in shutdown() docstring
+09ed1ac9509b47afe09f6dcef23d52aa3d5750ba	2026-08-01T00:57:16+03:00	StanleyStetson	fix(desktop): memoize sidebar flatRows and row renderers to prevent scroll jitter (fixes #73629)
+416f91d271dece024c41d76ecdf356b153600801	2026-08-01T02:02:30+03:00	StanleyStetson	fix(test): export VirtualSessionListProps and assert sessions array identity change
+372494fdf940452f1f67a353d170739807a2df26	2026-08-03T00:07:14+05:30	kshitij	style(desktop): eslint --fix import order in sessions-section test
+873af72f8cb06344590ac9abe9aff34507bbd98b	2026-07-26T04:40:16-07:00	briandevans	fix(ui-tui): pause status-chrome timers while a blocking overlay is open
+ee8765c9300c40575e16d94d2d6c000487a02d6e	2026-07-30T08:39:34-07:00	briandevans	fix(ui-tui): gate status-rule timers on real occlusion, not $isBlocked
+e8c1882766d257145f6f20ca1b3d37289680bf34	2026-08-03T09:51:25+05:30	kshitij	refactor(ui-tui): single source for the floating-panel kind set
+4ffc8449a315504271f79953782d41fb33b68aa9	2026-08-02T14:45:47-07:00	LFDM Core	fix(compression): overflow handlers pass overhead-aware token size to LCM recovery (issue 441)
+ff3c9848d44877da80b3c644b0066df923d7634f	2026-08-02T17:56:17-07:00	LFDM Core	fix(compression): route overhead-aware tokens in post-tool compress + add recovery-path tests
+799102a4d884c63f3428e0592e724c86d5161de9	2026-07-24T20:42:29-03:00	webtecnica	fix(matrix): fallback to homeserver query for room encryption detection (#71067)
+a4b686c29e81b7a93a95d6d7c4fcd66a0fee0963	2026-07-25T12:36:03-07:00	ckaznocha	fix(matrix): reset Olm crypto store when the access token's device ID changes
+907bdc7856b2e48df1cf43af52a54dca215685b1	2026-08-02T16:15:34-07:00	ckaznocha	fix(matrix): let the token's own device win over a stale MATRIX_DEVICE_ID
+3a43422065a631604e321de64f3b5fb48a49eb5d	2026-07-25T12:43:06-07:00	ckaznocha	fix(matrix): migrate crypto store when the Olm pickle key changes
+80d5a57b9447c92bce6a4f5408bb5d5d6a912d29	2026-08-02T16:19:18-07:00	ckaznocha	fix(matrix): commit the migrated account only after the session sweep
+648c01c6939e08e9f840236bfd58774370d3f126	2026-08-03T09:57:31+05:30	kshitij	fix(matrix): pickle key from resolved device ID, skip migration after reset, cache enc info
+947fdeab3bdef53bb3ff856a4bce0e6e6235122a	2026-08-02T23:03:59-04:00	Anthony Tran	fix(whatsapp): guard bridge reconnect against hangs and unhandled rejections
+45d3416d82652feea3c2cfb9a323ef61ff120a27	2026-08-03T10:04:35+05:30	kshitijk4poor	chore: add contributor email mapping for danielblankhh
+21040c4ab66899995d78cca00e83e5325f786883	2026-08-03T10:04:45+05:30	kshitij	Merge pull request #77339 from kshitijk4poor/chore-dblank-email
+c98ed22e42509d46b92ae35e08abc169bafb2353	2026-08-02T21:48:55-03:00	CriptoGus	fix(cron): stop lifecycle guard false-positives and crashes on .py/binary scripts
+037825c1f24d86cc54f47b731330524cf1cabee2	2026-08-03T10:03:41+05:30	kshitij	fix: check NUL bytes before size limit in _read_referenced_script
+df9e039d2da8e0182d8796a059b003fa67502652	2026-08-02T22:14:30-04:00	Coffee☕️	fix(discord): preserve links in truncated tool previews
+911d8dfbf45fe590aefefd764c3079c34ef38da5	2026-08-02T22:29:19-04:00	Coffee☕️	refactor(discord): simplify tool preview links
+56941eb3293acfd22b4aabadaa9514b9f67d0b44	2026-08-02T22:32:25-04:00	Coffee☕️	refactor(gateway): share markdown link formatting
+7af104b37b4de8039bf7affdfd9f059a82ca0025	2026-08-02T22:36:31-04:00	Coffee☕️	refactor(discord): keep link formatting adapter-local
+e599f100ec1bb95c1881930f3fdbf682900181e7	2026-08-02T23:19:58-04:00	Coffee☕️	fix(discord): avoid truncated URL link targets
+dd600d1ace727fc9f10c9f8763f21b564e25b06f	2026-08-02T21:37:18-07:00	Teknium	fix(discord): suppress link embeds in tool preview markdown links
+75901a295dc44f359f2b6336e03cd3eedbcf9d4c	2026-07-29T14:38:24-04:00	Mahdi Hedhli	perf(tts): pipeline sync per-sentence synthesis with playback
+f9ed58e6aca4f774cc5b2e063d405566ddf01589	2026-08-03T10:05:45+07:00	JonthanaHanh	fix(tui-gateway): merge agent output on model-switch history_version mismatch (#76870)
+cc04825c5dd49afe9dd503f4115d1e9b37e64505	2026-08-03T10:22:53+05:30	kshitij	fix: content-based diff for model-switch marker merge (#76870)
+07dd2f8fc93c0ae47f37edc2f815c9483c58e73b	2026-08-03T10:25:15+05:30	kshitij	chore: AUTHOR_MAP kshitij@k4poor.dev -> kshitijk4poor
+498800a22ef606323ffe14b515d77f0b87999232	2026-07-19T12:31:15Z	ibaldr89	fix(gateway): offload delivery ledger I/O
+b7e3cc37bea6f44c55811c718da8f064d0e2a466	2026-08-02T23:05:59+05:30	kshitijk4poor	test: move the redelivery event-loop test to the class that has its helpers
+5b36d64583bf9ed8c30b127d24b671f229f8abcb	2026-08-02T23:52:05+05:30	kshitijk4poor	test: raise blocking-probe timeouts for loaded CI runners
+5633764733cdb64f5e72964d6f2d654eb9b50906	2026-08-03T10:48:46+05:30	kshitijk4poor	test: wait for ledger-wrapped sends in drain assertions
+1d3242ac72b841fc5b3f0cecabb6be64f8347ef1	2026-08-03T11:02:47+05:30	kshitij	chore: map universeszym@mail.ustc.edu.cn to Johnny-xuan
+6858e0d9315c21dad04958f3343de44ccd2d232b	2026-08-03T11:03:06+05:30	kshitij	Merge pull request #77371 from kshitijk4poor/chore/attrib-johnny-xuan
+4be0d5602334c72e76f972e8b04400cf8c51be59	2026-08-02T22:14:58-07:00	Teknium	perf(tools): compact delegate_task description by deduping against param schema
+a01f979b6e86d24a798968d5341788e008f96caf	2026-08-02T22:31:52-07:00	Teknium	perf(tools): restore benchmark-sensitive phrasing in compacted description
+d127fb21971515536124de6463aba825fa3b4ac7	2026-08-02T22:56:01-07:00	Teknium	fix(approval): stop treating newlines inside quoted arguments as command starts
+d1afa16053a3777849c2b5465d59a0147b2172f9	2026-08-02T22:56:25-07:00	Teknium	fix(cron): retain completed one-shot jobs instead of deleting them on completion
