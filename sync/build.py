@@ -159,6 +159,27 @@ def apply_patches(root: str, cfg: dict) -> tuple[int, list[str]]:
     return applied, misses
 
 
+def stamp_version(root: str, version: str) -> None:
+    """Overwrite apps/desktop/package.json's version field.
+
+    Upstream freezes this field — it does not track their own releases,
+    so electron-builder's artifactName template
+    (Hermes-${version}-${os}-${arch}.${ext}) resolves to the same stale
+    string on every build no matter which commit sync/hermes.lock points
+    at. This stamps our own release version in its place so each built
+    filename increments with the tag that produced it.
+    """
+    path = os.path.join(root, "apps", "desktop", "package.json")
+    with open(path, encoding="utf-8") as fh:
+        data = json.load(fh)
+    old = data.get("version")
+    data["version"] = version
+    with open(path, "w", encoding="utf-8", newline="") as fh:
+        json.dump(data, fh, indent=2)
+        fh.write("\n")
+    print(f"      {old} -> {version}")
+
+
 def drop_paths(root: str, cfg: dict) -> int:
     dropped = 0
     for rel in cfg["drop"]["paths"]:
@@ -225,6 +246,18 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="build", help="output directory")
     ap.add_argument("--keep-clone", action="store_true")
+    ap.add_argument(
+        "--app-version",
+        default=None,
+        help=(
+            "Stamp this into apps/desktop/package.json's \"version\" field "
+            "before building. Upstream never bumps that field on their own "
+            "main branch, or even on their own tagged releases, so left "
+            "alone every SARTHI build ships under the same frozen version "
+            "string forever regardless of which commit it is pinned to. "
+            "Pass the release tag that triggered this build (e.g. 0.3.8)."
+        ),
+    )
     args = ap.parse_args()
 
     cfg = load_config()
@@ -240,24 +273,24 @@ def main() -> int:
     tmp = tempfile.mkdtemp(prefix="sarthi-build-", dir=ROOT)
     clone = os.path.join(tmp, "upstream")
     try:
-        print("[1/7] Fetching pristine upstream...")
+        print("[1/8] Fetching pristine upstream...")
         fetch_upstream(cfg["upstream"]["repo"], sha, clone)
 
-        print("[2/7] Dropping upstream-only infrastructure...")
+        print("[2/8] Dropping upstream-only infrastructure...")
         dropped = drop_paths(clone, cfg)
         print(f"      removed {dropped} path(s)")
 
         rb = Rebrander(cfg)
 
-        print("[3/7] Rewriting file contents...")
+        print("[3/8] Rewriting file contents...")
         changed, skipped = rewrite_contents(clone, rb)
         print(f"      rewrote {changed} file(s), skipped {skipped} binary/unreadable")
 
-        print("[4/7] Renaming files and directories...")
+        print("[4/8] Renaming files and directories...")
         renamed = rename_paths(clone, rb)
         print(f"      renamed {renamed} path(s)")
 
-        print("[5/7] Applying explicit identity patches...")
+        print("[5/8] Applying explicit identity patches...")
         applied, misses = apply_patches(clone, cfg)
         print(f"      applied {applied} patch(es)")
         if misses:
@@ -268,11 +301,17 @@ def main() -> int:
                 print(f"  - {m}")
             return 1
 
-        print("[6/7] Applying overlay/ ...")
+        if args.app_version:
+            print(f"[6/8] Stamping app version -> {args.app_version} ...")
+            stamp_version(clone, args.app_version)
+        else:
+            print("[6/8] No --app-version given, leaving upstream's frozen version as-is")
+
+        print("[7/8] Applying overlay/ ...")
         copied = apply_overlay(clone)
         print(f"      copied {copied} overlay file(s)")
 
-        print("[7/7] Verifying...")
+        print("[8/8] Verifying...")
         problems = verify(clone, cfg)
         if problems:
             print("\nERROR: build failed verification:\n")
