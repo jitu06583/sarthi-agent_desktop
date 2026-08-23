@@ -70,7 +70,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          npm ci 2>&1 | tee "$RUNNER_TEMP/step.log"
+          npm ci 2>&1 | tee "$GITHUB_WORKSPACE/step.log"
 
       - name: Install Linux packaging tools
         if: matrix.name == 'linux'
@@ -81,7 +81,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          npm run ${{ matrix.dist_script }} 2>&1 | tee "$RUNNER_TEMP/step.log"
+          npm run ${{ matrix.dist_script }} 2>&1 | tee "$GITHUB_WORKSPACE/step.log"
         env:
           # No Apple Developer credentials configured yet — the mac build stays
           # unsigned/un-notarized (users right-click → Open the first time).
@@ -94,7 +94,7 @@ jobs:
         if: failure()
         shell: bash
         run: |
-          LOG="$RUNNER_TEMP/step.log"
+          LOG="$GITHUB_WORKSPACE/step.log"
           [ -f "$LOG" ] || { echo "::error::Failed before any captured step ran."; exit 0; }
           {
             echo "### Build failure — ${{ matrix.name }}"
