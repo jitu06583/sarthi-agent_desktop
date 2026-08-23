@@ -233,7 +233,11 @@ def main() -> int:
 
     print(f"Pinned upstream commit: {sha}")
 
-    tmp = tempfile.mkdtemp(prefix="sarthi-build-")
+    # dir=ROOT keeps the clone on the same drive as the output.
+    # On Windows runners the OS temp dir is C: while the checkout is
+    # D:, so the final shutil.move() silently falls back to a
+    # copy+rmtree and dies deleting read-only git pack files.
+    tmp = tempfile.mkdtemp(prefix="sarthi-build-", dir=ROOT)
     clone = os.path.join(tmp, "upstream")
     try:
         print("[1/7] Fetching pristine upstream...")
