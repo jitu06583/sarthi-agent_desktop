@@ -45,6 +45,8 @@ jobs:
             name: linux
 
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
     timeout-minutes: 60
 
     steps:
@@ -62,23 +64,57 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
 
       - name: Install root dependencies
+        id: install
         working-directory: build
-        run: npm ci
+        shell: bash
+        run: |
+          set -o pipefail
+          npm ci 2>&1 | tee "$GITHUB_WORKSPACE/step.log"
 
-      - name: Install desktop workspace dependencies
-        working-directory: build
-        run: npm install --workspace apps/desktop
+      - name: Install Linux packaging tools
+        if: matrix.name == 'linux'
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq rpm libarchive-tools
 
       - name: Build (${{ matrix.name }})
         working-directory: build/apps/desktop
-        run: npm run ${{ matrix.dist_script }}
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run ${{ matrix.dist_script }} 2>&1 | tee "$GITHUB_WORKSPACE/step.log"
         env:
           # No Apple Developer credentials configured yet — the mac build stays
           # unsigned/un-notarized (users right-click → Open the first time).
           CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      # On failure, publish the tail of the failing command to the run page.
+      # Job summaries and annotations are readable without signing in, so a
+      # failed build explains itself instead of hiding behind "exit code 1".
+      - name: Report failure
+        if: failure()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          LOG="$GITHUB_WORKSPACE/step.log"
+          if [ -f "$LOG" ]; then
+            TAIL=$(tail -n 150 "$LOG")
+          else
+            TAIL="(no captured log — failed before or outside a captured step)"
+          fi
+          {
+            echo "### Build failure - ${{ matrix.name }}"
+            echo
+            echo '```'
+            echo "$TAIL"
+            echo '```'
+          } > "$GITHUB_WORKSPACE/report.md"
+          cat "$GITHUB_WORKSPACE/report.md" >> "$GITHUB_STEP_SUMMARY"
+          gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/comments" \
+            -f body="$(cat "$GITHUB_WORKSPACE/report.md")" >/dev/null || \
+            echo "::warning::could not post log comment"
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
