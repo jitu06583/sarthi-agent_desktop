@@ -59,7 +59,10 @@ jobs:
           python-version: "3.11"
 
       - name: Generate the branded tree
-        run: python sync/build.py --out build
+        shell: bash
+        run: |
+          set -o pipefail
+          python sync/build.py --out build 2>&1 | tee "$GITHUB_WORKSPACE/step.log"
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -88,6 +91,10 @@ jobs:
           # No Apple Developer credentials configured yet — the mac build stays
           # unsigned/un-notarized (users right-click → Open the first time).
           CSC_IDENTITY_AUTO_DISCOVERY: false
+          # electron-builder refuses to run without a token even when not
+          # publishing (it checks release info for the update feed). The
+          # ambient Actions token is enough for that, no secret needed.
+          GH_TOKEN: ${{ github.token }}
 
       # On failure, publish the tail of the failing command to the run page.
       # Job summaries and annotations are readable without signing in, so a
