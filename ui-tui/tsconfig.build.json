@@ -1,8 +1,0 @@
-{
-  "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "paths": {
-      "@sarthi/ink": ["src/types/sarthi-ink.d.ts"]
-    }
-  }
-}

@@ -1,0 +1,99 @@
+name: Sarthi Sync
+
+# One-click sync with upstream Hermes.
+#
+# Triggered from the admin panel on sarthi-agent.vercel.app, or manually from
+# the Actions tab. It checks whether upstream has moved, runs the branded
+# build to prove the new commit actually builds clean, and opens a pull
+# request whose entire diff is one line: the pinned commit in sync/hermes.lock.
+#
+# It never merges anything. It never rewrites the repo. If the build fails
+# verification, no PR is opened and the failure is the signal.
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    # Weekly check, Monday 06:00 UTC. Harmless when upstream has not moved.
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Resolve latest upstream commit
+        id: upstream
+        run: |
+          REPO=$(python -c "import json;print(json.load(open('sync/identity.json'))['upstream']['repo'])")
+          LATEST=$(git ls-remote "$REPO" HEAD | cut -f1)
+          CURRENT=$(grep -v '^#' sync/hermes.lock | head -1 | tr -d '[:space:]')
+          echo "latest=$LATEST"   >> "$GITHUB_OUTPUT"
+          echo "current=$CURRENT" >> "$GITHUB_OUTPUT"
+          if [ "$LATEST" = "$CURRENT" ]; then
+            echo "moved=false" >> "$GITHUB_OUTPUT"
+            echo "Already on the latest upstream commit ($CURRENT). Nothing to do."
+          else
+            echo "moved=true" >> "$GITHUB_OUTPUT"
+            echo "Upstream moved: $CURRENT -> $LATEST"
+          fi
+
+      - name: Pin the new commit
+        if: steps.upstream.outputs.moved == 'true'
+        run: echo "${{ steps.upstream.outputs.latest }}" > sync/hermes.lock
+
+      - name: Build against the new commit
+        if: steps.upstream.outputs.moved == 'true'
+        run: python sync/build.py --out build
+
+      - name: Summarise
+        if: steps.upstream.outputs.moved == 'true'
+        run: |
+          {
+            echo "### Sarthi sync"
+            echo
+            echo "| | commit |"
+            echo "|---|---|"
+            echo "| before | \`${{ steps.upstream.outputs.current }}\` |"
+            echo "| after  | \`${{ steps.upstream.outputs.latest }}\` |"
+            echo
+            echo "The branded build ran clean against the new commit: every"
+            echo "identity patch matched and the user-data location is unchanged."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Open pull request
+        if: steps.upstream.outputs.moved == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: sync/hermes-${{ steps.upstream.outputs.latest }}
+          base: main
+          add-paths: sync/hermes.lock
+          commit-message: "sync: pin Hermes ${{ steps.upstream.outputs.latest }}"
+          title: "Sync: pin Hermes ${{ steps.upstream.outputs.latest }}"
+          body: |
+            Upstream Hermes moved. This bumps the pinned commit.
+
+            | | commit |
+            |---|---|
+            | before | `${{ steps.upstream.outputs.current }}` |
+            | after  | `${{ steps.upstream.outputs.latest }}` |
+
+            The branded build already ran against the new commit in this
+            workflow. It passed, which means every identity patch in
+            `sync/identity.json` still matched and the user-data location
+            (`.sarthi` / `SARTHI_HOME`) is unchanged.
+
+            Merging this changes nothing for anyone until a release tag is
+            pushed. Installers are rebuilt by `build-desktop.yml` on `v*`.
+          delete-branch: true

@@ -1,0 +1,96 @@
+{
+  "_comment": "Declarative branding config. This is the ONLY place Sarthi identity is defined. sync/build.py reads this to turn pristine upstream Hermes into a branded Sarthi tree. Nothing else in this repo hardcodes branding.",
+
+  "upstream": {
+    "repo": "https://github.com/NousResearch/hermes-agent.git",
+    "lock_file": "sync/hermes.lock"
+  },
+
+  "rename": {
+    "_comment": "Case-preserving word swap applied to file contents AND file/dir names.",
+    "HERMES": "SARTHI",
+    "Hermes": "Sarthi",
+    "hermes": "sarthi"
+  },
+
+  "protected": {
+    "_comment": "Regex patterns that must survive the rename untouched. These are real external references — model IDs, npm packages, the upstream Docker image, upstream URLs we intentionally point at. Renaming them breaks real functionality.",
+    "patterns": [
+      "hermes-parser",
+      "hermes-estree",
+      "nousresearch/hermes-agent",
+      "NousResearch/hermes-agent",
+      "hermes-agent\\.nousresearch\\.com",
+      "Hermes-4-405B",
+      "Hermes-3-\\S*",
+      "hermes-4-405b",
+      "hermes-3-\\S*"
+    ]
+  },
+
+  "user_data": {
+    "_comment": "CRITICAL — DO NOT CHANGE THESE VALUES, EVER. This is where the installed app keeps the user's memory, profiles, bots, MCP servers, and skills on their own machine (outside this repo). Changing the directory name or env var orphans every existing user's data: the app would start looking in a new empty folder and their setup would appear wiped. The rename rules above intentionally produce these values; this block exists so any future change is a deliberate, visible decision rather than an accident.",
+    "home_dir": ".sarthi",
+    "home_env_var": "SARTHI_HOME"
+  },
+
+  "patches": {
+    "_comment": "Explicit find/replace applied AFTER the rename. These are identity fields the blind rename cannot get right, because they point at NousResearch-owned namespaces, URLs, and contact details that must become yours. Each entry: file path (in the generated tree) -> list of [find, replace].",
+
+    "apps/desktop/package.json": [
+      ["\"appId\": \"com.nousresearch.sarthi\"", "\"appId\": \"com.sarthi.agent\""],
+      ["\"maintainer\": \"Nous Research <support@nousresearch.com>\"", "\"maintainer\": \"Jitendra Singh <jitu6583@gmail.com>\""]
+    ],
+
+    "apps/desktop/src/app/settings/about-settings.tsx": [
+      ["https://github.com/NousResearch/hermes-agent/releases", "https://github.com/jitu06583/sarthi-agent_desktop/releases"],
+      ["https://hermes-agent.nousresearch.com/", "https://sarthi-agent.vercel.app/"]
+    ],
+
+    "apps/desktop/src/i18n/en.ts": [
+      ["curl -fsSL https://hermes-agent.nousresearch.com/install.sh | sh", "curl -fsSL https://sarthi-agent.vercel.app/install.sh | sh"]
+    ],
+
+    "website/src/components/UserStoriesCollage/index.tsx": [
+      ["https://github.com/NousResearch/hermes-agent/edit/main/website/src/data/userStories.json", "https://github.com/jitu06583/sarthi-agent_desktop/edit/main/website/src/data/userStories.json"]
+    ],
+
+    "apps/desktop/electron/main.ts": [
+      ["app.setAppUserModelId('com.nousresearch.sarthi')", "app.setAppUserModelId('com.sarthi.agent')"],
+      ["// electron-builder derives from the build `appId` (com.nousresearch.sarthi) —", "// electron-builder derives from the build `appId` (com.sarthi.agent) —"]
+    ],
+
+    "apps/bootstrap-installer/src-tauri/tauri.conf.json": [
+      ["\"identifier\": \"com.nousresearch.sarthi.setup\"", "\"identifier\": \"com.sarthi.agent.setup\""]
+    ],
+
+    "apps/desktop/electron/update-remote.ts": [
+      ["const OFFICIAL_REPO_CANONICAL = 'github.com/nousresearch/hermes-agent'", "const OFFICIAL_REPO_CANONICAL = 'github.com/jitu06583/sarthi-agent_desktop'"]
+    ],
+
+    "apps/desktop/electron/update-remote.test.ts": [
+      ["assert.equal(canonicalGitHubRemote('git@github.com:nousresearch/hermes-agent.git'), OFFICIAL_REPO_CANONICAL)", "assert.equal(canonicalGitHubRemote('git@github.com:jitu06583/sarthi-agent_desktop.git'), OFFICIAL_REPO_CANONICAL)"],
+      ["assert.equal(isOfficialSshRemote('git@github.com:nousresearch/hermes-agent.git'), true)", "assert.equal(isOfficialSshRemote('git@github.com:jitu06583/sarthi-agent_desktop.git'), true)"]
+    ]
+  },
+
+  "drop": {
+    "_comment": "Paths deleted from the generated tree. These are NousResearch's internal engineering apparatus — CI tuned to their org (paid 32-core runners, their contributor registry, their docs-site deploy), and contributor/governance files that describe their project, not yours. Keeping them is what caused every CI failure in PR #5. build-desktop.yml (ours) is re-added from overlay/ afterwards.",
+    "paths": [
+      ".github/workflows",
+      ".github/actions",
+      "contributors",
+      "CONTRIBUTING.md",
+      "CONTRIBUTING.es.md",
+      ".mailmap",
+      ".coderabbit.yaml"
+    ]
+  },
+
+  "force_add": {
+    "_comment": "Files upstream tracks with `git add -f` despite their own .gitignore. A plain `git add -A` silently skips these, which is exactly how userStories.json went missing and broke the docs build in PR #5.",
+    "paths": [
+      "website/src/data/userStories.json"
+    ]
+  }
+}
