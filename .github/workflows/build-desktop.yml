@@ -45,6 +45,8 @@ jobs:
             name: linux
 
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
     timeout-minutes: 60
 
     steps:
@@ -93,18 +95,26 @@ jobs:
       - name: Report failure
         if: failure()
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           LOG="$GITHUB_WORKSPACE/step.log"
-          [ -f "$LOG" ] || { echo "::error::Failed before any captured step ran."; exit 0; }
+          if [ -f "$LOG" ]; then
+            TAIL=$(tail -n 150 "$LOG")
+          else
+            TAIL="(no captured log — failed before or outside a captured step)"
+          fi
           {
-            echo "### Build failure — ${{ matrix.name }}"
+            echo "### Build failure - ${{ matrix.name }}"
             echo
             echo '```'
-            tail -n 120 "$LOG"
+            echo "$TAIL"
             echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
-          KEY=$(grep -iE "error|not found|mismatch|ENOENT|cannot|failed" "$LOG" | tail -n 12 | tr '\n' ' | ')
-          echo "::error::${{ matrix.name }}: ${KEY:-see job summary}"
+          } > "$GITHUB_WORKSPACE/report.md"
+          cat "$GITHUB_WORKSPACE/report.md" >> "$GITHUB_STEP_SUMMARY"
+          gh api "repos/${{ github.repository }}/commits/${{ github.sha }}/comments" \
+            -f body="$(cat "$GITHUB_WORKSPACE/report.md")" >/dev/null || \
+            echo "::warning::could not post log comment"
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
