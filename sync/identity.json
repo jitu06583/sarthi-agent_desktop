@@ -39,7 +39,8 @@
 
     "apps/desktop/package.json": [
       ["\"appId\": \"com.nousresearch.sarthi\"", "\"appId\": \"com.sarthi.agent\""],
-      ["\"maintainer\": \"Nous Research <support@nousresearch.com>\"", "\"maintainer\": \"Jitendra Singh <jitu6583@gmail.com>\""]
+      ["\"maintainer\": \"Nous Research <support@nousresearch.com>\"", "\"maintainer\": \"Jitendra Singh <jitu6583@gmail.com>\""],
+      ["\"url\": \"git+https://github.com/NousResearch/hermes-agent.git\"", "\"url\": \"git+https://github.com/jitu06583/sarthi-agent_desktop.git\""]
     ],
 
     "apps/desktop/src/app/settings/about-settings.tsx": [
