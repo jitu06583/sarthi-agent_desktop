@@ -3,12 +3,18 @@ name: Build Desktop App
 # Builds the SARTHI desktop app for Windows, macOS, and Linux, then attaches
 # the installers to a GitHub Release.
 #
-# Trigger it by pushing a version tag, e.g.:
-#   git tag v0.1.0
-#   git push origin v0.1.0
+# The repo holds no application source. It holds the pinned upstream commit
+# and the branding, so every build regenerates the tree from scratch:
 #
-# Or run it manually from the Actions tab (workflow_dispatch) to test a build
-# without creating a release.
+#   python sync/build.py --out build
+#
+# That guarantees what ships is exactly what sync/identity.json describes,
+# with no drift from a stale checked-in copy.
+#
+# Trigger by pushing a version tag:
+#   git tag v0.2.0 && git push origin v0.2.0
+#
+# Or run manually from the Actions tab to test a build without releasing.
 
 on:
   push:
@@ -24,43 +30,53 @@ jobs:
         include:
           - os: windows-latest
             dist_script: dist:win
-            artifact_glob: apps/desktop/release/*.exe
+            artifact_glob: build/apps/desktop/release/*.exe
             name: windows
           - os: macos-latest
             dist_script: dist:mac
-            artifact_glob: apps/desktop/release/*.dmg
+            artifact_glob: build/apps/desktop/release/*.dmg
             name: macos
           - os: ubuntu-latest
             dist_script: dist:linux
             artifact_glob: |
-              apps/desktop/release/*.AppImage
-              apps/desktop/release/*.deb
-              apps/desktop/release/*.rpm
+              build/apps/desktop/release/*.AppImage
+              build/apps/desktop/release/*.deb
+              build/apps/desktop/release/*.rpm
             name: linux
 
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Generate the branded tree
+        run: python sync/build.py --out build
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: "npm"
 
       - name: Install root dependencies
+        working-directory: build
         run: npm ci
 
       - name: Install desktop workspace dependencies
+        working-directory: build
         run: npm install --workspace apps/desktop
 
       - name: Build (${{ matrix.name }})
-        working-directory: apps/desktop
+        working-directory: build/apps/desktop
         run: npm run ${{ matrix.dist_script }}
         env:
-          # No Apple Developer credentials configured yet — mac build stays
+          # No Apple Developer credentials configured yet — the mac build stays
           # unsigned/un-notarized (users right-click → Open the first time).
           CSC_IDENTITY_AUTO_DISCOVERY: false
 
