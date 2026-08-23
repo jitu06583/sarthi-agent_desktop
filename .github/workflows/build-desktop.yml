@@ -65,8 +65,12 @@ jobs:
           node-version: "22"
 
       - name: Install root dependencies
+        id: install
         working-directory: build
-        run: npm ci
+        shell: bash
+        run: |
+          set -o pipefail
+          npm ci 2>&1 | tee "$RUNNER_TEMP/step.log"
 
       - name: Install Linux packaging tools
         if: matrix.name == 'linux'
@@ -74,11 +78,33 @@ jobs:
 
       - name: Build (${{ matrix.name }})
         working-directory: build/apps/desktop
-        run: npm run ${{ matrix.dist_script }}
+        shell: bash
+        run: |
+          set -o pipefail
+          npm run ${{ matrix.dist_script }} 2>&1 | tee "$RUNNER_TEMP/step.log"
         env:
           # No Apple Developer credentials configured yet — the mac build stays
           # unsigned/un-notarized (users right-click → Open the first time).
           CSC_IDENTITY_AUTO_DISCOVERY: false
+
+      # On failure, publish the tail of the failing command to the run page.
+      # Job summaries and annotations are readable without signing in, so a
+      # failed build explains itself instead of hiding behind "exit code 1".
+      - name: Report failure
+        if: failure()
+        shell: bash
+        run: |
+          LOG="$RUNNER_TEMP/step.log"
+          [ -f "$LOG" ] || { echo "::error::Failed before any captured step ran."; exit 0; }
+          {
+            echo "### Build failure — ${{ matrix.name }}"
+            echo
+            echo '```'
+            tail -n 120 "$LOG"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          KEY=$(grep -iE "error|not found|mismatch|ENOENT|cannot|failed" "$LOG" | tail -n 12 | tr '\n' ' | ')
+          echo "::error::${{ matrix.name }}: ${KEY:-see job summary}"
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
