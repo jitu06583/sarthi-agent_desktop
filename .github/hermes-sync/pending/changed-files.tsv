@@ -1474,6 +1474,7 @@ A	contributors/emails/bot@bkstock.dev
 A	contributors/emails/brdpedroo@gmail.com
 A	contributors/emails/brian717fr@gmail.com
 A	contributors/emails/brian@bsweatt.com
+A	contributors/emails/brucex2710@gmail.com
 A	contributors/emails/cad@arcabot.ai
 A	contributors/emails/caleb.deleeuw@gmail.com
 A	contributors/emails/carlotestor@users.noreply.github.com
@@ -1847,6 +1848,7 @@ A	gateway/browser_control_artifacts.py
 A	gateway/browser_control_broker.py
 M	gateway/channel_directory.py
 M	gateway/config.py
+A	gateway/control_socket.py
 M	gateway/delivery_ledger.py
 A	gateway/disk_status.py
 M	gateway/drain_control.py
@@ -2998,6 +3000,8 @@ M	tests/gateway/test_config.py
 M	tests/gateway/test_config_cwd_bridge.py
 M	tests/gateway/test_config_driven_access_policy.py
 M	tests/gateway/test_config_env_bridge_authority.py
+A	tests/gateway/test_control_socket.py
+A	tests/gateway/test_control_socket_windows_live.py
 M	tests/gateway/test_cron_active_work_drain.py
 A	tests/gateway/test_cron_drain_floor.py
 M	tests/gateway/test_cron_fire_webhook.py
@@ -3270,14 +3274,17 @@ A	tests/hermes_cli/test_deferred_platform_client_tools.py
 M	tests/hermes_cli/test_dep_ensure.py
 M	tests/hermes_cli/test_deprecated_cwd_warning.py
 M	tests/hermes_cli/test_desktop_exe_integrity.py
+A	tests/hermes_cli/test_desktop_lifecycle_windows_live.py
 M	tests/hermes_cli/test_doctor.py
 M	tests/hermes_cli/test_doctor_dedicated_provider_skip.py
 A	tests/hermes_cli/test_doctor_journal_modes.py
 A	tests/hermes_cli/test_doctor_live.py
 M	tests/hermes_cli/test_dump_terminal_backend.py
 M	tests/hermes_cli/test_early_recovery.py
+M	tests/hermes_cli/test_ensure_acp_launcher.py
 A	tests/hermes_cli/test_ensure_gateway_service.py
 M	tests/hermes_cli/test_ensure_hermes_home_uid_34107.py
+A	tests/hermes_cli/test_ensure_windows_bin_launchers.py
 M	tests/hermes_cli/test_env_loader.py
 M	tests/hermes_cli/test_fallback_config.py
 M	tests/hermes_cli/test_fireworks_provider.py
@@ -3442,6 +3449,7 @@ A	tests/hermes_cli/test_sessions_pin.py
 M	tests/hermes_cli/test_set_config_value.py
 D	tests/hermes_cli/test_setup_menu_curses_migration.py
 A	tests/hermes_cli/test_setup_summary_provider_warning.py
+A	tests/hermes_cli/test_shim_fail_closed_windows_live.py
 A	tests/hermes_cli/test_sizefmt.py
 M	tests/hermes_cli/test_skills_hub.py
 A	tests/hermes_cli/test_skills_uninstall_flags.py
@@ -3464,6 +3472,7 @@ M	tests/hermes_cli/test_tools_disable_enable.py
 A	tests/hermes_cli/test_tui_launcher_skips_plugin_discovery.py
 M	tests/hermes_cli/test_tui_npm_install.py
 A	tests/hermes_cli/test_uninstall_shell_configs.py
+A	tests/hermes_cli/test_uninstall_windows_bin_launchers.py
 A	tests/hermes_cli/test_update_apply_shallow_count.py
 M	tests/hermes_cli/test_update_autostash.py
 A	tests/hermes_cli/test_update_behind_count_recovery.py
@@ -3490,6 +3499,7 @@ A	tests/hermes_cli/test_update_parked_branch_guard.py
 A	tests/hermes_cli/test_update_receipt.py
 A	tests/hermes_cli/test_update_secret_import_lock.py
 A	tests/hermes_cli/test_update_self_lock.py
+A	tests/hermes_cli/test_update_shim_fail_closed.py
 A	tests/hermes_cli/test_update_shim_self_lock.py
 A	tests/hermes_cli/test_update_skip_unchanged_editable_install.py
 M	tests/hermes_cli/test_update_stale_dashboard.py
@@ -3525,7 +3535,7 @@ A	tests/hermes_cli/test_web_server_pty_idle_backoff.py
 M	tests/hermes_cli/test_web_server_session_search.py
 M	tests/hermes_cli/test_web_ui_build.py
 M	tests/hermes_cli/test_win_pty_bridge.py
-A	tests/hermes_cli/test_windows_cli_launcher_repair.py
+A	tests/hermes_cli/test_windows_gateway_cold_start_desktop_lifecycle.py
 M	tests/hermes_cli/test_windows_native_docs.py
 A	tests/hermes_cli/test_worktree_command.py
 A	tests/hermes_cli/test_worktree_gc.py
@@ -3785,7 +3795,7 @@ M	tests/test_sqlite_lock_safe_inspection.py
 M	tests/test_sqlite_wal_reset_gate.py
 A	tests/test_stale_tool_call_marker_session_repair.py
 M	tests/test_state_db_malformed_repair.py
-A	tests/test_state_db_notadb_selfheal.py
+A	tests/test_state_db_notadb_fail_closed.py
 A	tests/test_state_db_repair_live_writer_guard.py
 A	tests/test_state_db_repair_loop_cap.py
 A	tests/test_state_db_repair_loop_mtime.py

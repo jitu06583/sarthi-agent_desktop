@@ -4827,4 +4827,29 @@ c0055b3a6d10e074296272460d7fdd3c187132f7	2026-08-22T10:10:25-07:00	Teknium	chore
 0af2858a3ae4d4aac2bbc9849c9ffef4dbbae11f	2026-08-21T20:54:01+03:00	EAbaracus	chore: remove committed root artifacts (log.txt, sqlite_leak_fix.png, default.tar.gz)
 db7dda468f26a111b497511896af7a5d9c625fe9	2026-08-22T10:23:54-07:00	Teknium	chore: anchor artifact ignore rules to repo root; block them from Docker image layers
 0cde4dd93aa794c65fee6cc85b0b5e4eee77e8e2	2026-08-22T10:24:04-07:00	Teknium	chore: add contributor email mapping for EAbaracus
+679e9cd2943dddf59f50486c265a7ab110ad0f19	2026-08-22T13:38:56-04:00	emozilla	fix(windows): stage hermes launchers in the managed binary dir, not the git checkout
+5d5179d7a9c0b1535cb11254835f9dbb53bd7e80	2026-08-22T13:39:04-04:00	emozilla	fix(windows): remove the hermes launchers on uninstall
+0605279b358f0ca048a61b48e5af948769ccf095	2026-08-22T13:39:04-04:00	emozilla	test: guard os.geteuid() for Windows in the ACP launcher tests
 13f4cfebfafbce8ac9d1bf29f66731858ed638b5	2026-08-22T11:05:50-07:00	sovthpaw	fix(skills_guard): --host flags no longer flagged as DNS exfiltration
+85044caebe68bda89a853980fac04b0e6796e529	2026-08-23T02:46:59+05:30	kshitij	chore: AUTHOR_MAP brucex2710@gmail.com -> brucexu-eth
+c80a0a551c7038517456ee0aeb60203ec92aedb6	2026-08-23T02:49:46+05:30	kshitij	Merge pull request #92529 from kshitijk4poor/chore/author-map-brucexu-eth
+50bbcbf2b483c7a15a180fe1fb6ea142b62d8928	2026-08-21T14:46:55Z	Bruce Xu	fix(state): fail closed on unscoped SQLite corruption
+987064caa4f8845f605ac7346fed5b72fddfb21c	2026-08-23T02:40:18+05:30	kshitij	fix: restore generic corruption match in FTS self-heal
+60b6269142db284f5142a73b4be8e6d78c0661a3	2026-08-22T11:46:02-07:00	Teknium	feat(gateway): gateway-owned control socket — identify/status verbs, fleet consumers prefer it over scans (#92091 step 1)
+d1c84fc5d37827407266e125edeaf3c4b731bf29	2026-08-22T11:51:50-07:00	Teknium	test(gateway): live Windows named-pipe E2E for the control socket (wine2e lane)
+67aac4d863db4e1b5a462672d4cb6bdf7a3196ef	2026-08-22T11:55:19-07:00	Teknium	fix(gateway): control-socket fallback survives deep TMPDIR; tests bind-location-aware
+530028c213ae9eed5d7f1a826451e0edf24a11d2	2026-08-22T11:56:49-07:00	Teknium	test(gateway): pipe E2E compares the server's self-reported pid, tree-kills the uv trampoline
+7a54ab22e648a0d2d7e740fad908dda93f025820	2026-08-22T17:39:49-07:00	Teknium	fix(gateway): control-socket hardening from #92447 post-merge review
+fe95ed3930e3fe203c703a3893928e31b5ccbb69	2026-08-22T22:16:38-04:00	emozilla	Merge origin/main: reconcile with PR #92092 (in-checkout launcher restore)
+83864c0b5d8464bdd1afa3b6bae2d9b57332055c	2026-08-22T18:40:34-07:00	Teknium	fix(update): a contended venv is never mutated — failed shim quarantine now refuses instead of warning (#87331)
+0c435f4601c009eee91357cd9f46557dfb10f127	2026-08-22T18:50:41-07:00	Teknium	fix(update): reword refusal message — footgun linter matched prose 'venv open (' as bare open()
+fd760435c6688a2b6c6b7436dde30e267237baef	2026-08-22T19:06:45-07:00	Teknium	test(bedrock): make the botocore stub windows airtight — kills the vendored-import flake
+0b01599eefcb2ec8d464c8c7b2b11289bb37c207	2026-08-22T23:10:32-04:00	emozilla	fix(tests): repair the two Linux-lane CI failures on this branch
+c9c44d0df92279815bfd00ad53b82a256781d497	2026-08-22T20:58:00-07:00	Teknium	Merge pull request #92636 from NousResearch/fix/windows-launcher-managed-bin
+87b645f52ccc807df6304bcf1a1d4daa7e53f2ed	2026-08-22T21:11:01-07:00	Teknium	fix(desktop): a failed Bot Chat registry lookup no longer forks the bot's forever chat
+4ccc4b69319879faf568b38aea140ea443e0e8de	2026-08-22T09:38:58+02:00	686f6c61	fix(update): skip Windows gateway cold-start when Desktop owns lifecycle
+f4067774aa45f1d86bdc49f5319d7eeb080ca7be	2026-08-22T21:19:24-07:00	Teknium	fix(update): token-based control-plane classifier + live E2E for the Desktop-lifecycle cold-start skip (#76129 salvage follow-up)
+4edb24276fb334a64ef310f29b13aaca9baeb9df	2026-08-23T03:09:22Z	chelsealong	fix(tools): don't pre-check keyless local backends in Tool Gateway checklist
+ce9ddd35e7922594ef6fc2a468bbf3b3b5765c86	2026-08-23T03:15:43Z	chelsealong	fix(gateway): fix 3-tuple/4-tuple arity crash in get_gateway_eligible_tools
+f93593d165f9150763b5d89a0194427736e1c40b	2026-08-23T04:01:03Z	chelsealong	test(gateway): cover browser-use as an explicit non-nous selection
+8b86097a62ad9d35c74a6a62e2cf233c5ceb038d	2026-08-22T21:22:08-07:00	Teknium	fix(gateway): honor env-configured local backends and persist Tool Gateway declines
