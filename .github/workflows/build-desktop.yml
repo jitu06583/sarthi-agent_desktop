@@ -62,7 +62,16 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          python sync/build.py --out build 2>&1 | tee "$GITHUB_WORKSPACE/step.log"
+          # On a tag push (v0.3.8 -> 0.3.8) stamp that into the built
+          # package.json so the shipped filename increments every release
+          # instead of staying frozen at whatever upstream last set it to.
+          # A manual workflow_dispatch run has no tag, so it builds with
+          # whatever version is already pinned.
+          ARGS="--out build"
+          if [[ "${GITHUB_REF_TYPE:-}" == "tag" ]]; then
+            ARGS="$ARGS --app-version ${GITHUB_REF_NAME#v}"
+          fi
+          python sync/build.py $ARGS 2>&1 | tee "$GITHUB_WORKSPACE/step.log"
 
       - name: Set up Node
         uses: actions/setup-node@v4
