@@ -81,7 +81,7 @@ python $SARTHI_HOME/skills/devops/watchers/scripts/watch_rss.py \
 
 ```bash
 python $SARTHI_HOME/skills/devops/watchers/scripts/watch_github.py \
-  --name sarthi-issues --repo NousResearch/sarthi-agent --scope issues
+  --name sarthi-issues --repo NousResearch/hermes-agent --scope issues
 ```
 
 轮询任意 JSON API：

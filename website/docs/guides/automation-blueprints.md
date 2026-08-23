@@ -34,9 +34,9 @@ Label, prioritize, and summarize new issues every night. Delivers a digest to yo
 
 ```bash
 sarthi cron create "0 2 * * *" \
-  "You are a project manager triaging the NousResearch/sarthi-agent GitHub repo.
+  "You are a project manager triaging the NousResearch/hermes-agent GitHub repo.
 
-1. Run: gh issue list --repo NousResearch/sarthi-agent --state open --json number,title,labels,author,createdAt --limit 30
+1. Run: gh issue list --repo NousResearch/hermes-agent --state open --json number,title,labels,author,createdAt --limit 30
 2. Identify issues opened in the last 24 hours
 3. For each new issue:
    - Suggest a priority label (P0-critical, P1-high, P2-medium, P3-low)
@@ -76,7 +76,7 @@ Review for:
 - Missing tests for new behavior
 
 Post a concise review. If the PR is a trivial docs/typo change, say so briefly." \
-  --skill github-code-review \
+  --skills github-code-review \
   --deliver github_comment
 ```
 
@@ -116,9 +116,9 @@ Weekly scan of merged PRs to find API changes that need documentation updates.
 
 ```bash
 sarthi cron create "0 9 * * 1" \
-  "Scan the NousResearch/sarthi-agent repo for documentation drift.
+  "Scan the NousResearch/hermes-agent repo for documentation drift.
 
-1. Run: gh pr list --repo NousResearch/sarthi-agent --state merged --json number,title,files,mergedAt --limit 30
+1. Run: gh pr list --repo NousResearch/hermes-agent --state merged --json number,title,files,mergedAt --limit 30
 2. Filter to PRs merged in the last 7 days
 3. For each merged PR, check if it modified:
    - Tool schemas (tools/*.py) — may need docs/reference/tools-reference.md update
@@ -432,7 +432,7 @@ If action is 'closed' and pull_request.merged is true:
 5. Reference the original PR in the new PR description
 
 If action is not 'closed' or not merged, respond with [SILENT]." \
-  --skill github-pr-workflow \
+  --skills github-pr-workflow \
   --deliver log
 ```
 

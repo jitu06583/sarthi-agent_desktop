@@ -33,9 +33,9 @@ def _primary_hex() -> str:
         from sarthi_cli.skin_engine import get_active_skin
 
         skin = get_active_skin()
-        return skin.get_color("ui_primary", "") or skin.get_color("banner_title", "#2DD4BF")
+        return skin.get_color("ui_primary", "") or skin.get_color("banner_title", "#FFD700")
     except Exception:
-        return "#2DD4BF"
+        return "#FFD700"
 
 
 @lru_cache(maxsize=1)

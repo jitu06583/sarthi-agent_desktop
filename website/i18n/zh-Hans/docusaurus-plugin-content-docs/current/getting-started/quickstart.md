@@ -50,7 +50,7 @@ description: "与 Sarthi Agent 的第一次对话——从安装到开始聊天�
 
 ### 在 macOS 或 Windows 上使用 Sarthi Desktop 安装器（推荐）
 
-如需同时安装命令行与桌面应用，请从我们的官网[下载 Sarthi Desktop 安装器](https://sarthi-agent.vercel.app/)并运行。
+如需同时安装命令行与桌面应用，请从我们的官网[下载 Sarthi Desktop 安装器](https://hermes-agent.nousresearch.com/)并运行。
 
 ### 不使用 Sarthi Desktop：
 
@@ -58,7 +58,7 @@ description: "与 Sarthi Agent 的第一次对话——从安装到开始聊天�
 
 ```bash
 # Linux / macOS / WSL2 / Android (Termux)
-curl -fsSL https://sarthi-agent.vercel.app/install.sh | bash
+curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
 ```
 
 安装脚本会在 `~/.sarthi/sarthi-agent` 创建一个受管理的隔离环境（独立的 uv 托管解释器和 venv），这是唯一受支持的安装方式 —— 包括开发用途。请勿使用 `pip install sarthi-agent`。
@@ -102,7 +102,7 @@ sarthi setup --portal
 | Provider | 说明 | 配置方式 |
 |----------|-----------|---------------|
 | **Nous Portal** | 订阅制，零配置 | 通过 `sarthi model` 进行 OAuth 登录 |
-| **OpenAI Codex** | ChatGPT OAuth，使用 Codex 模型 | 通过 `sarthi model` 进行设备码认证 |
+| **OpenAI Codex** | ChatGPT 或 Codex 订阅，使用 Codex 模型 | 通过 `sarthi model` → **ChatGPT or Codex Subscription** 进行设备码认证 |
 | **Anthropic** | 直接使用 Claude 模型——Max 计划 + 额外用量积分（OAuth），或按 token 付费的 API key | `sarthi model` → OAuth 登录（需要 Max + 额外积分），或 Anthropic API key |
 | **OpenRouter** | 跨多个 provider 的多模型路由 | 输入 API key |
 | **Z.AI** | GLM / Zhipu 托管模型 | 设置 `GLM_API_KEY` / `ZAI_API_KEY` |
@@ -123,6 +123,7 @@ sarthi setup --portal
 | **NVIDIA NIM** | 通过 build.nvidia.com 或本地 NIM 使用 Nemotron 模型 | 设置 `NVIDIA_API_KEY`（可选：`NVIDIA_BASE_URL`） |
 | **GitHub Copilot** | GitHub Copilot 订阅（GPT-5.x、Claude、Gemini 等） | 通过 `sarthi model` 进行 OAuth，或设置 `COPILOT_GITHUB_TOKEN` / `GH_TOKEN` |
 | **GitHub Copilot ACP** | Copilot ACP agent 后端（在本地启动 `copilot` CLI） | `sarthi model`（需要 `copilot` CLI + `copilot login`） |
+| **Vercel AI Gateway** | Vercel AI Gateway 路由 | 设置 `AI_GATEWAY_API_KEY` |
 | **Custom Endpoint** | VLLM、SGLang、Ollama 或任何兼容 OpenAI 的 API | 设置 base URL + API key |
 
 对于大多数初次使用的用户：选择一个 provider，接受默认值（除非你明确知道为何要修改）。完整的 provider 目录及环境变量和配置步骤请参阅 [Providers](../integrations/providers.md) 页面。
@@ -258,7 +259,7 @@ sarthi config set terminal.backend ssh       # 远程服务器
 # 在 Sarthi 安装目录下运行（curl 安装器在 Linux/macOS 上将其放置于
 # ~/.sarthi/sarthi-agent，在 Windows 上为 %LOCALAPPDATA%\sarthi\sarthi-agent）：
 cd ~/.sarthi/sarthi-agent
-uv pip install -e ".[voice]"
+uv pip install --python ./venv/bin/python -e ".[voice]"
 # 包含 faster-whisper，用于免费的本地语音转文字
 ```
 

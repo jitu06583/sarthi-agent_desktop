@@ -110,6 +110,15 @@ let
           overlay
           buildSystemOverrides
           pythonPackageOverrides
+          # ``setup.py`` permits wheel/sdist creation only from the sealed
+          # Sarthi derivation. This is deliberately a derivation environment
+          # variable, not a devShell variable: ``nix develop -c uv build``
+          # must remain blocked.
+          (final: prev: {
+            sarthi-agent = prev.sarthi-agent.overrideAttrs (_old: {
+              SARTHI_NIX_BUILD = "1";
+            });
+          })
         ]
       );
 

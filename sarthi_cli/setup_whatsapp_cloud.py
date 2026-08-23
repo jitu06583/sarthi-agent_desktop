@@ -33,6 +33,7 @@ to verify the loop end-to-end once everything's running.
 """
 
 from __future__ import annotations
+from sarthi_cli.cli_output import line_input
 
 import re
 import secrets
@@ -180,7 +181,7 @@ def _prompt(message: str, default: Optional[str] = None, secret: bool = False) -
 
             raw = getpass.getpass(f"{message}{suffix} (input hidden): ").strip()
         else:
-            raw = input(f"{message}{suffix}: ").strip()
+            raw = line_input(f"{message}{suffix}: ").strip()
     except (EOFError, KeyboardInterrupt):
         print()
         return ""
@@ -444,7 +445,7 @@ def run_whatsapp_cloud_setup() -> int:
     current_allow = get_env_value("WHATSAPP_CLOUD_ALLOWED_USERS") or None
     allow_default = current_allow if current_allow else None
     try:
-        allowed = input(
+        allowed = line_input(
             f"  → Allowed users{' [' + allow_default + ']' if allow_default else ''}: "
         ).strip() or (allow_default or "")
     except (EOFError, KeyboardInterrupt):
@@ -535,7 +536,7 @@ def run_whatsapp_cloud_setup() -> int:
     print("        Requires Meta's business verification process —")
     print("        Business Manager → Security Center → Start Verification.")
     print()
-    print("  Docs: https://sarthi-agent.vercel.app/docs/user-guide/")
+    print("  Docs: https://hermes-agent.nousresearch.com/docs/user-guide/")
     print("        messaging/whatsapp-cloud")
     print()
     return 0

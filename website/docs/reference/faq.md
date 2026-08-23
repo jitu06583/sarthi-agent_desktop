@@ -206,12 +206,27 @@ source ~/.bashrc
 # If you previously installed with sudo, clean up:
 sudo rm /usr/local/bin/sarthi
 # Then re-run the standard installer
-curl -fsSL https://sarthi-agent.vercel.app/install.sh | bash
+curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
 ```
 
 ---
 
 ### Provider & Model Issues
+
+#### The agent says "Sarthi policy" or "Sarthi guardrails" refused my request
+
+A model cannot reliably identify why it refused a request. If the refusal appears only in the assistant's prose, its claim that a hidden Sarthi runtime policy caused it may be a hallucinated explanation or a restriction applied by the selected model or provider.
+
+Sarthi enforcement is explicit: a blocked tool action returns a tool error naming the denied command or path, and an approval-required action shows an approval prompt. Sarthi does not silently turn those execution controls into a general content-refusal layer. Provider-level controls can still apply when configured, such as Amazon Bedrock Guardrails.
+
+To isolate the source:
+
+1. Run `/status` to confirm the active model and provider.
+2. Check whether the refusal includes an actual Sarthi tool error or approval prompt. If it is prose only, do not treat the model's attribution as runtime evidence.
+3. Retry in a fresh session with another configured model or provider. A refusal that changes with the model is model/provider behavior, not a Sarthi execution control.
+4. If an explicit tool error appears, use its exact text when reporting the problem.
+
+See [Security](/user-guide/security) for Sarthi' documented execution controls and [Providers](/integrations/providers) for provider configuration.
 
 #### `/model` only shows one provider / can't switch providers
 
@@ -313,16 +328,18 @@ model:
   context_length: 131072  # your model's actual context window
 ```
 
-Or for custom endpoints, add it per-model:
+Or for custom endpoints, add it per-model on the provider entry:
 
 ```yaml
-custom_providers:
-  - name: "My Server"
-    base_url: "http://localhost:11434/v1"
+providers:
+  my-server:
+    api: "http://localhost:11434/v1"
     models:
       qwen3.5:27b:
         context_length: 64000
 ```
+
+(Older configs use the legacy `custom_providers:` list — still supported and auto-migrated to `providers:`.)
 
 See [Context Length Detection](../integrations/providers.md#context-length-detection) for how auto-detection works and all override options.
 
@@ -500,12 +517,18 @@ You can verify the plist has the correct PATH:
 
 **Solution:**
 ```bash
+# See exactly what the fixed prompt costs — breakdown by block
+# (system prompt, skills index, memory, tool schemas). Runs offline.
+sarthi prompt-size
+
 # Compress the conversation to reduce tokens
 /compress
 
 # Check session token usage
 /usage
 ```
+
+If the baseline looks high before you've typed anything, that's the fixed prompt budget — the system prompt plus tool schemas sent on every call. Run [`sarthi prompt-size`](/reference/cli-commands#sarthi-prompt-size) to measure it, then trim: disable toolsets you don't use (`sarthi tools`) and uninstall or disable skills you don't need (`sarthi skills`).
 
 :::tip
 Use `/compress` regularly during long sessions. It summarizes the conversation history and reduces token usage significantly while preserving context.
@@ -608,6 +631,8 @@ No. Each messaging platform (Telegram, Discord, etc.) requires exclusive access 
 ### Do profiles share memory or sessions?
 
 No. Each profile has its own memory store, session database, and skills directory. They are completely isolated. If you want to start a new profile with existing memories and sessions, use `sarthi profile create newname --clone-all` to copy everything from the current profile, or add `--clone-from <profile>` to copy from a specific source profile.
+
+This isolation is also the reason to never run two agents against the *same* profile or Sarthi home: both write memory automatically and each loads the other's writes at session start, so their stored state degrades with every session. One agent per profile; for genuinely shared memory across agents, use an [external memory provider](/user-guide/features/memory-providers).
 
 ### What happens when I run `sarthi update`?
 
@@ -736,7 +761,7 @@ Skills with very long descriptions are truncated to 40 characters in the Telegra
 
 1. Install Sarthi Agent on the new machine:
    ```bash
-   curl -fsSL https://sarthi-agent.vercel.app/install.sh | bash
+   curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
    ```
 
 2. On the **source machine**, create a full backup:
@@ -840,6 +865,6 @@ If using OpenRouter, make sure your API key has credits. A 400 from OpenRouter o
 
 If your issue isn't covered here:
 
-1. **Search existing issues:** [GitHub Issues](https://github.com/jitendra-singh-thakur/sarthi-agent/issues)
+1. **Search existing issues:** [GitHub Issues](https://github.com/NousResearch/hermes-agent/issues)
 2. **Ask the community:** [Nous Research Discord](https://discord.gg/nousresearch)
 3. **File a bug report:** Include your OS, Python version (`python3 --version`), Sarthi version (`sarthi --version`), and the full error message

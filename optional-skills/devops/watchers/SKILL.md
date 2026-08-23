@@ -66,7 +66,7 @@ Watch a GitHub repo (set `GITHUB_TOKEN` in `${SARTHI_HOME:-~/.sarthi}/.env` to a
 
 ```bash
 python $SARTHI_HOME/skills/devops/watchers/scripts/watch_github.py \
-  --name sarthi-issues --repo NousResearch/sarthi-agent --scope issues
+  --name sarthi-issues --repo NousResearch/hermes-agent --scope issues
 ```
 
 Poll an arbitrary JSON API:

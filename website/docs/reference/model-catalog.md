@@ -13,7 +13,7 @@ When the manifest is unreachable (offline, network blocked, hosting failure), Sa
 ## Live manifest URL
 
 ```
-https://sarthi-agent.vercel.app/docs/api/model-catalog.json
+https://hermes-agent.nousresearch.com/docs/api/model-catalog.json
 ```
 
 Published on every merge to `main` via the existing `deploy-site.yml` GitHub Pages pipeline. The source of truth lives in the repo at `website/static/api/model-catalog.json`.
@@ -30,7 +30,7 @@ Published on every merge to `main` via the existing `deploy-site.yml` GitHub Pag
       "metadata": {},
       "models": [
         {"id": "z-ai/glm-5.2",         "description": "default", "default": true},
-        {"id": "moonshotai/kimi-k2.6", "description": "recommended", "metadata": {}},
+        {"id": "moonshotai/kimi-k3",   "description": "recommended", "metadata": {}},
         {"id": "openai/gpt-5.4",       "description": ""}
       ]
     },
@@ -39,7 +39,7 @@ Published on every merge to `main` via the existing `deploy-site.yml` GitHub Pag
       "models": [
         {"id": "z-ai/glm-5.2", "default": true},
         {"id": "anthropic/claude-opus-4.7"},
-        {"id": "moonshotai/kimi-k2.6"}
+        {"id": "moonshotai/kimi-k3"}
       ]
     }
   }
@@ -71,7 +71,7 @@ Cache location: `~/.sarthi/cache/model_catalog.json`.
 ```yaml
 model_catalog:
   enabled: true
-  url: https://sarthi-agent.vercel.app/docs/api/model-catalog.json
+  url: https://hermes-agent.nousresearch.com/docs/api/model-catalog.json
   ttl_hours: 1
   providers: {}
 ```
@@ -90,6 +90,20 @@ model_catalog:
 ```
 
 The overriding manifest only needs to populate the provider block(s) it cares about. Other providers continue to resolve against the master URL.
+
+### Hiding providers from the picker
+
+`excluded_providers` lets you hide specific providers from the `/model` picker even when valid credentials exist. Useful when credentials are present for legacy or testing providers that shouldn't appear in normal use (e.g. an old Copilot or OpenRouter token still cached in `auth.json` or discovered via the `gh` CLI).
+
+```yaml
+model_catalog:
+  excluded_providers:
+    - copilot
+    - openrouter
+    - openai
+```
+
+The exclusion is matched case-insensitively against every key a provider can surface under — the Sarthi id and models.dev id (built-in mapped providers), the overlay pid and resolved Sarthi slug (overlay providers), and the canonical slug (canonical providers) — so a single entry like `copilot` hides the provider regardless of which section emits it. It is honored by every `/model` picker surface: the gateway interactive/text pickers, the TUI picker, and the interactive `sarthi model` CLI picker. An empty list (or omitting the key) has no effect.
 
 ## Updating the manifest
 

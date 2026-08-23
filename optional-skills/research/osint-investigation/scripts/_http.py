@@ -13,7 +13,7 @@ import urllib.request
 
 DEFAULT_UA = (
     "sarthi-osint-investigation/0.2 "
-    "(+https://github.com/jitendra-singh-thakur/sarthi-agent; "
+    "(+https://github.com/NousResearch/hermes-agent; "
     "set SARTHI_OSINT_UA env var to identify yourself per "
     "Wikimedia / SEC fair-use guidance)"
 )

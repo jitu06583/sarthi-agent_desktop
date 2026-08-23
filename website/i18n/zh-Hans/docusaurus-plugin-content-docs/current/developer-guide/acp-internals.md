@@ -17,7 +17,6 @@ ACP 适配器将 Sarthi 的同步 `AIAgent` 封装为异步 JSON-RPC stdio 服�
 - `acp_adapter/permissions.py`
 - `acp_adapter/tools.py`
 - `acp_adapter/auth.py`
-- `acp_registry/agent.json`
 
 ## 启动流程
 
@@ -30,8 +29,6 @@ sarthi acp / sarthi-acp / python -m acp_adapter
   -> construct SarthiACPAgent
   -> acp.run_agent(agent, use_unstable_protocol=True)
 ```
-
-Zed ACP Registry 路径通过 `uvx --from 'sarthi-agent[acp]==<version>' sarthi-acp` 启动同一适配器，指向 `sarthi-agent` PyPI 发布包。
 
 stdout 保留用于 ACP JSON-RPC 传输。人类可读的日志输出至 stderr。
 
@@ -149,7 +146,7 @@ ACP 不实现自己的认证存储。
 - `acp_adapter/auth.py`
 - `sarthi_cli/runtime_provider.py`
 
-因此 ACP 通告并使用当前配置的 Sarthi provider/凭据。它还始终通告一个终端 setup 认证方法（`sarthi-setup`，参数 `--setup`），以便首次运行的 registry 客户端在启动正常 ACP 会话前可以打开 Sarthi 的交互式模型/provider 配置。
+因此 ACP 通告并使用当前配置的 Sarthi provider/凭据。它还始终通告一个终端 setup 认证方法（`sarthi-setup`，参数 `--setup`），以便首次运行的 ACP 客户端在启动正常 ACP 会话前可以打开 Sarthi 的交互式模型/provider 配置。
 
 ## 工作目录绑定
 

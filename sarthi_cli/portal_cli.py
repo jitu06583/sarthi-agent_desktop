@@ -28,18 +28,19 @@ from sarthi_cli.config import load_config
 
 DEFAULT_PORTAL_URL = "https://portal.nousresearch.com"
 SUBSCRIPTION_URL = "https://portal.nousresearch.com/manage-subscription"
-DOCS_URL = "https://sarthi-agent.vercel.app/docs/user-guide/features/tool-gateway"
+DOCS_URL = "https://hermes-agent.nousresearch.com/docs/user-guide/features/tool-gateway"
 
 
 def _cmd_status(args) -> int:
     """Show Portal auth + Tool Gateway routing summary."""
-    from sarthi_cli.auth import get_nous_auth_status
+    from sarthi_cli.auth import get_nous_auth_status_local
     from sarthi_cli.nous_subscription import get_nous_subscription_features
 
     config = load_config() or {}
 
     try:
-        auth = get_nous_auth_status() or {}
+        # Read-only status display: refresh-free snapshot (no OAuth refresh).
+        auth = get_nous_auth_status_local() or {}
     except Exception:
         auth = {}
 

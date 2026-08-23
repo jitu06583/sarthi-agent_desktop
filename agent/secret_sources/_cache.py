@@ -82,7 +82,9 @@ def resolve_cache_home(home_path: Optional[Path] = None) -> Path:
     (and tests that don't thread a home through) working.
     """
     if home_path is None:
-        home_path = Path(os.getenv("SARTHI_HOME", Path.home() / ".sarthi"))
+        from sarthi_constants import get_sarthi_home
+
+        home_path = get_sarthi_home()
     return home_path
 
 

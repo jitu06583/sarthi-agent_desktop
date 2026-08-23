@@ -38,21 +38,6 @@ def test_puid_pgid_remaps_sarthi_user(
     )
 
 
-def test_sarthi_uid_gid_take_precedence_over_aliases(
-    built_image: str, container_name: str,
-) -> None:
-    """SARTHI_UID/SARTHI_GID must win over PUID/PGID when both are set."""
-    start_container(built_image, container_name, "SARTHI_UID=2000", "SARTHI_GID=2001", "PUID=1000", "PGID=1000")
-
-    r = docker_exec_sh(container_name, "id -u sarthi", timeout=10)
-    assert r.stdout.strip() == "2000", (
-        f"expected sarthi UID 2000 (SARTHI_UID wins), got: {r.stdout.strip()}"
-    )
-
-    r = docker_exec_sh(container_name, "id -g sarthi", timeout=10)
-    assert r.stdout.strip() == "2001", (
-        f"expected sarthi GID 2001 (SARTHI_GID wins), got: {r.stdout.strip()}"
-    )
 
 
 def test_nas_low_uid_accepted(

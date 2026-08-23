@@ -25,7 +25,7 @@ platforms:
     enabled: true
     extra:
       port: 8644
-      secret: "generate-a-strong-secret-here"
+      secret: "your-webhook-secret-here"
 ```
 
 Omitting `host` uses the dual-stack default and listens on both IPv4 and IPv6.
@@ -36,7 +36,7 @@ Add to `${SARTHI_HOME:-~/.sarthi}/.env`:
 ```bash
 WEBHOOK_ENABLED=true
 WEBHOOK_PORT=8644
-WEBHOOK_SECRET=generate-a-strong-secret-here
+WEBHOOK_SECRET=your-webhook-secret-here
 ```
 
 After configuration, start (or restart) the gateway:
@@ -83,7 +83,7 @@ sarthi webhook subscribe todoist-sarthi \
   --deliver telegram --deliver-chat-id "12345"
 ```
 
-Full filter syntax: https://sarthi-agent.vercel.app/docs/user-guide/messaging/webhooks#payload-filters
+Full filter syntax: https://hermes-agent.nousresearch.com/docs/user-guide/messaging/webhooks#payload-filters
 
 ### List subscriptions
 ```bash

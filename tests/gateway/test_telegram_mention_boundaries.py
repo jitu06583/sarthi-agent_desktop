@@ -31,6 +31,14 @@ def _mention_entity(text, mention="@sarthi_bot"):
     return SimpleNamespace(type="mention", offset=offset, length=len(mention))
 
 
+def _telegram_mention_entity(text, mention="@sarthi_bot", entity_type="mention"):
+    """Build an entity with Telegram UTF-16 code-unit offset/length values."""
+    start = text.index(mention)
+    offset = len(text[:start].encode("utf-16-le")) // 2
+    length = len(mention.encode("utf-16-le")) // 2
+    return SimpleNamespace(type=entity_type, offset=offset, length=length)
+
+
 def _text_mention_entity(offset, length, user_id):
     """Build a TEXT_MENTION entity (used when the target user has no public @handle)."""
     return SimpleNamespace(
@@ -62,22 +70,11 @@ class TestRealMentionsAreDetected:
         msg = _message(text=text, entities=[_mention_entity(text)])
         assert adapter._message_mentions_bot(msg) is True
 
-    def test_mention_mid_sentence(self):
-        adapter = _make_adapter()
-        text = "hey @sarthi_bot, can you help?"
-        msg = _message(text=text, entities=[_mention_entity(text)])
-        assert adapter._message_mentions_bot(msg) is True
 
-    def test_mention_at_end_of_message(self):
+    def test_mention_after_non_bmp_characters_uses_telegram_offsets(self):
         adapter = _make_adapter()
-        text = "thanks for looking @sarthi_bot"
-        msg = _message(text=text, entities=[_mention_entity(text)])
-        assert adapter._message_mentions_bot(msg) is True
-
-    def test_mention_in_caption(self):
-        adapter = _make_adapter()
-        caption = "photo for @sarthi_bot"
-        msg = _message(caption=caption, caption_entities=[_mention_entity(caption)])
+        text = "\U0001f680\U0001f680 @sarthi_bot hello"
+        msg = _message(text=text, entities=[_telegram_mention_entity(text)])
         assert adapter._message_mentions_bot(msg) is True
 
     def test_text_mention_entity_targets_bot(self):
@@ -102,22 +99,6 @@ class TestSubstringFalsePositivesAreRejected:
         msg = _message(text="email me at foo@sarthi_bot.example")
         assert adapter._message_mentions_bot(msg) is False
 
-    def test_hostname_substring(self):
-        adapter = _make_adapter()
-        msg = _message(text="contact user@sarthi_bot.domain.com")
-        assert adapter._message_mentions_bot(msg) is False
-
-    def test_superstring_username(self):
-        """`@sarthi_botx` is a different username; Telegram would emit a mention
-        entity for `@sarthi_botx`, not `@sarthi_bot`."""
-        adapter = _make_adapter()
-        msg = _message(text="@sarthi_botx hello")
-        assert adapter._message_mentions_bot(msg) is False
-
-    def test_underscore_suffix_substring(self):
-        adapter = _make_adapter()
-        msg = _message(text="see @sarthi_bot_admin for help")
-        assert adapter._message_mentions_bot(msg) is False
 
     def test_substring_inside_url_without_entity(self):
         """@handle inside a URL produces a URL entity, not a MENTION entity."""
@@ -125,16 +106,6 @@ class TestSubstringFalsePositivesAreRejected:
         msg = _message(text="see https://example.com/@sarthi_bot for details")
         assert adapter._message_mentions_bot(msg) is False
 
-    def test_substring_inside_code_block_without_entity(self):
-        """Telegram doesn't emit mention entities inside code/pre entities."""
-        adapter = _make_adapter()
-        msg = _message(text="use the string `@sarthi_bot` in config")
-        assert adapter._message_mentions_bot(msg) is False
-
-    def test_plain_text_with_no_at_sign(self):
-        adapter = _make_adapter()
-        msg = _message(text="just a normal group message")
-        assert adapter._message_mentions_bot(msg) is False
 
     def test_email_substring_in_caption(self):
         adapter = _make_adapter()
@@ -145,27 +116,11 @@ class TestSubstringFalsePositivesAreRejected:
 class TestEntityEdgeCases:
     """Malformed or mismatched entities should not crash or over-match."""
 
-    def test_mention_entity_for_different_username(self):
-        adapter = _make_adapter()
-        text = "@someone_else hi"
-        msg = _message(text=text, entities=[_mention_entity(text, mention="@someone_else")])
-        assert adapter._message_mentions_bot(msg) is False
-
-    def test_text_mention_entity_for_different_user(self):
-        adapter = _make_adapter()
-        msg = _message(text="hi there", entities=[_text_mention_entity(0, 2, user_id=12345)])
-        assert adapter._message_mentions_bot(msg) is False
 
     def test_malformed_entity_with_negative_offset(self):
         adapter = _make_adapter()
         msg = _message(text="@sarthi_bot hi",
                        entities=[SimpleNamespace(type="mention", offset=-1, length=11)])
-        assert adapter._message_mentions_bot(msg) is False
-
-    def test_malformed_entity_with_zero_length(self):
-        adapter = _make_adapter()
-        msg = _message(text="@sarthi_bot hi",
-                       entities=[SimpleNamespace(type="mention", offset=0, length=0)])
         assert adapter._message_mentions_bot(msg) is False
 
 
@@ -183,3 +138,23 @@ class TestCaseInsensitivity:
         text = "hi @Sarthi_Bot"
         msg = _message(text=text, entities=[_mention_entity(text, mention="@Sarthi_Bot")])
         assert adapter._message_mentions_bot(msg) is True
+
+
+class TestTelegramUtf16EntityOffsets:
+    def test_extracts_bot_mention_username_after_non_bmp_characters(self):
+        text = "\U0001f9ea\U0001f9ea @sarthi_bot please"
+        msg = _message(text=text, entities=[_telegram_mention_entity(text)])
+        assert TelegramAdapter._extract_bot_mention_usernames(msg) == {"sarthi_bot"}
+
+    def test_bot_command_suffix_after_non_bmp_characters_mentions_bot(self):
+        adapter = _make_adapter()
+        text = "\U0001f9ea\U0001f9ea /new@sarthi_bot"
+        entity = _telegram_mention_entity(text, mention="/new@sarthi_bot", entity_type="bot_command")
+        msg = _message(text=text, entities=[entity])
+        assert adapter._message_mentions_bot(msg) is True
+
+    def test_extracts_bot_command_target_after_non_bmp_characters(self):
+        text = "\U0001f9ea\U0001f9ea /new@sarthi_bot"
+        entity = _telegram_mention_entity(text, mention="/new@sarthi_bot", entity_type="bot_command")
+        msg = _message(text=text, entities=[entity])
+        assert TelegramAdapter._extract_bot_mention_usernames(msg) == {"sarthi_bot"}

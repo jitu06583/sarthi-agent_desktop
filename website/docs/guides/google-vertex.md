@@ -18,7 +18,7 @@ Vertex has **no static API key** for the standard endpoint. Every request needs 
 - **Credentials**, one of:
   - a **service-account JSON** key file with the `roles/aiplatform.user` role, or
   - **Application Default Credentials** via `gcloud auth application-default login` (or the metadata server when running on a GCP VM).
-- **`google-auth`** — installed automatically the first time you select Vertex (lazy install), or explicitly with `pip install 'sarthi-agent[vertex]'`.
+- **`google-auth`** — installed automatically the first time you select Vertex (lazy install). Run `sarthi setup` to repair a managed install if that fails.
 
 ## Quick Start
 
@@ -128,7 +128,7 @@ Sarthi found neither a service-account JSON nor working ADC. Either set `VERTEX_
 
 ### `google-auth` not installed
 
-Install the extra: `pip install 'sarthi-agent[vertex]'`. Sarthi also lazy-installs it the first time you select the Vertex provider.
+Sarthi lazy-installs it the first time you select the Vertex provider. If that fails, run `sarthi setup` to repair the managed install.
 
 ### 404 on Gemini 3.x models
 

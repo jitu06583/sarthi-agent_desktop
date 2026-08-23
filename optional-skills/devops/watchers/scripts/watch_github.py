@@ -6,7 +6,7 @@ Usage (via cron with --no-agent):
     sarthi cron create sarthi-issues \\
       --schedule "*/5 * * * *" --no-agent \\
       --script "$SARTHI_HOME/skills/devops/watchers/scripts/watch_github.py" \\
-      --script-args "--name sarthi-issues --repo NousResearch/sarthi-agent --scope issues"
+      --script-args "--name sarthi-issues --repo NousResearch/hermes-agent --scope issues"
 
 Set GITHUB_TOKEN (or GH_TOKEN) in the Sarthi .env file
 (``${SARTHI_HOME:-~/.sarthi}/.env``) to avoid the 60 req/hr

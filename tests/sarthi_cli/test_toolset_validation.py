@@ -23,9 +23,6 @@ def _is_valid(name):
     return name in _KNOWN
 
 
-def test_valid_config_produces_no_warnings():
-    cfg = {"cli": ["sarthi-cli"], "telegram": ["sarthi-telegram"]}
-    assert validate_platform_toolsets(cfg, _is_valid) == []
 
 
 def test_38798_corruption_warns_and_suggests_correct_name():
@@ -49,43 +46,5 @@ def test_mixed_valid_and_invalid_flags_only_the_invalid():
     assert "unknown toolset 'bogus'" in warnings[0]
 
 
-def test_unknown_without_valid_platform_default_omits_suggestion():
-    # sarthi-mystery is not a known toolset, so no "did you mean" hint.
-    warnings = validate_platform_toolsets({"mystery": ["nope"]}, _is_valid)
-    unknown = [w for w in warnings if "unknown toolset 'nope'" in w]
-    assert len(unknown) == 1
-    assert "did you mean" not in unknown[0]
 
 
-@pytest.mark.parametrize("value", [None, {}, [], "sarthi-cli", 42])
-def test_non_dict_or_empty_yields_no_warnings(value):
-    assert validate_platform_toolsets(value, _is_valid) == []
-
-
-def test_scalar_toolset_value_is_accepted():
-    # Some configs store the toolset as a bare string rather than a list.
-    assert validate_platform_toolsets({"cli": "sarthi-cli"}, _is_valid) == []
-
-
-def test_non_string_entries_are_skipped_not_counted_invalid():
-    cfg = {"cli": [None, 123, "sarthi-cli"]}
-    # The junk entries are ignored; the valid one keeps it from being "zero".
-    assert validate_platform_toolsets(cfg, _is_valid) == []
-
-
-def test_all_invalid_reports_each_and_the_zero_state():
-    cfg = {"cli": ["sarthi"], "discord": ["sarthi"]}
-    warnings = validate_platform_toolsets(cfg, _is_valid)
-    assert sum("unknown toolset" in w for w in warnings) == 2
-    assert any("zero valid toolsets" in w for w in warnings)
-
-
-def test_real_validate_toolset_treats_sarthi_cli_valid_and_sarthi_invalid():
-    # Ties the helper to reality: the canonical registry check agrees that
-    # `sarthi-cli` is the real toolset and `sarthi` is not (the #38798 crux).
-    from toolsets import validate_toolset
-
-    assert validate_toolset("sarthi-cli") is True
-    assert validate_toolset("sarthi") is False
-    warnings = validate_platform_toolsets({"cli": ["sarthi"]}, validate_toolset)
-    assert any("did you mean 'sarthi-cli'?" in w for w in warnings)

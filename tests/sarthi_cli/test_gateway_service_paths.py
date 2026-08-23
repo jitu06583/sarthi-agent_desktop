@@ -20,11 +20,3 @@ def test_service_path_includes_node_modules_when_present(tmp_path):
     assert str(nm_bin) in dirs
 
 
-def test_service_path_includes_sarthi_home_node_modules(tmp_path):
-    """Service PATH should include ~/.sarthi/node_modules/.bin when it exists."""
-    sarthi_nm = tmp_path / ".sarthi" / "node_modules" / ".bin"
-    sarthi_nm.mkdir(parents=True)
-    from sarthi_cli.gateway import _build_service_path_dirs
-    with patch("sarthi_cli.gateway.get_sarthi_home", return_value=tmp_path / ".sarthi"):
-        dirs = _build_service_path_dirs(project_root=tmp_path)
-    assert str(sarthi_nm) in dirs

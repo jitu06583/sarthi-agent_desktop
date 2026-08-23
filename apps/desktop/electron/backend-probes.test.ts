@@ -12,7 +12,15 @@ import path from 'node:path'
 
 import { test } from 'vitest'
 
-import { canImportSarthiCli, sarthiRuntimeImportProbe, verifySarthiCli } from './backend-probes'
+import {
+  canImportSarthiCli,
+  DEFAULT_PROBE_TIMEOUT_MS,
+  sarthiRuntimeImportProbe,
+  PROBE_TIMEOUT_MS,
+  resolveProbeTimeoutMs,
+  shouldTrustSarthiOverride,
+  verifySarthiCli
+} from './backend-probes'
 
 // Resolve the host's own Node binary -- guaranteed to be on disk and
 // runnable. We use it as both a stand-in for "a python that doesn't
@@ -51,6 +59,15 @@ test('sarthi runtime import probe checks config dependencies', () => {
   assert.match(probe, /\bimport sarthi_cli\.config\b/)
 })
 
+test('explicit Sarthi override is authoritative', () => {
+  assert.equal(shouldTrustSarthiOverride('/nix/store/abc/bin/sarthi'), true)
+})
+
+test('empty Sarthi override is not authoritative', () => {
+  assert.equal(shouldTrustSarthiOverride(''), false)
+  assert.equal(shouldTrustSarthiOverride(undefined), false)
+})
+
 test('verifySarthiCli returns false when command is falsy', () => {
   assert.equal(verifySarthiCli(''), false)
   assert.equal(verifySarthiCli(null), false)
@@ -86,9 +103,25 @@ test('verifySarthiCli returns true when --version exits 0', () => {
 })
 
 test('verifySarthiCli swallows timeouts (does not throw)', () => {
-  // We can't easily provoke a real 5s hang in CI without slowing the
+  // We can't easily provoke a real hang in CI without slowing the
   // suite, but we CAN confirm that an invocation that DOES throw
   // (because the binary is missing) returns false rather than
   // propagating. Same code path the timeout case takes.
   assert.equal(verifySarthiCli('/definitely/not/a/real/binary/anywhere'), false)
+})
+
+test('default probe timeout is 15s (not the old 5s death-loop value)', () => {
+  assert.equal(DEFAULT_PROBE_TIMEOUT_MS, 15_000)
+  // Module constant uses process.env at load time; with no override it
+  // matches the default (tests run without SARTHI_PROBE_TIMEOUT_MS).
+  assert.equal(PROBE_TIMEOUT_MS, DEFAULT_PROBE_TIMEOUT_MS)
+})
+
+test('resolveProbeTimeoutMs honours SARTHI_PROBE_TIMEOUT_MS', () => {
+  assert.equal(resolveProbeTimeoutMs({}), DEFAULT_PROBE_TIMEOUT_MS)
+  assert.equal(resolveProbeTimeoutMs({ SARTHI_PROBE_TIMEOUT_MS: '30000' }), 30_000)
+  assert.equal(resolveProbeTimeoutMs({ SARTHI_PROBE_TIMEOUT_MS: '0' }), DEFAULT_PROBE_TIMEOUT_MS)
+  assert.equal(resolveProbeTimeoutMs({ SARTHI_PROBE_TIMEOUT_MS: 'nope' }), DEFAULT_PROBE_TIMEOUT_MS)
+  // Cap runaway values
+  assert.equal(resolveProbeTimeoutMs({ SARTHI_PROBE_TIMEOUT_MS: '999999' }), 120_000)
 })

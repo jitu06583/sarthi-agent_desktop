@@ -1,6 +1,6 @@
 ---
 name: plan
-description: "Plan mode: write an actionable markdown plan to .sarthi/plans/, no execution. Bite-sized tasks, exact paths, complete code."
+description: Write a markdown plan to .sarthi/plans/; no execution.
 version: 2.0.0
 author: Sarthi Agent (writing-craft adapted from obra/superpowers)
 license: MIT

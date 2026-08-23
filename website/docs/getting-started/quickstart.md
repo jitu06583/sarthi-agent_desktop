@@ -48,21 +48,21 @@ Pick the row that matches your goal:
 
 ## 1. Install Sarthi Agent
 ### With the Sarthi Desktop installer on macOS or Windows (recommended)
-To easily install the command-line and desktop applications, [download the Sarthi Desktop installer](https://sarthi-agent.vercel.app/) from our website and run it.
+To easily install the command-line and desktop applications, [download the Sarthi Desktop installer](https://hermes-agent.nousresearch.com/) from our website and run it.
 
 ### Without Sarthi Desktop:
 For a command-line only install without Sarthi Desktop, run:
 
 #### Linux / macOS / WSL2 / Android (Termux)
 ```bash
-curl -fsSL https://sarthi-agent.vercel.app/install.sh | bash
+curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
 ```
 
 #### Windows (native)
 
 Run in powershell:
 ```powershell
-iex (irm https://sarthi-agent.vercel.app/install.ps1) 
+iex (irm https://hermes-agent.nousresearch.com/install.ps1) 
 ```
 
 :::tip Android / Termux
@@ -110,7 +110,7 @@ Good defaults:
 | Provider | What it is | How to set up |
 |----------|-----------|---------------|
 | **Nous Portal** | Subscription-based, zero-config | OAuth login via `sarthi model` |
-| **OpenAI Codex** | ChatGPT OAuth, uses Codex models | Device code auth via `sarthi model` |
+| **OpenAI Codex** | ChatGPT or Codex subscription, uses Codex models | Device code auth via `sarthi model` → **ChatGPT or Codex Subscription** |
 | **Anthropic** | Claude models directly — Max plan + extra usage credits (OAuth), or API key for pay-per-token | `sarthi model` → OAuth login (requires Max + extra credits), or an Anthropic API key |
 | **OpenRouter** | Multi-provider routing across many models | Enter your API key |
 | **Fireworks AI** | Direct OpenAI-compatible model API | Set `FIREWORKS_API_KEY` |
@@ -119,6 +119,7 @@ Good defaults:
 | **Kimi / Moonshot China** | China-region Moonshot endpoint | Set `KIMI_CN_API_KEY` |
 | **Arcee AI** | Trinity models | Set `ARCEEAI_API_KEY` |
 | **GMI Cloud** | Multi-model direct API | Set `GMI_API_KEY` |
+| **Actual Computer** | Your own hardware as a private inference cluster — hosted relay or local daemon | Set `ACTUAL_API_KEY` (relay) or `ACTUAL_BASE_URL=http://127.0.0.1:8080` (local, no key) |
 | **MiniMax (OAuth)** | MiniMax frontier model via browser OAuth — no API key needed (model name in `sarthi_cli/models.py` may change between releases) | `sarthi model` → MiniMax (OAuth) |
 | **MiniMax** | International MiniMax endpoint | Set `MINIMAX_API_KEY` |
 | **MiniMax China** | China-region MiniMax endpoint | Set `MINIMAX_CN_API_KEY` |
@@ -143,6 +144,7 @@ Good defaults:
 | **NVIDIA NIM** | Nemotron models via build.nvidia.com or local NIM | Set `NVIDIA_API_KEY` (optional: `NVIDIA_BASE_URL`) |
 | **GitHub Copilot** | GitHub Copilot subscription (GPT-5.x, Claude, Gemini, etc.) | OAuth via `sarthi model`, or `COPILOT_GITHUB_TOKEN` / `GH_TOKEN` |
 | **GitHub Copilot ACP** | Copilot ACP agent backend (spawns local `copilot` CLI) | `sarthi model` (requires `copilot` CLI + `copilot login`) |
+| **Vercel AI Gateway** | Vercel AI Gateway routing | Set `AI_GATEWAY_API_KEY` |
 | **Custom Endpoint** | VLLM, SGLang, Ollama, or any OpenAI-compatible API | Set base URL + API key |
 
 For most first-time users: choose a provider, accept the defaults unless you know why you're changing them. The full provider catalog with env vars and setup steps lives on the [Providers](../integrations/providers.md) page.
@@ -274,13 +276,15 @@ sarthi config set terminal.backend docker    # Docker isolation
 sarthi config set terminal.backend ssh       # Remote server
 ```
 
+For Docker sandboxes, you can also enable the **egress credential-injection proxy** so the sandbox never sees your real API keys — only opaque proxy tokens that work exclusively from behind a local TLS-intercepting daemon. See [Egress proxy](../user-guide/egress/iron-proxy.md). Setup is `sarthi egress setup && sarthi egress start`; `sarthi setup terminal` also points Docker users at it. Modal, SSH, Daytona, and Singularity are not wired yet.
+
 ### Voice mode
 
 ```bash
 # From the Sarthi install directory (the curl installer placed it at
 # ~/.sarthi/sarthi-agent on Linux/macOS or %LOCALAPPDATA%\sarthi\sarthi-agent on Windows):
 cd ~/.sarthi/sarthi-agent
-uv pip install -e ".[voice]"
+uv pip install --python ./venv/bin/python -e ".[voice]"
 # Includes faster-whisper for free local speech-to-text
 ```
 
@@ -389,3 +393,4 @@ That sequence gets you from "broken vibes" back to a known state fast.
 - **[AI Providers](../integrations/providers.md)** — Full provider list and setup details
 - **[Skills System](../user-guide/features/skills.md)** — Reusable workflows and knowledge
 - **[Tips & Best Practices](../guides/tips.md)** — Power user tips
+- **[Moving to another machine](/reference/faq#exporting-sarthi-to-another-machine)** — `sarthi backup` migrates your whole setup (or [a single profile](/reference/faq#moving-a-single-profile-to-another-machine)); no need to rebuild from scratch

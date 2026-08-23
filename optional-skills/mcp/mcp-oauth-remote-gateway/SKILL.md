@@ -8,7 +8,7 @@ platforms: [linux, macos]
 metadata:
   sarthi:
     tags: [MCP, OAuth, PKCE, Remote-Deployment]
-    related_skills: [native-mcp, mcporter, fastmcp]
+    related_skills: [sarthi-agent, mcporter, fastmcp]
 ---
 
 # MCP OAuth on a Remote Sarthi Gateway

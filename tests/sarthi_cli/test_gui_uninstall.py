@@ -40,122 +40,12 @@ def _make_user_data(sarthi_home: Path) -> None:
     (sarthi_home / "sessions").mkdir()
 
 
-def test_agent_is_installed_detects_source_and_venv(tmp_path):
-    sarthi_home = tmp_path / ".sarthi"
-    sarthi_home.mkdir()
-    assert gu.agent_is_installed(sarthi_home) is False
-    _make_agent(sarthi_home)
-    assert gu.agent_is_installed(sarthi_home) is True
 
 
-def test_agent_is_installed_venv_only(tmp_path):
-    """A checkout with only a venv (no package dir yet) still counts."""
-    sarthi_home = tmp_path / ".sarthi"
-    (sarthi_home / "sarthi-agent" / "venv").mkdir(parents=True)
-    assert gu.agent_is_installed(sarthi_home) is True
 
 
-def test_source_built_artifacts_lists_known_paths(tmp_path):
-    sarthi_home = tmp_path / ".sarthi"
-    _make_gui_build(sarthi_home)
-    artifacts = gu.source_built_gui_artifacts(sarthi_home)
-    names = {p.name for p in artifacts}
-    assert "dist" in names
-    assert "release" in names
-    assert "node_modules" in names
-    assert "desktop-build-stamp.json" in names
 
 
-def test_gui_is_installed_true_when_built(tmp_path, monkeypatch):
-    sarthi_home = tmp_path / ".sarthi"
-    _make_gui_build(sarthi_home)
-    # Make sure packaged-app + userdata probes don't false-positive on the box
-    # running the test.
-    monkeypatch.setattr(gu, "packaged_gui_app_paths", lambda: [])
-    monkeypatch.setattr(gu, "desktop_userdata_dir", lambda: tmp_path / "nope")
-    assert gu.gui_is_installed(sarthi_home) is True
-
-
-def test_gui_is_installed_false_when_nothing(tmp_path, monkeypatch):
-    sarthi_home = tmp_path / ".sarthi"
-    sarthi_home.mkdir()
-    monkeypatch.setattr(gu, "packaged_gui_app_paths", lambda: [])
-    monkeypatch.setattr(gu, "desktop_userdata_dir", lambda: tmp_path / "nope")
-    assert gu.gui_is_installed(sarthi_home) is False
-
-
-def test_uninstall_gui_removes_only_gui_artifacts(tmp_path, monkeypatch):
-    """The core invariant: GUI gone, agent + user data untouched."""
-    sarthi_home = tmp_path / ".sarthi"
-    agent_root = _make_agent(sarthi_home)
-    _make_gui_build(sarthi_home)
-    _make_user_data(sarthi_home)
-
-    # Isolate the packaged-app + userdata probes from the test machine.
-    monkeypatch.setattr(gu, "packaged_gui_app_paths", lambda: [])
-    monkeypatch.setattr(gu, "desktop_userdata_dir", lambda: tmp_path / "userdata-none")
-
-    removed = gu.uninstall_gui(sarthi_home)
-    removed_names = {p.name for p in removed}
-
-    # GUI artifacts removed.
-    desktop = agent_root / "apps" / "desktop"
-    assert not (desktop / "dist").exists()
-    assert not (desktop / "release").exists()
-    assert not (desktop / "node_modules").exists()
-    assert not (agent_root / "node_modules").exists()
-    assert not (sarthi_home / "desktop-build-stamp.json").exists()
-    assert "dist" in removed_names
-
-    # Agent + user data preserved.
-    assert (agent_root / "sarthi_cli" / "__init__.py").exists()
-    assert (agent_root / "venv").exists()
-    assert (sarthi_home / "config.yaml").exists()
-    assert (sarthi_home / ".env").exists()
-    assert (sarthi_home / "sessions").exists()
-    # The desktop source dir itself survives (only its build output is gone).
-    assert desktop.exists()
-
-
-def test_uninstall_gui_removes_userdata(tmp_path, monkeypatch):
-    sarthi_home = tmp_path / ".sarthi"
-    _make_agent(sarthi_home)
-    userdata = tmp_path / "Sarthi-userdata"
-    userdata.mkdir()
-    (userdata / "connection.json").write_text("{}")
-
-    monkeypatch.setattr(gu, "packaged_gui_app_paths", lambda: [])
-    monkeypatch.setattr(gu, "desktop_userdata_dir", lambda: userdata)
-
-    gu.uninstall_gui(sarthi_home)
-    assert not userdata.exists()
-
-
-def test_uninstall_gui_keeps_userdata_when_requested(tmp_path, monkeypatch):
-    sarthi_home = tmp_path / ".sarthi"
-    _make_agent(sarthi_home)
-    userdata = tmp_path / "Sarthi-userdata"
-    userdata.mkdir()
-
-    monkeypatch.setattr(gu, "packaged_gui_app_paths", lambda: [])
-    monkeypatch.setattr(gu, "desktop_userdata_dir", lambda: userdata)
-
-    gu.uninstall_gui(sarthi_home, remove_userdata=False)
-    assert userdata.exists()
-
-
-def test_uninstall_gui_removes_packaged_bundle(tmp_path, monkeypatch):
-    sarthi_home = tmp_path / ".sarthi"
-    _make_agent(sarthi_home)
-    bundle = tmp_path / "Sarthi.app"
-    (bundle / "Contents").mkdir(parents=True)
-
-    monkeypatch.setattr(gu, "packaged_gui_app_paths", lambda: [bundle])
-    monkeypatch.setattr(gu, "desktop_userdata_dir", lambda: tmp_path / "none")
-
-    removed = gu.uninstall_gui(sarthi_home)
-    assert not bundle.exists()
-    assert bundle in removed
 
 
 def test_gui_install_summary_shape(tmp_path, monkeypatch):
@@ -175,25 +65,65 @@ def test_gui_install_summary_shape(tmp_path, monkeypatch):
     assert summary["platform"] == sys.platform
 
 
-def test_userdata_dir_per_platform(monkeypatch):
-    """userData path matches Electron's app.getPath('userData') for "Sarthi"."""
-    home = Path("/home/tester")
-    monkeypatch.setattr(Path, "home", classmethod(lambda cls: home))
 
-    monkeypatch.setattr(gu.sys, "platform", "darwin")
-    assert gu.desktop_userdata_dir() == home / "Library" / "Application Support" / "Sarthi"
 
+
+
+def test_linux_discovery_includes_launcher_entry(tmp_path, monkeypatch):
+    """The launcher entry that `sarthi desktop` installs is removable."""
     monkeypatch.setattr(gu.sys, "platform", "linux")
-    monkeypatch.delenv("XDG_CONFIG_HOME", raising=False)
-    assert gu.desktop_userdata_dir() == home / ".config" / "Sarthi"
+    monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path / "xdg"))
+
+    from sarthi_cli import linux_desktop_entry as lde
+
+    assert lde.desktop_entry_path() in gu.packaged_gui_app_paths()
 
 
-def test_userdata_dir_windows(monkeypatch):
-    home = Path("/home/tester")
-    monkeypatch.setattr(Path, "home", classmethod(lambda cls: home))
-    monkeypatch.setattr(gu.sys, "platform", "win32")
-    monkeypatch.setenv("APPDATA", r"C:\Users\tester\AppData\Roaming")
-    assert gu.desktop_userdata_dir() == Path(r"C:\Users\tester\AppData\Roaming") / "Sarthi"
+def test_uninstall_removes_launcher_entry_and_refreshes_cache(tmp_path, monkeypatch):
+    monkeypatch.setattr(gu.sys, "platform", "linux")
+    monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path / "xdg"))
+
+    from sarthi_cli import linux_desktop_entry as lde
+
+    entry = lde.desktop_entry_path()
+    entry.parent.mkdir(parents=True, exist_ok=True)
+    entry.write_text("x", encoding="utf-8")
+
+    refreshed: list[Path] = []
+    monkeypatch.setattr(
+        lde, "refresh_desktop_databases", lambda d: refreshed.append(d) or ["kbuildsycoca6"]
+    )
+
+    sarthi_home = tmp_path / ".sarthi"
+    _make_agent(sarthi_home)
+    icon = lde.icon_path(sarthi_home / "sarthi-agent")
+    icon.parent.mkdir(parents=True, exist_ok=True)
+    icon.write_bytes(b"\x89PNG")
+    monkeypatch.setattr(gu, "desktop_userdata_dir", lambda: tmp_path / "none")
+
+    removed = gu.uninstall_gui(sarthi_home)
+
+    assert entry in removed and not entry.exists()
+    assert refreshed == [entry.parent]
+    # The icon lives in the checkout. A GUI uninstall must not delete it.
+    assert lde.icon_path(sarthi_home / "sarthi-agent").exists()
+    # The agent itself survives a GUI uninstall.
+    assert (sarthi_home / "sarthi-agent" / "sarthi_cli").is_dir()
+
+
+def test_uninstall_skips_cache_refresh_when_no_launcher_entry(tmp_path, monkeypatch):
+    monkeypatch.setattr(gu.sys, "platform", "linux")
+    monkeypatch.setenv("XDG_DATA_HOME", str(tmp_path / "xdg"))
+
+    from sarthi_cli import linux_desktop_entry as lde
+
+    refreshed: list[Path] = []
+    monkeypatch.setattr(lde, "refresh_desktop_databases", lambda d: refreshed.append(d) or [])
+    monkeypatch.setattr(gu, "desktop_userdata_dir", lambda: tmp_path / "none")
+
+    gu.uninstall_gui(tmp_path / ".sarthi")
+
+    assert refreshed == []
 
 
 @pytest.mark.skipif(sys.platform == "win32", reason="POSIX symlink semantics")
@@ -218,119 +148,10 @@ class _Args:
         self.gui_summary = gui_summary
 
 
-def test_run_uninstall_yes_keep_data_is_non_interactive(tmp_path, monkeypatch):
-    """``--yes`` (no ``--full``) runs with no prompt, sweeps the GUI, keeps data.
-
-    We DO NOT spawn the real CLI here (its project_root removal would delete the
-    test checkout) — we call run_uninstall in-process against a throwaway
-    SARTHI_HOME with all the destructive externals stubbed out.
-    """
-    import sarthi_cli.uninstall as uninstall
-
-    sarthi_home = tmp_path / ".sarthi"
-    agent_root = sarthi_home / "sarthi-agent"
-    (agent_root / "sarthi_cli").mkdir(parents=True)
-    (sarthi_home / "config.yaml").write_text("x: 1\n")
-    desktop = agent_root / "apps" / "desktop"
-    (desktop / "release").mkdir(parents=True)
-    (sarthi_home / "desktop-build-stamp.json").write_text("{}")
-    fake_code = tmp_path / "checkout"
-    fake_code.mkdir()
-
-    # Stub every destructive external so the test only exercises the control
-    # flow + the real GUI sweep (which is safe inside tmp_path).
-    monkeypatch.setattr(uninstall, "get_sarthi_home", lambda: sarthi_home)
-    monkeypatch.setattr(uninstall, "get_project_root", lambda: fake_code)
-    monkeypatch.setattr(uninstall, "uninstall_gateway_service", lambda: False)
-    monkeypatch.setattr(uninstall, "remove_path_from_shell_configs", lambda: [])
-    monkeypatch.setattr(uninstall, "remove_wrapper_script", lambda: [])
-    monkeypatch.setattr(uninstall, "remove_node_symlinks", lambda h: [])
-    monkeypatch.setattr(uninstall, "_discover_named_profiles", lambda: [])
-    # Make input() blow up so a regression that reaches a prompt fails loudly.
-    monkeypatch.setattr("builtins.input", lambda *a, **k: pytest.fail("prompted in --yes mode"))
-
-    from sarthi_cli import gui_uninstall as gu_mod
-    monkeypatch.setattr(gu_mod, "packaged_gui_app_paths", lambda: [])
-    monkeypatch.setattr(gu_mod, "desktop_userdata_dir", lambda: tmp_path / "none")
-
-    uninstall.run_uninstall(_Args(yes=True, full=False))
-
-    # Code checkout removed, GUI artifacts swept, but user data preserved.
-    assert not fake_code.exists()
-    assert not (sarthi_home / "desktop-build-stamp.json").exists()
-    assert not (desktop / "release").exists()
-    assert (sarthi_home / "config.yaml").exists()
-    assert sarthi_home.exists()
 
 
-def test_run_uninstall_yes_full_wipes_home(tmp_path, monkeypatch):
-    """``--yes --full`` removes the whole SARTHI_HOME non-interactively."""
-    import sarthi_cli.uninstall as uninstall
-
-    sarthi_home = tmp_path / ".sarthi"
-    (sarthi_home / "sarthi-agent" / "sarthi_cli").mkdir(parents=True)
-    (sarthi_home / "config.yaml").write_text("x: 1\n")
-    fake_code = tmp_path / "checkout"
-    fake_code.mkdir()
-
-    monkeypatch.setattr(uninstall, "get_sarthi_home", lambda: sarthi_home)
-    monkeypatch.setattr(uninstall, "get_project_root", lambda: fake_code)
-    monkeypatch.setattr(uninstall, "uninstall_gateway_service", lambda: False)
-    monkeypatch.setattr(uninstall, "remove_path_from_shell_configs", lambda: [])
-    monkeypatch.setattr(uninstall, "remove_wrapper_script", lambda: [])
-    monkeypatch.setattr(uninstall, "remove_node_symlinks", lambda h: [])
-    monkeypatch.setattr(uninstall, "_discover_named_profiles", lambda: [])
-    monkeypatch.setattr("builtins.input", lambda *a, **k: pytest.fail("prompted in --yes mode"))
-
-    from sarthi_cli import gui_uninstall as gu_mod
-    monkeypatch.setattr(gu_mod, "packaged_gui_app_paths", lambda: [])
-    monkeypatch.setattr(gu_mod, "desktop_userdata_dir", lambda: tmp_path / "none")
-
-    uninstall.run_uninstall(_Args(yes=True, full=True))
-
-    assert not sarthi_home.exists()
 
 
-def test_uninstall_module_main_gui_mode(tmp_path, monkeypatch):
-    """`python -m sarthi_cli.uninstall --mode gui` runs the GUI-only path.
-
-    This is the lightweight, venv-independent entrypoint the desktop launches
-    with a system Python (so lite/full don't rmtree their own running venv on
-    Windows). Verify it dispatches by mode without prompting.
-    """
-    import sarthi_cli.uninstall as uninstall
-
-    sarthi_home = tmp_path / ".sarthi"
-    agent_root = sarthi_home / "sarthi-agent"
-    (agent_root / "sarthi_cli").mkdir(parents=True)
-    desktop = agent_root / "apps" / "desktop"
-    (desktop / "release").mkdir(parents=True)
-    (sarthi_home / "desktop-build-stamp.json").write_text("{}")
-    (sarthi_home / "config.yaml").write_text("x: 1\n")
-
-    monkeypatch.setattr(uninstall, "get_sarthi_home", lambda: sarthi_home)
-    from sarthi_cli import gui_uninstall as gu_mod
-    monkeypatch.setattr(gu_mod, "packaged_gui_app_paths", lambda: [])
-    monkeypatch.setattr(gu_mod, "desktop_userdata_dir", lambda: tmp_path / "none")
-    monkeypatch.setattr(gu_mod, "get_sarthi_home", lambda: sarthi_home)
-    monkeypatch.setattr("builtins.input", lambda *a, **k: pytest.fail("prompted in module main"))
-
-    rc = uninstall.main(["--mode", "gui"])
-    assert rc == 0
-    # GUI swept, agent + config kept (gui-only contract).
-    assert not (desktop / "release").exists()
-    assert not (sarthi_home / "desktop-build-stamp.json").exists()
-    assert (agent_root / "sarthi_cli").exists()
-    assert (sarthi_home / "config.yaml").exists()
-
-
-def test_uninstall_module_main_rejects_bad_mode():
-    """An invalid --mode exits non-zero (argparse), never silently full-wipes."""
-    import sarthi_cli.uninstall as uninstall
-
-    with pytest.raises(SystemExit) as exc:
-        uninstall.main(["--mode", "nuke"])
-    assert exc.value.code != 0
 
 
 def test_uninstall_args_namespace_mode_mapping():

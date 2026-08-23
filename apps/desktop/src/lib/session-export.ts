@@ -1,5 +1,5 @@
 import type { SessionInfo } from '@/sarthi'
-import { getSessionMessages } from '@/sarthi'
+import { getAllSessionMessages } from '@/sarthi'
 import { translateNow } from '@/i18n'
 import { notify, notifyError } from '@/store/notifications'
 
@@ -33,7 +33,7 @@ export async function exportSession(sessionId: string, params: Omit<ExportSessio
 
   try {
     const profile = params.profile ?? params.session?.profile
-    const { messages } = await getSessionMessages(sessionId, profile)
+    const { messages } = await getAllSessionMessages(sessionId, profile)
 
     const payload = {
       exported_at: new Date().toISOString(),

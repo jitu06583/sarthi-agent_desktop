@@ -1,6 +1,6 @@
 ---
 name: openclaw-migration
-description: Migrate a user's OpenClaw customization footprint into Sarthi Agent. Imports Sarthi-compatible memories, SOUL.md, command allowlists, user skills, and selected workspace assets from ~/.openclaw, then reports exactly what could not be migrated and why.
+description: Import an OpenClaw setup (memories, skills) into Sarthi.
 version: 1.0.0
 author: Sarthi Agent (Nous Research)
 license: MIT
@@ -229,37 +229,37 @@ The helper script still supports category-level `--include` / `--exclude`, but t
 Dry run with full discovery:
 
 ```bash
-python3 ~/.sarthi/skills/migration/openclaw-migration/scripts/openclaw_to_sarthi.py
+python ~/.sarthi/skills/migration/openclaw-migration/scripts/openclaw_to_sarthi.py
 ```
 
 When using the terminal tool, prefer an absolute invocation pattern such as:
 
 ```json
-{"command":"python3 /home/USER/.sarthi/skills/migration/openclaw-migration/scripts/openclaw_to_sarthi.py","workdir":"/home/USER"}
+{"command":"python /home/USER/.sarthi/skills/migration/openclaw-migration/scripts/openclaw_to_sarthi.py","workdir":"/home/USER"}
 ```
 
 Dry run with the user-data preset:
 
 ```bash
-python3 ~/.sarthi/skills/migration/openclaw-migration/scripts/openclaw_to_sarthi.py --preset user-data
+python ~/.sarthi/skills/migration/openclaw-migration/scripts/openclaw_to_sarthi.py --preset user-data
 ```
 
 Execute a user-data migration:
 
 ```bash
-python3 ~/.sarthi/skills/migration/openclaw-migration/scripts/openclaw_to_sarthi.py --execute --preset user-data --skill-conflict skip
+python ~/.sarthi/skills/migration/openclaw-migration/scripts/openclaw_to_sarthi.py --execute --preset user-data --skill-conflict skip
 ```
 
 Execute a full compatible migration:
 
 ```bash
-python3 ~/.sarthi/skills/migration/openclaw-migration/scripts/openclaw_to_sarthi.py --execute --preset full --migrate-secrets --skill-conflict skip
+python ~/.sarthi/skills/migration/openclaw-migration/scripts/openclaw_to_sarthi.py --execute --preset full --migrate-secrets --skill-conflict skip
 ```
 
 Execute with workspace instructions included:
 
 ```bash
-python3 ~/.sarthi/skills/migration/openclaw-migration/scripts/openclaw_to_sarthi.py --execute --preset user-data --skill-conflict rename --workspace-target "/absolute/workspace/path"
+python ~/.sarthi/skills/migration/openclaw-migration/scripts/openclaw_to_sarthi.py --execute --preset user-data --skill-conflict rename --workspace-target "/absolute/workspace/path"
 ```
 
 Do not use `$PWD` or the home directory as the workspace target by default. Ask for an explicit workspace path first.

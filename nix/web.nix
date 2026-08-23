@@ -1,21 +1,13 @@
 # nix/web.nix — Sarthi Web Dashboard (Vite/React) frontend build
-{ pkgs, sarthiNpmLib, ... }:
-let
-  # @sarthi/shared ships as a file: workspace dep of web, so its source
-  # must be in the filtered src tree too.
-  npm = sarthiNpmLib.mkNpmPassthru {
-    dirs = [
-      "web"
-      "apps/shared"
-    ];
-  };
+{ sarthiNpmLib, ... }:
+sarthiNpmLib.buildNpmPackage {
+  dirs = [
+    "web"
 
-  packageJson = builtins.fromJSON (builtins.readFile (npm.src + "/web/package.json"));
-  version = packageJson.version;
-in
-pkgs.buildNpmPackage (npm // {
-  pname = "sarthi-web";
-  inherit version;
+    # @sarthi/shared ships as a file: workspace dep of web, so its source
+    # must be in the filtered src tree too.
+    "apps/shared"
+  ];
 
   doCheck = false;
 
@@ -38,4 +30,4 @@ pkgs.buildNpmPackage (npm // {
     cp -r web/dist $out
     runHook postInstall
   '';
-})
+}

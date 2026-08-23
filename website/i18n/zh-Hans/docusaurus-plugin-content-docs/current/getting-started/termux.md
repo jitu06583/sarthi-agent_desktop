@@ -46,7 +46,7 @@ python -m pip install -e '.[termux]' -c constraints-termux.txt
 Sarthi 现已内置 Termux 感知的安装路径：
 
 ```bash
-curl -fsSL https://sarthi-agent.vercel.app/install.sh | bash
+curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
 ```
 
 在 Termux 上，安装程序会自动：
@@ -80,7 +80,7 @@ pkg install -y git python clang rust make pkg-config libffi openssl nodejs ripgr
 ### 2. 克隆 Sarthi
 
 ```bash
-git clone https://github.com/jitendra-singh-thakur/sarthi-agent.git
+git clone https://github.com/NousResearch/hermes-agent.git
 cd sarthi-agent
 ```
 
@@ -118,7 +118,7 @@ ln -sf "$PWD/venv/bin/sarthi" "$PREFIX/bin/sarthi"
 ### 6. 验证安装
 
 ```bash
-sarthi version
+sarthi --version
 sarthi doctor
 ```
 

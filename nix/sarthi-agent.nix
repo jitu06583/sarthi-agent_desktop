@@ -10,7 +10,6 @@
   makeWrapper,
   callPackage,
   python312,
-  nodejs_22,
   electron,
   ripgrep,
   git,
@@ -21,6 +20,9 @@
   # linux-only deps
   wl-clipboard,
   xclip,
+
+  # linux-only dev deps
+  cage,
 
   # Flake inputs — passed explicitly by packages.nix and overlays.nix
   uv2nix,
@@ -36,7 +38,6 @@
   extraDependencyGroups ? [ ],
 }:
 let
-  nodejs = nodejs_22;
   mkSarthiVenv =
     extraDependencyGroups:
     callPackage ./python.nix {
@@ -48,7 +49,7 @@ let
   sarthiVenv = (mkSarthiVenv extraDependencyGroups).venv;
 
   sarthiNpmLib = callPackage ./lib.nix {
-    inherit npm-lockfile-fix nodejs;
+    inherit npm-lockfile-fix;
   };
 
   sarthiTui = callPackage ./tui.nix {
@@ -61,8 +62,7 @@ let
 
   bundledSkills = lib.cleanSourceWith {
     src = ../skills;
-    filter =
-      path: _type: !(lib.hasInfix "/index-cache/" path) && !(lib.hasInfix "/__pycache__/" path);
+    filter = path: _type: !(lib.hasInfix "/index-cache/" path) && !(lib.hasInfix "/__pycache__/" path);
   };
 
   # Optional skills are NOT in the wheel (pythonSrc excludes them, see
@@ -70,8 +70,7 @@ let
   # same mechanism Homebrew packaging uses.
   bundledOptionalSkills = lib.cleanSourceWith {
     src = ../optional-skills;
-    filter =
-      path: _type: !(lib.hasInfix "/index-cache/" path) && !(lib.hasInfix "/__pycache__/" path);
+    filter = path: _type: !(lib.hasInfix "/index-cache/" path) && !(lib.hasInfix "/__pycache__/" path);
   };
 
   # Import bundled plugins (memory, context_engine, platforms/*).  Keeping
@@ -85,20 +84,18 @@ let
   # i18n locale catalogs (locales/*.yaml). Shipped into the store and pointed
   # at by SARTHI_BUNDLED_LOCALES so the wrapped binary always resolves human
   # strings instead of raw i18n keys (#23943 / #27632 / #35374).
-  #
-  # Defense-in-depth, not load-bearing: the wheel already declares locales/ as
-  # setuptools data-files, so uv2nix materializes them into the venv's data
-  # scheme and agent/i18n.py resolves them with no env var. The wrapper override
-  # pins the store path so a future uv2nix change that drops data-files can't
-  # silently ship raw keys via `nix build` (checks don't run on a plain build).
-  # The bundled-locales flake check verifies BOTH paths independently.
-  #
-  # Plain cleanSource (no __pycache__ filter): locales/ is bare *.yaml, never
-  # compiled, so it never carries a __pycache__ dir to exclude.
   bundledLocales = lib.cleanSource ../locales;
 
+  # Shipped MCP catalog (optional-mcps/<name>/manifest.yaml). Same bare-data-dir
+  # case as locales: not a Python package, so it's symlinked into the store and
+  # exposed via SARTHI_OPTIONAL_MCPS.
+  bundledOptionalMcps = lib.cleanSourceWith {
+    src = ../optional-mcps;
+    filter = path: _type: !(lib.hasInfix "/__pycache__/" path);
+  };
+
   runtimeDeps = [
-    nodejs
+    sarthiNpmLib.nodejs
     ripgrep
     git
     openssh
@@ -180,6 +177,7 @@ stdenv.mkDerivation (finalAttrs: {
     ln -s ${bundledOptionalSkills} $out/share/sarthi-agent/optional-skills
     ln -s ${bundledPlugins} $out/share/sarthi-agent/plugins
     ln -s ${bundledLocales} $out/share/sarthi-agent/locales
+    ln -s ${bundledOptionalMcps} $out/share/sarthi-agent/optional-mcps
     ln -s ${sarthiWeb} $out/share/sarthi-agent/web_dist
     ln -s ${sarthiTui}/lib/sarthi-tui $out/ui-tui
 
@@ -191,10 +189,12 @@ stdenv.mkDerivation (finalAttrs: {
           --set SARTHI_OPTIONAL_SKILLS $out/share/sarthi-agent/optional-skills \
           --set SARTHI_BUNDLED_PLUGINS $out/share/sarthi-agent/plugins \
           --set SARTHI_BUNDLED_LOCALES $out/share/sarthi-agent/locales \
+          --set SARTHI_OPTIONAL_MCPS $out/share/sarthi-agent/optional-mcps \
           --set SARTHI_WEB_DIST $out/share/sarthi-agent/web_dist \
           --set SARTHI_TUI_DIR $out/ui-tui \
+          --set-default SARTHI_BIN $out/bin/sarthi \
           --set SARTHI_PYTHON ${sarthiVenv}/bin/python3 \
-          --set SARTHI_NODE ${lib.getExe nodejs}${
+          --set SARTHI_NODE ${lib.getExe sarthiNpmLib.nodejs}${
             # Fold the line continuation INTO the optionalString: a bare
             # `\` on the line above an empty expansion would dangle onto a
             # blank line, ending the makeWrapper command early and running
@@ -251,12 +251,19 @@ stdenv.mkDerivation (finalAttrs: {
         export SARTHI_PYTHON=${devPython}/bin/python3
       '';
 
-      devDeps = runtimeDeps ++ [ devPython ];
+      devDeps =
+        runtimeDeps
+        ++ [
+          devPython
+        ]
+        ++ lib.optionals stdenv.isLinux [
+          cage # for running e2e tests without popping windows
+        ];
     };
 
   meta = with lib; {
     description = "AI agent with advanced tool-calling capabilities";
-    homepage = "https://github.com/jitendra-singh-thakur/sarthi-agent";
+    homepage = "https://github.com/NousResearch/hermes-agent";
     mainProgram = "sarthi";
     license = licenses.mit;
     platforms = platforms.unix;

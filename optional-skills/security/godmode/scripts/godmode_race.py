@@ -56,7 +56,7 @@ ULTRAPLINIAN_MODELS = [
     'mistralai/mixtral-8x22b-instruct',
     'meta-llama/llama-3.3-70b-instruct',
     'qwen/qwen-2.5-72b-instruct',
-    'nousresearch/hermes-4-70b',
+    'nousresearch/sarthi-4-70b',
     'z-ai/glm-5-turbo',
     'mistralai/mistral-medium-3.1',
     # SMART TIER (25-38)

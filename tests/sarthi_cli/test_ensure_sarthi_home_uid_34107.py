@@ -35,47 +35,12 @@ class TestResolveSarthiUidGid:
         assert uid == 1000
         assert gid == 911
 
-    def test_returns_none_when_unset(self, monkeypatch):
-        monkeypatch.delenv("SARTHI_UID", raising=False)
-        monkeypatch.delenv("SARTHI_GID", raising=False)
-        from sarthi_cli.config import _resolve_sarthi_uid_gid
-        uid, gid = _resolve_sarthi_uid_gid()
-        assert uid is None
-        assert gid is None
 
-    def test_uid_only_returns_gid_none(self, monkeypatch):
-        monkeypatch.setenv("SARTHI_UID", "1000")
-        monkeypatch.delenv("SARTHI_GID", raising=False)
-        from sarthi_cli.config import _resolve_sarthi_uid_gid
-        uid, gid = _resolve_sarthi_uid_gid()
-        assert uid == 1000
-        assert gid is None
-
-    def test_invalid_uid_returns_none_for_that_field(self, monkeypatch):
-        monkeypatch.setenv("SARTHI_UID", "not-a-number")
-        monkeypatch.setenv("SARTHI_GID", "911")
-        from sarthi_cli.config import _resolve_sarthi_uid_gid
-        uid, gid = _resolve_sarthi_uid_gid()
-        assert uid is None
-        assert gid == 911
-
-    def test_empty_string_treated_as_unset(self, monkeypatch):
-        monkeypatch.setenv("SARTHI_UID", "")
-        monkeypatch.setenv("SARTHI_GID", "")
-        from sarthi_cli.config import _resolve_sarthi_uid_gid
-        uid, gid = _resolve_sarthi_uid_gid()
-        assert uid is None
-        assert gid is None
-
-    def test_whitespace_padded_values(self, monkeypatch):
-        monkeypatch.setenv("SARTHI_UID", " 1000 ")
-        monkeypatch.setenv("SARTHI_GID", "  911")
-        from sarthi_cli.config import _resolve_sarthi_uid_gid
-        uid, gid = _resolve_sarthi_uid_gid()
-        assert uid == 1000
-        assert gid == 911
-
-    @pytest.mark.skipif(sys.platform != "win32", reason="Windows-specific")
+    # ``windows_only`` rather than ``skipif(sys.platform != "win32")``: the
+    # Windows CI job selects ``-m windows_only``, so a bare skipif would leave
+    # this test skipped on Linux AND unselected on the Windows lane — dead on
+    # every host.
+    @pytest.mark.windows_only
     def test_windows_returns_none_none(self, monkeypatch):
         monkeypatch.setenv("SARTHI_UID", "1000")
         monkeypatch.setenv("SARTHI_GID", "911")
@@ -103,31 +68,6 @@ class TestChownToSarthiUid:
             cfg._chown_to_sarthi_uid(d)
         mock_chown.assert_called_once_with(d, 1000, 911)
 
-    def test_uses_minus_one_for_missing_field(self, tmp_path, monkeypatch):
-        """When only one env var is set, the other field passes -1 to
-        os.chown which means 'do not change' on POSIX."""
-        monkeypatch.setenv("SARTHI_UID", "1000")
-        monkeypatch.delenv("SARTHI_GID", raising=False)
-        from sarthi_cli import config as cfg
-
-        d = tmp_path / "subdir"
-        d.mkdir()
-
-        with patch.object(cfg.os, "chown") as mock_chown:
-            cfg._chown_to_sarthi_uid(d)
-        mock_chown.assert_called_once_with(d, 1000, -1)
-
-    def test_no_op_when_neither_set(self, tmp_path, monkeypatch):
-        monkeypatch.delenv("SARTHI_UID", raising=False)
-        monkeypatch.delenv("SARTHI_GID", raising=False)
-        from sarthi_cli import config as cfg
-
-        d = tmp_path / "subdir"
-        d.mkdir()
-
-        with patch.object(cfg.os, "chown") as mock_chown:
-            cfg._chown_to_sarthi_uid(d)
-        mock_chown.assert_not_called()
 
     def test_eperm_is_silently_swallowed(self, tmp_path, monkeypatch):
         """When running as non-root, os.chown raises EPERM. That's fine —

@@ -1,14 +1,14 @@
 ---
-title: "Sarthi S6 Container Supervision"
+title: "Sarthi S6 Container Supervision — Modify or debug s6 services in the Sarthi Docker image"
 sidebar_label: "Sarthi S6 Container Supervision"
-description: "Modify, debug, or extend the s6-overlay supervision tree inside the Sarthi Agent Docker image — adding new services, debugging profile gateways, understandin..."
+description: "Modify or debug s6 services in the Sarthi Docker image"
 ---
 
 {/* This page is auto-generated from the skill's SKILL.md by website/scripts/generate-skill-docs.py. Edit the source SKILL.md, not this page. */}
 
 # Sarthi S6 Container Supervision
 
-Modify, debug, or extend the s6-overlay supervision tree inside the Sarthi Agent Docker image — adding new services, debugging profile gateways, understanding the Architecture B main-program pattern.
+Modify or debug s6 services in the Sarthi Docker image.
 
 ## Skill metadata
 
@@ -21,7 +21,7 @@ Modify, debug, or extend the s6-overlay supervision tree inside the Sarthi Agent
 | License | MIT |
 | Platforms | linux |
 | Tags | `docker`, `s6`, `supervision`, `gateway`, `profiles` |
-| Related skills | [`sarthi-agent`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-sarthi-agent), `sarthi-agent-dev` |
+| Related skills | [`sarthi-agent`](/docs/user-guide/skills/bundled/autonomous-ai-agents/autonomous-ai-agents-sarthi-agent) |
 
 ## Reference: full SKILL.md
 

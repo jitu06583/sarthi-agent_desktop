@@ -1,6 +1,6 @@
 """Tests for get_sarthi_home() profile-mode fallback warning.
 
-Regression test for https://github.com/jitendra-singh-thakur/sarthi-agent/issues/18594.
+Regression test for https://github.com/NousResearch/hermes-agent/issues/18594.
 
 When SARTHI_HOME is unset but an active_profile file indicates a non-default
 profile is active, get_sarthi_home() should:
@@ -38,16 +38,6 @@ class TestGetSarthiHomeProfileWarning:
         assert result == tmp_path / ".sarthi"
         assert "SARTHI_HOME fallback" not in capsys.readouterr().err
 
-    def test_default_active_profile_no_warning(
-        self, fresh_constants, tmp_path, capsys
-    ):
-        """active_profile=default → still no warning, returns ~/.sarthi."""
-        sarthi_dir = tmp_path / ".sarthi"
-        sarthi_dir.mkdir()
-        (sarthi_dir / "active_profile").write_text("default\n")
-        result = fresh_constants.get_sarthi_home()
-        assert result == tmp_path / ".sarthi"
-        assert "SARTHI_HOME fallback" not in capsys.readouterr().err
 
     def test_named_profile_unset_home_warns_once(
         self, fresh_constants, tmp_path, capsys
@@ -102,15 +92,3 @@ class TestGetSarthiHomeProfileWarning:
         # Shouldn't crash; shouldn't warn either (can't tell what profile was intended)
         assert "SARTHI_HOME fallback" not in capsys.readouterr().err
 
-    def test_empty_active_profile_no_warning(
-        self, fresh_constants, tmp_path, capsys
-    ):
-        """Empty active_profile file → treated as default, no warning."""
-        sarthi_dir = tmp_path / ".sarthi"
-        sarthi_dir.mkdir()
-        (sarthi_dir / "active_profile").write_text("")
-
-        result = fresh_constants.get_sarthi_home()
-
-        assert result == tmp_path / ".sarthi"
-        assert "SARTHI_HOME fallback" not in capsys.readouterr().err

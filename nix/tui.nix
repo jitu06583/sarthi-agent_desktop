@@ -1,14 +1,10 @@
 # nix/tui.nix — Sarthi TUI (Ink/React) compiled with tsc and bundled
-{ pkgs, sarthiNpmLib, ... }:
-let
-  npm = sarthiNpmLib.mkNpmPassthru { dirs = [ "ui-tui" ]; };
-
-  packageJson = builtins.fromJSON (builtins.readFile (npm.src + "/ui-tui/package.json"));
-  version = packageJson.version;
-in
-pkgs.buildNpmPackage (npm // {
-  pname = "sarthi-tui";
-  inherit version;
+{ sarthiNpmLib, ... }:
+sarthiNpmLib.buildNpmPackage {
+  dirs = [
+    "ui-tui"
+    "apps/shared"
+  ];
 
   doCheck = false;
 
@@ -30,4 +26,4 @@ pkgs.buildNpmPackage (npm // {
 
     runHook postInstall
   '';
-})
+}

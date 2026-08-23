@@ -20,9 +20,7 @@ logger = logging.getLogger(__name__)
 
 def _print_aiohttp_missing() -> None:
     print(
-        "sarthi proxy requires aiohttp. Install one of:\n"
-        "  pip install 'sarthi-agent[messaging]'\n"
-        "  pip install aiohttp",
+        "sarthi proxy requires aiohttp. Run `sarthi setup` to install it.",
         file=sys.stderr,
     )
 

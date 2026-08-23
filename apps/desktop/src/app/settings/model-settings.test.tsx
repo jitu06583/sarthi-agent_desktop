@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { MemoryRouter } from 'react-router'
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Radix Select calls scrollIntoView on its items when the content opens; jsdom
@@ -21,12 +22,16 @@ const saveMoaModels = vi.fn()
 const setEnvVar = vi.fn()
 const getSarthiConfigRecord = vi.fn()
 const saveSarthiConfig = vi.fn()
+const startManualLocalEndpoint = vi.fn()
+const startManualOnboarding = vi.fn()
 const startManualProviderOAuth = vi.fn()
+let profileSwitchHandler: (() => void) | null = null
 
 vi.mock('@/sarthi', () => ({
   getGlobalModelInfo: () => getGlobalModelInfo(),
   getGlobalModelOptions: () => getGlobalModelOptions(),
   getAuxiliaryModels: () => getAuxiliaryModels(),
+  getApiRequestProfile: () => 'default',
   getMoaModels: () => getMoaModels(),
   setModelAssignment: (body: unknown) => setModelAssignment(body),
   getRecommendedDefaultModel: (slug: string) => getRecommendedDefaultModel(slug),
@@ -38,29 +43,37 @@ vi.mock('@/sarthi', () => ({
 }))
 
 vi.mock('@/store/onboarding', () => ({
+  startManualLocalEndpoint: () => startManualLocalEndpoint(),
+  startManualOnboarding: () => startManualOnboarding(),
   startManualProviderOAuth: (slug: string) => startManualProviderOAuth(slug)
 }))
 
+vi.mock('../hooks/use-on-profile-switch', () => ({
+  useOnProfileSwitch: (handler: () => void) => {
+    profileSwitchHandler = handler
+  }
+}))
+
 beforeEach(() => {
-  getGlobalModelInfo.mockResolvedValue({ provider: 'nous', model: 'hermes-4' })
+  getGlobalModelInfo.mockResolvedValue({ provider: 'nous', model: 'sarthi-4' })
   getGlobalModelOptions.mockResolvedValue({
     providers: [
       {
         name: 'Nous',
         slug: 'nous',
-        models: ['hermes-4', 'hermes-4-mini'],
+        models: ['sarthi-4', 'sarthi-4-mini'],
         authenticated: true,
-        capabilities: { 'hermes-4': { reasoning: true, fast: true } }
+        capabilities: { 'sarthi-4': { reasoning: true, fast: true } }
       }
     ]
   })
   getAuxiliaryModels.mockResolvedValue({
-    main: { provider: 'nous', model: 'hermes-4' },
+    main: { provider: 'nous', model: 'sarthi-4' },
     tasks: [{ task: 'vision', provider: 'auto', model: '', base_url: '' }]
   })
   getMoaModels.mockResolvedValue(null)
-  setModelAssignment.mockResolvedValue({ provider: 'nous', model: 'hermes-4', gateway_tools: [] })
-  getRecommendedDefaultModel.mockResolvedValue({ provider: 'nous', model: 'hermes-4', free_tier: null })
+  setModelAssignment.mockResolvedValue({ ok: true, provider: 'nous', model: 'sarthi-4', gateway_tools: [] })
+  getRecommendedDefaultModel.mockResolvedValue({ provider: 'nous', model: 'sarthi-4', free_tier: null })
   setEnvVar.mockResolvedValue({ ok: true })
   getSarthiConfigRecord.mockResolvedValue({ agent: { reasoning_effort: 'medium', service_tier: 'normal' } })
   saveSarthiConfig.mockResolvedValue({ ok: true })
@@ -69,6 +82,7 @@ beforeEach(() => {
 afterEach(() => {
   cleanup()
   vi.clearAllMocks()
+  profileSwitchHandler = null
 })
 
 async function renderModelSettings() {
@@ -76,9 +90,13 @@ async function renderModelSettings() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
 
   return render(
-    <QueryClientProvider client={client}>
-      <ModelSettings />
-    </QueryClientProvider>
+    // The aux-task deep-link highlight reads useSearchParams, so the page
+    // needs a router context in tests (the app provides HashRouter at root).
+    <MemoryRouter>
+      <QueryClientProvider client={client}>
+        <ModelSettings />
+      </QueryClientProvider>
+    </MemoryRouter>
   )
 }
 
@@ -96,6 +114,151 @@ describe('ModelSettings', () => {
     // "Nous" shows in both the trigger and the open list.
     expect((await screen.findAllByText('Nous')).length).toBeGreaterThan(0)
     expect(screen.queryByText(/DeepSeek/)).toBeNull()
+  })
+
+  it.each(['custom', 'local', 'custom:lab'])(
+    'opens local endpoint setup when %s has no inventory row',
+    async provider => {
+      getGlobalModelInfo.mockResolvedValueOnce({ provider, model: '' })
+      getGlobalModelOptions.mockResolvedValueOnce({ providers: [] })
+
+      await renderModelSettings()
+
+      const providerSelect = (await screen.findAllByRole('combobox'))[0]
+
+      expect(providerSelect.textContent).toContain(provider)
+      expect(screen.queryByText(/undefined/)).toBeNull()
+      expect(screen.queryByText(/signs in through your browser/)).toBeNull()
+
+      fireEvent.click(await screen.findByRole('button', { name: 'Set up provider' }))
+
+      expect(startManualLocalEndpoint).toHaveBeenCalledOnce()
+      expect(startManualOnboarding).not.toHaveBeenCalled()
+      expect(startManualProviderOAuth).not.toHaveBeenCalled()
+    }
+  )
+
+  it('opens the generic provider picker for an unknown provider with no inventory row', async () => {
+    getGlobalModelInfo.mockResolvedValueOnce({ provider: 'retired-provider', model: '' })
+    getGlobalModelOptions.mockResolvedValueOnce({ providers: [] })
+
+    await renderModelSettings()
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Set up provider' }))
+
+    expect(startManualOnboarding).toHaveBeenCalledOnce()
+    expect(startManualLocalEndpoint).not.toHaveBeenCalled()
+    expect(startManualProviderOAuth).not.toHaveBeenCalled()
+  })
+
+  it('deep-links a known OAuth provider row into its setup flow', async () => {
+    getGlobalModelInfo.mockResolvedValueOnce({ provider: 'anthropic', model: '' })
+    getGlobalModelOptions.mockResolvedValueOnce({
+      providers: [
+        {
+          name: 'Anthropic',
+          slug: 'anthropic',
+          models: [],
+          authenticated: false,
+          auth_type: 'oauth'
+        }
+      ]
+    })
+
+    await renderModelSettings()
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Set up Anthropic' }))
+
+    expect(startManualProviderOAuth).toHaveBeenCalledWith('anthropic')
+    expect(startManualLocalEndpoint).not.toHaveBeenCalled()
+    expect(startManualOnboarding).not.toHaveBeenCalled()
+  })
+
+  it('replaces the selected provider and model when the active profile changes', async () => {
+    getGlobalModelInfo
+      .mockResolvedValueOnce({ provider: 'custom', model: 'local-a' })
+      .mockResolvedValueOnce({ provider: 'nous', model: 'sarthi-4' })
+    getGlobalModelOptions
+      .mockResolvedValueOnce({
+        providers: [
+          {
+            name: 'Custom A',
+            slug: 'custom',
+            models: ['local-a'],
+            authenticated: true
+          }
+        ]
+      })
+      .mockResolvedValueOnce({
+        providers: [
+          {
+            name: 'Nous',
+            slug: 'nous',
+            models: ['sarthi-4'],
+            authenticated: true,
+            capabilities: { 'sarthi-4': { reasoning: true, fast: true } }
+          }
+        ]
+      })
+
+    await renderModelSettings()
+    expect((await screen.findAllByRole('combobox'))[0].textContent).toContain('Custom A')
+
+    await act(async () => {
+      profileSwitchHandler?.()
+    })
+
+    await waitFor(() => expect(getGlobalModelInfo).toHaveBeenCalledTimes(2))
+    await waitFor(() => expect(screen.getAllByRole('combobox')[0].textContent).toContain('Nous'))
+    expect(screen.queryByRole('button', { name: 'Set up provider' })).toBeNull()
+  })
+
+  it('preserves a user-defined provider endpoint when applying the main model', async () => {
+    getGlobalModelOptions.mockResolvedValueOnce({
+      providers: [
+        {
+          name: 'Nous',
+          slug: 'nous',
+          models: ['sarthi-4'],
+          authenticated: true
+        },
+        {
+          name: 'Ollama',
+          slug: 'local-ollama',
+          models: ['qwen3:latest'],
+          authenticated: true,
+          is_user_defined: true,
+          api_url: 'http://localhost:11434/v1'
+        }
+      ]
+    })
+    setModelAssignment.mockResolvedValueOnce({
+      ok: true,
+      provider: 'local-ollama',
+      model: 'qwen3:latest',
+      gateway_tools: []
+    })
+
+    await renderModelSettings()
+
+    const providerSelect = (await screen.findAllByRole('combobox'))[0]
+    fireEvent.click(providerSelect)
+    fireEvent.click(await screen.findByRole('option', { name: 'Ollama' }))
+
+    const modelSelect = (await screen.findAllByRole('combobox'))[1]
+    fireEvent.click(modelSelect)
+    fireEvent.click(await screen.findByRole('option', { name: 'qwen3:latest' }))
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Apply' }))
+
+    await waitFor(() =>
+      expect(setModelAssignment).toHaveBeenCalledWith({
+        model: 'qwen3:latest',
+        provider: 'local-ollama',
+        scope: 'main',
+        base_url: 'http://localhost:11434/v1'
+      })
+    )
   })
 
   it('writes the profile default speed (service_tier) when the fast switch is toggled', async () => {
@@ -118,9 +281,9 @@ describe('ModelSettings', () => {
         {
           name: 'Nous',
           slug: 'nous',
-          models: ['hermes-4'],
+          models: ['sarthi-4'],
           authenticated: true,
-          capabilities: { 'hermes-4': { reasoning: false, fast: false } }
+          capabilities: { 'sarthi-4': { reasoning: false, fast: false } }
         }
       ]
     })
@@ -147,7 +310,7 @@ describe('ModelSettings', () => {
 
     await waitFor(() =>
       expect(setModelAssignment).toHaveBeenCalledWith({
-        model: 'hermes-4',
+        model: 'sarthi-4',
         provider: 'nous',
         scope: 'auxiliary',
         task: 'vision'
@@ -155,12 +318,48 @@ describe('ModelSettings', () => {
     )
   })
 
+  it('carries the user-defined endpoint when an aux slot is set to a local main model', async () => {
+    getGlobalModelOptions.mockResolvedValueOnce({
+      providers: [
+        {
+          name: 'Ollama',
+          slug: 'local-ollama',
+          models: ['qwen3:latest'],
+          authenticated: true,
+          is_user_defined: true,
+          api_url: 'http://localhost:11434/v1'
+        }
+      ]
+    })
+    getGlobalModelInfo.mockResolvedValueOnce({ provider: 'local-ollama', model: 'qwen3:latest' })
+    getAuxiliaryModels.mockResolvedValueOnce({
+      main: { provider: 'local-ollama', model: 'qwen3:latest' },
+      tasks: [{ task: 'vision', provider: 'auto', model: '', base_url: '' }]
+    })
+
+    await renderModelSettings()
+
+    const setToMainButtons = await screen.findAllByRole('button', { name: 'Set to main' })
+    fireEvent.click(setToMainButtons[0])
+
+    await waitFor(() =>
+      expect(setModelAssignment).toHaveBeenCalledWith({
+        model: 'qwen3:latest',
+        provider: 'local-ollama',
+        scope: 'auxiliary',
+        task: 'vision',
+        base_url: 'http://localhost:11434/v1'
+      })
+    )
+  })
+
   it('warns when a main switch leaves auxiliary tasks pinned to another provider', async () => {
     setModelAssignment.mockResolvedValueOnce({
+      ok: true,
       provider: 'openrouter',
       model: 'anthropic/claude-opus-4.7',
       gateway_tools: [],
-      stale_aux: [{ task: 'compression', provider: 'nous', model: 'hermes-4' }]
+      stale_aux: [{ task: 'compression', provider: 'nous', model: 'sarthi-4' }]
     })
 
     await renderModelSettings()
@@ -176,7 +375,7 @@ describe('ModelSettings', () => {
 
   it('shows a persistent banner when a loaded aux slot mismatches the main provider', async () => {
     getAuxiliaryModels.mockResolvedValueOnce({
-      main: { provider: 'nous', model: 'hermes-4' },
+      main: { provider: 'nous', model: 'sarthi-4' },
       tasks: [{ task: 'curator', provider: 'openrouter', model: 'anthropic/claude-opus-4.7', base_url: '' }]
     })
 
@@ -194,7 +393,7 @@ describe('ModelSettings MoA preset editor', () => {
     presets: {
       default: {
         reference_models: [
-          { provider: 'nous', model: 'hermes-4' },
+          { provider: 'nous', model: 'sarthi-4' },
           { provider: 'openrouter', model: 'deepseek/deepseek-v4-pro' }
         ],
         aggregator: { provider: 'openrouter', model: 'anthropic/claude-opus-4.8' },
@@ -205,7 +404,7 @@ describe('ModelSettings MoA preset editor', () => {
       }
     },
     reference_models: [
-      { provider: 'nous', model: 'hermes-4' },
+      { provider: 'nous', model: 'sarthi-4' },
       { provider: 'openrouter', model: 'deepseek/deepseek-v4-pro' }
     ],
     aggregator: { provider: 'openrouter', model: 'anthropic/claude-opus-4.8' },
@@ -221,9 +420,9 @@ describe('ModelSettings MoA preset editor', () => {
         {
           name: 'Nous',
           slug: 'nous',
-          models: ['hermes-4', 'hermes-4-mini'],
+          models: ['sarthi-4', 'sarthi-4-mini'],
           authenticated: true,
-          capabilities: { 'hermes-4': { reasoning: true, fast: true } }
+          capabilities: { 'sarthi-4': { reasoning: true, fast: true } }
         },
         {
           name: 'OpenRouter',
@@ -316,7 +515,54 @@ describe('ModelSettings MoA preset editor', () => {
       // Radix treats re-picking the current value as a no-op (no
       // onValueChange), so nothing changes: no save, model still shown.
       expect(saveMoaModels).not.toHaveBeenCalled()
-      expect(screen.getByText('nous · hermes-4')).toBeTruthy()
+      expect(screen.getByText('nous · sarthi-4')).toBeTruthy()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('autosaves the selected preset when its enabled switch is toggled', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+
+    try {
+      await openReferenceEditor()
+
+      fireEvent.click(screen.getByRole('switch', { name: 'Enabled' }))
+      await vi.advanceTimersByTimeAsync(700)
+
+      expect(saveMoaModels).toHaveBeenCalledWith(
+        expect.objectContaining({
+          presets: expect.objectContaining({
+            default: expect.objectContaining({ enabled: false })
+          })
+        })
+      )
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('saves a disabled reference model without removing it (per-slot enabled toggle)', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+
+    try {
+      await openReferenceEditor()
+
+      fireEvent.click(screen.getByRole('switch', { name: 'Disable reference 1' }))
+      await vi.advanceTimersByTimeAsync(700)
+
+      expect(saveMoaModels).toHaveBeenCalledWith(
+        expect.objectContaining({
+          presets: expect.objectContaining({
+            default: expect.objectContaining({
+              reference_models: [
+                expect.objectContaining({ provider: 'nous', model: 'sarthi-4', enabled: false }),
+                expect.objectContaining({ provider: 'openrouter', model: 'deepseek/deepseek-v4-pro' })
+              ]
+            })
+          })
+        })
+      )
     } finally {
       vi.useRealTimers()
     }

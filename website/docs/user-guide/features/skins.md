@@ -50,24 +50,24 @@ Controls all color values throughout the CLI. Values are hex color strings.
 
 | Key | Description | Default (`default` skin) |
 |-----|-------------|--------------------------|
-| `banner_border` | Panel border around the startup banner | `#2563EB` (bronze) |
-| `banner_title` | Title text color in the banner | `#2DD4BF` (gold) |
-| `banner_accent` | Section headers in the banner (Available Tools, etc.) | `#10B981` (amber) |
-| `banner_dim` | Muted text in the banner (separators, secondary labels) | `#059669` (dark goldenrod) |
+| `banner_border` | Panel border around the startup banner | `#CD7F32` (bronze) |
+| `banner_title` | Title text color in the banner | `#FFD700` (gold) |
+| `banner_accent` | Section headers in the banner (Available Tools, etc.) | `#FFBF00` (amber) |
+| `banner_dim` | Muted text in the banner (separators, secondary labels) | `#B8860B` (dark goldenrod) |
 | `banner_text` | Body text in the banner (tool names, skill names) | `#FFF8DC` (cornsilk) |
-| `ui_accent` | General UI accent color (highlights, active elements) | `#10B981` |
-| `ui_label` | UI labels and tags | `#4dd0e1` (teal) |
+| `ui_accent` | General UI accent color (highlights, active elements) | `#FFBF00` |
+| `ui_label` | UI labels and tags | `#DAA520` (goldenrod) |
 | `ui_ok` | Success indicators (checkmarks, completion) | `#4caf50` (green) |
 | `ui_error` | Error indicators (failures, blocked) | `#ef5350` (red) |
 | `ui_warn` | Warning indicators (caution, approval prompts) | `#ffa726` (orange) |
 | `prompt` | Interactive prompt text color | `#FFF8DC` |
-| `input_rule` | Horizontal rule above the input area | `#2563EB` |
-| `response_border` | Border around the agent's response box (ANSI escape) | `#2DD4BF` |
+| `input_rule` | Horizontal rule above the input area | `#CD7F32` |
+| `response_border` | Border around the agent's response box (ANSI escape) | `#FFD700` |
 | `session_label` | Session label color | `#DAA520` |
 | `session_border` | Session ID dim border color | `#8B8682` |
 | `status_bar_bg` | Background color for the TUI status / usage bar | `#1a1a2e` |
 | `voice_status_bg` | Background color for the voice-mode status badge | `#1a1a2e` |
-| `selection_bg` | Background color for the TUI mouse-selection highlighter. Falls back to `completion_menu_current_bg` when unset. | `#333355` |
+| `selection_bg` | Background color for the TUI mouse-selection highlighter. Falls back to `completion_menu_current_bg` when unset. | `#3a3a55` |
 | `completion_menu_bg` | Background color for the completion menu list | `#1a1a2e` |
 | `completion_menu_current_bg` | Background color for the active completion row | `#333355` |
 | `completion_menu_meta_bg` | Background color for the completion meta column | `#1a1a2e` |
@@ -123,19 +123,19 @@ name: mytheme
 description: My custom theme
 
 colors:
-  banner_border: "#2563EB"
-  banner_title: "#2DD4BF"
-  banner_accent: "#10B981"
-  banner_dim: "#059669"
+  banner_border: "#CD7F32"
+  banner_title: "#FFD700"
+  banner_accent: "#FFBF00"
+  banner_dim: "#B8860B"
   banner_text: "#FFF8DC"
-  ui_accent: "#10B981"
+  ui_accent: "#FFBF00"
   ui_label: "#4dd0e1"
   ui_ok: "#4caf50"
   ui_error: "#ef5350"
   ui_warn: "#ffa726"
   prompt: "#FFF8DC"
-  input_rule: "#2563EB"
-  response_border: "#2DD4BF"
+  input_rule: "#CD7F32"
+  response_border: "#FFD700"
   session_label: "#DAA520"
   session_border: "#8B8682"
   status_bar_bg: "#1a1a2e"
@@ -182,9 +182,9 @@ tool_emojis:
 
 # Custom ASCII art banners (optional, Rich markup supported)
 # banner_logo: |
-#   [bold #2DD4BF] MY AGENT [/]
+#   [bold #FFD700] MY AGENT [/]
 # banner_hero: |
-#   [#2DD4BF]  Custom art here  [/]
+#   [#FFD700]  Custom art here  [/]
 ```
 
 ### Minimal custom skin example

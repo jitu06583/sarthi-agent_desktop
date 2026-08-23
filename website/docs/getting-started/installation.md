@@ -15,21 +15,21 @@ platform-gated features are supported), see **[Platform Support](./platform-supp
 
 ## Quick Install
 ### With the Sarthi Desktop installer on macOS or Windows (recommended)
-To easily install the command-line and desktop applications, [download the Sarthi Desktop installer](https://sarthi-agent.vercel.app/) from our website and run it.
+To easily install the command-line and desktop applications, [download the Sarthi Desktop installer](https://hermes-agent.nousresearch.com/) from our website and run it.
 
 ### Without Sarthi Desktop:
 For a command-line only install without Sarthi Desktop, run:
 
 #### Linux / macOS / WSL2 / Android (Termux)
 ```bash
-curl -fsSL https://sarthi-agent.vercel.app/install.sh | bash
+curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
 ```
 
 #### Windows (native)
 
 Run in powershell:
 ```powershell
-iex (irm https://sarthi-agent.vercel.app/install.ps1) 
+iex (irm https://hermes-agent.nousresearch.com/install.ps1) 
 ```
 
 If you want to install & run Sarthi Desktop after a command-line only install, simply run
@@ -82,6 +82,10 @@ sarthi setup --portal
 That logs you in, sets Nous as your provider, and turns on the Tool Gateway in one command.
 :::
 
+:::tip Already running Sarthi on another machine?
+You don't need to rebuild your setup from scratch. Restore a full backup with `sarthi import` (see [Exporting Sarthi to another machine](/reference/faq#exporting-sarthi-to-another-machine)), or bring over a single agent with `sarthi profile import` (see [Moving a single profile to another machine](/reference/faq#moving-a-single-profile-to-another-machine)). Note that a profile export excludes credentials by design, so an export alone is not a full backup — [`sarthi backup` vs `sarthi profile export`](/reference/faq#sarthi-backup-vs-sarthi-profile-export) explains which to use.
+:::
+
 ---
 
 ## Prerequisites
@@ -124,13 +128,15 @@ Running Sarthi as a dedicated unprivileged user (e.g. a `sarthi` systemd service
 
 2. **As the unprivileged service user**, run the regular installer. It will detect the missing sudo, skip `--with-deps`, and install Chromium into the user's local Playwright cache:
    ```bash
-   curl -fsSL https://sarthi-agent.vercel.app/install.sh | bash
+   curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
    ```
 
    If you want to skip the Playwright step entirely — for example because you're running headless and don't need browser automation — pass `--skip-browser`:
    ```bash
-   curl -fsSL https://sarthi-agent.vercel.app/install.sh | bash -s -- --skip-browser
+   curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash -s -- --skip-browser
    ```
+
+   The installer also pre-installs [`cua-driver`](../user-guide/features/computer-use.md) so the Computer Use toolset works the moment you enable it; pass `--skip-computer-use` to opt out (it will then install on demand when you enable the tool).
 
 3. **Make `sarthi` available to the service user's shells.** The installer writes the launcher to `~/.local/bin/sarthi`. System service accounts often have a minimal PATH that doesn't include `~/.local/bin`. Either add it to the user's environment, or symlink the launcher into a system location:
    ```bash
@@ -142,6 +148,14 @@ Running Sarthi as a dedicated unprivileged user (e.g. a `sarthi` systemd service
    ```
 
 4. **Verify:** `sarthi doctor` should now run cleanly. If you get `ModuleNotFoundError: No module named 'dotenv'`, you're invoking the repo source `sarthi` file (`~/.sarthi/sarthi-agent/sarthi`) with system Python instead of the venv launcher (`~/.sarthi/sarthi-agent/venv/bin/sarthi`) — fix step 3.
+
+5. **Running the messaging gateway from this account?** A user-level service stops at logout and does not start at boot until you enable lingering for the service user:
+
+   ```bash
+   sudo loginctl enable-linger <service-user>
+   ```
+
+   See [Messaging Gateway](/user-guide/messaging/) for the service setup itself.
 
 The same pattern works on Arch (the installer uses pacman with the same sudo-detection logic), Fedora/RHEL, and openSUSE — those distros don't support `--with-deps` at all, so an administrator always installs the system libraries separately. The relevant `dnf`/`zypper` commands are printed by the installer.
 
@@ -159,4 +173,4 @@ For more diagnostics, run `sarthi doctor` — it will tell you exactly what's mi
 
 ## Install method auto-detection
 
-Sarthi auto-detects whether it was installed via `pip`, the git installer, Homebrew, or NixOS, and `sarthi update` prints the matching update command for that path. There's no env var to set — the detection is based on the install layout (Python site-packages, `~/.sarthi/sarthi-agent/`, Homebrew prefix, or Nix store path). `sarthi doctor` also surfaces the detected method under its environment summary.
+Sarthi auto-detects whether it was installed via the git installer, Docker, or NixOS, and `sarthi update` prints the matching update command for that path. There's no env var to set — the detection is based on the install layout (`~/.sarthi/sarthi-agent/` checkout, Docker image stamp, or Nix store path). `sarthi doctor` also surfaces the detected method under its environment summary.

@@ -10,6 +10,10 @@ Run multiple independent Sarthi agents on the same machine — each with its own
 
 A profile is a separate Sarthi home directory. Each profile gets its own directory containing its own `config.yaml`, `.env`, `SOUL.md`, memories, sessions, skills, cron jobs, and state database. Profiles let you run separate agents for different purposes — a coding assistant, a personal bot, a research agent — without mixing up Sarthi state.
 
+:::caution Give every agent its own profile
+Never point two agent processes at the same profile (the same Sarthi home). Both write memory automatically, and each loads the other's writes into its system prompt at session start — so two writers on one home compound each other's state until it stops being anything you configured. Profiles exist exactly to prevent this; agents that need shared memory should use an [external memory provider](/user-guide/features/memory-providers) instead.
+:::
+
 When you create a profile, it automatically becomes its own command. Create a profile called `coder` and you immediately have `coder chat`, `coder setup`, `coder gateway start`, etc.
 
 ## Quick start
@@ -237,9 +241,29 @@ User-modified skills are never overwritten.
 sarthi profile list           # show all profiles with status
 sarthi profile show coder     # detailed info for one profile
 sarthi profile rename coder dev-bot   # rename (updates alias + service)
-sarthi profile export coder   # export to coder.tar.gz
-sarthi profile import coder.tar.gz   # import from archive
+sarthi profile export coder   # pack into coder.tar.gz (shareable; keys stripped)
+sarthi profile import coder.tar.gz   # install an archive as a new profile
 ```
+
+In chat, the same two live as `/export` and `/import` — and in the desktop app as **⌘K → Export/Import profile…**. See [Sharing a profile](#sharing-a-profile).
+
+### Naming the default profile
+
+The default profile's internal ID is always `default` — it can't be truly
+renamed because `~/.sarthi` is the installation root. Renaming it instead
+sets a **display name**, which UI surfaces show in place of the bare ID:
+
+```bash
+sarthi profile rename default Harumesu   # Unicode fine: 小助手
+```
+
+The display name appears in `sarthi profile list`/`show`, the `/profile`
+chat command, the dashboard, and the desktop app (including the Bot Mode
+roster). It is presentation-only: `-p default`, service names, cron jobs,
+and every other reference keep using the canonical `default` ID. It is
+stored as `display_name` in `~/.sarthi/profile.yaml`; remove that line to
+revert. Named profiles can carry a `display_name` too (it survives a real
+rename), but `rename` for them still renames the profile itself.
 
 ## Deleting a profile
 
@@ -301,9 +325,19 @@ the actual account home when `home_mode: profile` is active.
 
 The default profile is simply `~/.sarthi` itself. No migration needed — existing installs work identically.
 
-## Sharing profiles as distributions
+## Sharing a profile
 
-A profile you built on one machine can be packaged as a **git repository** and installed with one command on another machine — your own workstation, a teammate's laptop, or a community user's environment. The shared package includes the SOUL, config, skills, cron jobs, and MCP connections. Credentials, memories, and sessions stay per-machine.
+A profile you built on one machine can go to another — your own workstation, a teammate's laptop, or the community. Two paths:
+
+**Send a file.** `/export` packs the profile into one `.tar.gz` — skills, memory, persona, crons, plugins, settings, and (from the desktop) your theme and layout. API keys are stripped. The recipient runs `/import`.
+
+```bash
+# In chat, run /export, hand over the file, and they run /import on it
+sarthi profile export coder
+sarthi profile import ./coder.tar.gz --name coder
+```
+
+**Publish a distribution.** Package the profile as a **git repository** so recipients install it with one command and pull versioned updates later. Carries the SOUL, config, skills, cron jobs, and MCP connections; credentials, memories, and sessions stay per-machine.
 
 ```bash
 # Install a whole agent from a git repo
@@ -313,4 +347,4 @@ sarthi profile install github.com/you/research-bot --alias
 sarthi profile update research-bot
 ```
 
-See **[Profile Distributions: Share a Whole Agent](./profile-distributions.md)** for the full guide — authoring, publishing, update semantics, security model, and use cases.
+Use an export file for a one-time handoff or a move; use a distribution for an agent you'll keep shipping. See **[Profile Distributions: Share a Whole Agent](./profile-distributions.md)** for both — the comparison table, authoring, publishing, update semantics, and the security model.

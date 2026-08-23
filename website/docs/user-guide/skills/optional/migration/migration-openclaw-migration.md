@@ -1,14 +1,14 @@
 ---
-title: "Openclaw Migration — Migrate a user's OpenClaw customization footprint into Sarthi Agent"
+title: "Openclaw Migration — Import an OpenClaw setup (memories, skills) into Sarthi"
 sidebar_label: "Openclaw Migration"
-description: "Migrate a user's OpenClaw customization footprint into Sarthi Agent"
+description: "Import an OpenClaw setup (memories, skills) into Sarthi"
 ---
 
 {/* This page is auto-generated from the skill's SKILL.md by website/scripts/generate-skill-docs.py. Edit the source SKILL.md, not this page. */}
 
 # Openclaw Migration
 
-Migrate a user's OpenClaw customization footprint into Sarthi Agent. Imports Sarthi-compatible memories, SOUL.md, command allowlists, user skills, and selected workspace assets from ~/.openclaw, then reports exactly what could not be migrated and why.
+Import an OpenClaw setup (memories, skills) into Sarthi.
 
 ## Skill metadata
 

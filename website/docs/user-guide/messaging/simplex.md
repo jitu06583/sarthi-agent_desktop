@@ -85,6 +85,23 @@ SIMPLEX_GROUP_ALLOWED=*              # any group the bot is in
 Address groups by prefixing the chat ID with `group:`, e.g.
 `simplex:group:12` as a cron `deliver=` target or in a `sarthi send` call.
 
+## Sending with `sarthi send`
+
+SimpleX works as a standalone send target — the daemon must be running,
+but a live gateway is not required for plain text:
+
+```bash
+sarthi send --to simplex:alice "hello"          # DM by contact display name
+sarthi send --to simplex:group:12 "hello"       # group by numeric ID
+sarthi send --to simplex "hello"                # SIMPLEX_HOME_CHANNEL
+```
+
+While the gateway is running, the adapter enumerates your contacts and
+allowed groups into the channel directory (refreshed every 5 minutes), so
+`sarthi send --list` shows them by name. Before the first gateway run the
+platform still appears in `--list` with a "no channels discovered yet"
+hint — direct targets like the ones above work regardless.
+
 ## Attachments
 
 The adapter supports native SimpleX attachments in both directions:

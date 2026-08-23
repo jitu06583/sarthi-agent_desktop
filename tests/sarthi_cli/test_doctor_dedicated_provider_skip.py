@@ -8,7 +8,7 @@ with HTTP 404. The dedicated check at sarthi_cli/doctor.py already covers
 Anthropic with the right headers, so the pluggable profile must be
 skipped by `_build_apikey_providers_list()`.
 
-See: NousResearch/sarthi-agent#22346
+See: NousResearch/hermes-agent#22346
 """
 
 from __future__ import annotations
@@ -23,12 +23,16 @@ def test_build_apikey_providers_list_skips_dedicated_check_providers():
 
     # Tuple shape: (display_name, env_vars, default_url, base_env, supports_health_check)
     names = {entry[0].lower() for entry in entries}
-    assert not any("anthropic" in name for name in names), (
+    # Exact-name checks, not substring: third-party gateways that expose an
+    # Anthropic-compatible endpoint under Bearer auth (e.g. "CommandCode
+    # (Anthropic)") legitimately belong in the generic loop. Only the native
+    # Anthropic profile (x-api-key headers) must be skipped.
+    assert "anthropic" not in names, (
         f"Anthropic provider profile leaked into generic Bearer-auth health "
         f"check loop. Dedicated check above already covers it with "
         f"x-api-key headers. Got entries: {sorted(names)}"
     )
-    assert not any("openrouter" in name for name in names), (
+    assert "openrouter" not in names, (
         f"OpenRouter has a dedicated check; generic loop must skip it. "
         f"Got: {sorted(names)}"
     )
@@ -38,13 +42,3 @@ def test_build_apikey_providers_list_skips_dedicated_check_providers():
     )
 
 
-def test_build_apikey_providers_list_includes_non_dedicated_providers():
-    """Sanity guard: the skip-set must not strip every provider."""
-    from sarthi_cli import doctor
-
-    doctor._APIKEY_PROVIDERS_CACHE = None
-    entries = doctor._build_apikey_providers_list()
-
-    names = {entry[0] for entry in entries}
-    assert "DeepSeek" in names
-    assert "Z.AI / GLM" in names

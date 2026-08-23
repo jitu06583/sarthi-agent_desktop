@@ -6,7 +6,6 @@ No remote dependencies.
 Enhanced with UI-UX-PRO-MAX design intelligence.
 """
 
-import json
 import datetime
 import secrets
 from typing import Any, Dict, List
@@ -21,7 +20,7 @@ ICON_SPARKLES = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" 
 ICON_CHEVRON_RIGHT = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>'
 ICON_SEARCH = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>'
 ICON_SHIELD = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shield"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z"/></svg>'
-ICON_SARTHI = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#2DD4BF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>'
+ICON_SARTHI = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>'
 
 HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
@@ -41,7 +40,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
             --user-bg: #FFFFFF;
             --assistant-bg: #F1F5F9;
             --border-color: #E2E8F0;
-            --accent-color: #2563EB;
+            --accent-color: #CD7F32;
             --accent-foreground: #FFFFFF;
             --code-bg: #1E293B;
             --code-text: #F8FAFC;
@@ -61,11 +60,11 @@ HTML_TEMPLATE = """<!DOCTYPE html>
                 --secondary-text: #94A3B8;
                 --user-bg: #041c1c;
                 --assistant-bg: #0c1a1a;
-                --border-color: #2563EB;
-                --accent-color: #2DD4BF;
+                --border-color: #CD7F32;
+                --accent-color: #FFD700;
                 --code-bg: #000000;
                 --reasoning-bg: #1a1a1a;
-                --reasoning-border: #2563EB;
+                --reasoning-border: #CD7F32;
                 --tool-bg: #0c4a6e;
                 --tool-border: #075985;
                 --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3), 0 2px 4px -2px rgb(0 0 0 / 0.3);
@@ -811,7 +810,7 @@ def generate_multi_session_html_export(sessions: List[Dict[str, Any]]) -> str:
         sid = str(s.get("id", "N/A"))
         escaped_sid = _escape_html(sid)
         title = s.get("title") or "Sarthi Session"
-        model = s.get("model", "Unknown")
+        model = s.get("model") or "Unknown"
         started_at = _format_timestamp(s.get("started_at", 0))
         messages = s.get("messages", [])
         
@@ -857,7 +856,7 @@ def generate_multi_session_html_export(sessions: List[Dict[str, Any]]) -> str:
 
     script_nonce = secrets.token_urlsafe(16)
     return HTML_TEMPLATE.format(
-        page_title="Sarthi Session Export" if is_multi else _escape_html(sessions[0].get("title", "Sarthi Session")),
+        page_title="Sarthi Session Export" if is_multi else _escape_html(sessions[0].get("title") or "Sarthi Session"),
         sidebar_html=sidebar_html,
         sessions_html="\n".join(sessions_html_list),
         main_margin="var(--sidebar-width)" if is_multi else "0",

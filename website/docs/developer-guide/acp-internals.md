@@ -17,7 +17,6 @@ Key implementation files:
 - `acp_adapter/permissions.py`
 - `acp_adapter/tools.py`
 - `acp_adapter/auth.py`
-- `acp_registry/agent.json`
 
 ## Boot flow
 
@@ -30,8 +29,6 @@ sarthi acp / sarthi-acp / python -m acp_adapter
   -> construct SarthiACPAgent
   -> acp.run_agent(agent, use_unstable_protocol=True)
 ```
-
-The Zed ACP Registry path launches the same adapter through `uvx --from 'sarthi-agent[acp]==<version>' sarthi-acp`, pointed at the `sarthi-agent` PyPI release.
 
 Stdout is reserved for ACP JSON-RPC transport. Human-readable logs go to stderr.
 
@@ -149,7 +146,7 @@ Instead it reuses Sarthi' runtime resolver:
 - `acp_adapter/auth.py`
 - `sarthi_cli/runtime_provider.py`
 
-So ACP advertises and uses the currently configured Sarthi provider/credentials. It also always advertises a terminal setup auth method (`sarthi-setup`, args `--setup`) so first-run registry clients can open Sarthi' interactive model/provider configuration before starting a normal ACP session.
+So ACP advertises and uses the currently configured Sarthi provider/credentials. It also always advertises a terminal setup auth method (`sarthi-setup`, args `--setup`) so first-run ACP clients can open Sarthi' interactive model/provider configuration before starting a normal ACP session.
 
 ## Working directory binding
 

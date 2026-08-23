@@ -50,19 +50,19 @@ display:
 
 | 键 | 描述 | 默认值（`default` 皮肤） |
 |----|------|------------------------|
-| `banner_border` | 启动横幅周围的面板边框 | `#2563EB`（青铜色） |
-| `banner_title` | 横幅中的标题文字颜色 | `#2DD4BF`（金色） |
-| `banner_accent` | 横幅中的区块标题（Available Tools 等） | `#10B981`（琥珀色） |
-| `banner_dim` | 横幅中的弱化文字（分隔符、次要标签） | `#059669`（暗金菊色） |
+| `banner_border` | 启动横幅周围的面板边框 | `#CD7F32`（青铜色） |
+| `banner_title` | 横幅中的标题文字颜色 | `#FFD700`（金色） |
+| `banner_accent` | 横幅中的区块标题（Available Tools 等） | `#FFBF00`（琥珀色） |
+| `banner_dim` | 横幅中的弱化文字（分隔符、次要标签） | `#B8860B`（暗金菊色） |
 | `banner_text` | 横幅中的正文文字（工具名、技能名） | `#FFF8DC`（玉米丝色） |
-| `ui_accent` | 通用 UI 强调色（高亮、活动元素） | `#10B981` |
+| `ui_accent` | 通用 UI 强调色（高亮、活动元素） | `#FFBF00` |
 | `ui_label` | UI 标签与标记 | `#4dd0e1`（青色） |
 | `ui_ok` | 成功指示器（对勾、完成） | `#4caf50`（绿色） |
 | `ui_error` | 错误指示器（失败、阻断） | `#ef5350`（红色） |
 | `ui_warn` | 警告指示器（注意、审批提示） | `#ffa726`（橙色） |
 | `prompt` | 交互式 prompt（提示符）文字颜色 | `#FFF8DC` |
-| `input_rule` | 输入区域上方的水平分隔线 | `#2563EB` |
-| `response_border` | agent 响应框边框（ANSI 转义） | `#2DD4BF` |
+| `input_rule` | 输入区域上方的水平分隔线 | `#CD7F32` |
+| `response_border` | agent 响应框边框（ANSI 转义） | `#FFD700` |
 | `session_label` | 会话标签颜色 | `#DAA520` |
 | `session_border` | 会话 ID 弱化边框颜色 | `#8B8682` |
 | `status_bar_bg` | TUI 状态/用量栏的背景色 | `#1a1a2e` |
@@ -123,19 +123,19 @@ name: mytheme
 description: My custom theme
 
 colors:
-  banner_border: "#2563EB"
-  banner_title: "#2DD4BF"
-  banner_accent: "#10B981"
-  banner_dim: "#059669"
+  banner_border: "#CD7F32"
+  banner_title: "#FFD700"
+  banner_accent: "#FFBF00"
+  banner_dim: "#B8860B"
   banner_text: "#FFF8DC"
-  ui_accent: "#10B981"
+  ui_accent: "#FFBF00"
   ui_label: "#4dd0e1"
   ui_ok: "#4caf50"
   ui_error: "#ef5350"
   ui_warn: "#ffa726"
   prompt: "#FFF8DC"
-  input_rule: "#2563EB"
-  response_border: "#2DD4BF"
+  input_rule: "#CD7F32"
+  response_border: "#FFD700"
   session_label: "#DAA520"
   session_border: "#8B8682"
   status_bar_bg: "#1a1a2e"
@@ -182,9 +182,9 @@ tool_emojis:
 
 # Custom ASCII art banners (optional, Rich markup supported)
 # banner_logo: |
-#   [bold #2DD4BF] MY AGENT [/]
+#   [bold #FFD700] MY AGENT [/]
 # banner_hero: |
-#   [#2DD4BF]  Custom art here  [/]
+#   [#FFD700]  Custom art here  [/]
 ```
 
 ### 最简自定义皮肤示例

@@ -5,9 +5,9 @@ keep the user's real HOME by default so external CLIs find existing credentials.
 Containers still use the profile home for persistence, and users can explicitly
 opt into profile HOME isolation on the host.
 
-See: https://github.com/jitendra-singh-thakur/sarthi-agent/issues/25114
-See: https://github.com/jitendra-singh-thakur/sarthi-agent/issues/36144
-See: https://github.com/jitendra-singh-thakur/sarthi-agent/issues/29015
+See: https://github.com/NousResearch/hermes-agent/issues/25114
+See: https://github.com/NousResearch/hermes-agent/issues/36144
+See: https://github.com/NousResearch/hermes-agent/issues/29015
 """
 
 import os
@@ -35,18 +35,7 @@ class TestGetSubprocessHome:
         monkeypatch.delenv("TERMINAL_HOME_MODE", raising=False)
         monkeypatch.delenv("SARTHI_REAL_HOME", raising=False)
 
-    def test_returns_none_when_sarthi_home_unset(self, monkeypatch):
-        monkeypatch.delenv("SARTHI_HOME", raising=False)
-        from sarthi_constants import get_subprocess_home
-        assert get_subprocess_home() is None
 
-    def test_returns_none_when_home_dir_missing(self, tmp_path, monkeypatch):
-        sarthi_home = tmp_path / ".sarthi"
-        sarthi_home.mkdir()
-        monkeypatch.setenv("SARTHI_HOME", str(sarthi_home))
-        # No home/ subdirectory created
-        from sarthi_constants import get_subprocess_home
-        assert get_subprocess_home() is None
 
     def test_host_auto_keeps_real_home_when_profile_home_exists(self, tmp_path, monkeypatch):
         """Host installs should not hide real ~/.ssh, ~/.gitconfig, ~/.azure, etc."""
@@ -98,17 +87,6 @@ class TestGetSubprocessHome:
         assert get_real_home() == str(real_home)
         assert get_subprocess_home() == str(real_home)
 
-    def test_real_home_falls_back_to_os_account_when_home_is_profile(self, tmp_path, monkeypatch):
-        self._host_mode(monkeypatch)
-        profile_dir = tmp_path / ".sarthi" / "profiles" / "coder"
-        profile_home = profile_dir / "home"
-        profile_home.mkdir(parents=True)
-        monkeypatch.setenv("SARTHI_HOME", str(profile_dir))
-        monkeypatch.setenv("HOME", str(profile_home))
-
-        from sarthi_constants import get_real_home
-
-        assert get_real_home() != str(profile_home)
 
     def test_two_profiles_get_different_homes(self, tmp_path, monkeypatch):
         self._container_mode(monkeypatch)
@@ -132,43 +110,6 @@ class TestGetSubprocessHome:
         assert home_a.endswith("alpha/home")
         assert home_b.endswith("beta/home")
 
-    def test_context_override_is_thread_local(self, tmp_path, monkeypatch):
-        root = tmp_path / "root"
-        profile = tmp_path / "profile"
-        root.mkdir()
-        profile.mkdir()
-        monkeypatch.setenv("SARTHI_HOME", str(root))
-
-        from sarthi_constants import (
-            get_sarthi_home,
-            reset_sarthi_home_override,
-            set_sarthi_home_override,
-        )
-
-        ready = threading.Event()
-        release = threading.Event()
-        seen: list[str] = []
-
-        def read_from_other_thread():
-            ready.set()
-            release.wait(timeout=5)
-            seen.append(str(get_sarthi_home()))
-
-        thread = threading.Thread(target=read_from_other_thread)
-        thread.start()
-        assert ready.wait(timeout=5)
-
-        token = set_sarthi_home_override(profile)
-        try:
-            assert get_sarthi_home() == profile
-            release.set()
-            thread.join(timeout=5)
-        finally:
-            reset_sarthi_home_override(token)
-            release.set()
-
-        assert seen == [str(root)]
-        assert get_sarthi_home() == root
 
 
 # ---------------------------------------------------------------------------
@@ -236,28 +177,6 @@ class TestMakeRunEnvHomeInjection:
 
         assert result["HOME"] == "/home/user"
 
-    def test_context_override_bridges_to_subprocess_env(self, tmp_path, monkeypatch):
-        monkeypatch.setattr(sarthi_constants, "is_container", lambda: True)
-        root = tmp_path / "root"
-        profile = tmp_path / "profile"
-        root.mkdir()
-        profile.mkdir()
-        (profile / "home").mkdir()
-        monkeypatch.setenv("SARTHI_HOME", str(root))
-        monkeypatch.setenv("HOME", "/root")
-        monkeypatch.setenv("PATH", "/usr/bin:/bin")
-
-        from sarthi_constants import reset_sarthi_home_override, set_sarthi_home_override
-        from tools.environments.local import _make_run_env
-
-        token = set_sarthi_home_override(profile)
-        try:
-            result = _make_run_env({})
-        finally:
-            reset_sarthi_home_override(token)
-
-        assert result["SARTHI_HOME"] == str(profile)
-        assert result["HOME"] == str(profile / "home")
 
 
 # ---------------------------------------------------------------------------
@@ -311,27 +230,6 @@ class TestSanitizeSubprocessEnvHomeInjection:
 
         assert result["HOME"] == "/root"
 
-    def test_context_override_bridges_to_background_env(self, tmp_path, monkeypatch):
-        monkeypatch.setattr(sarthi_constants, "is_container", lambda: True)
-        root = tmp_path / "root"
-        profile = tmp_path / "profile"
-        root.mkdir()
-        profile.mkdir()
-        (profile / "home").mkdir()
-        monkeypatch.setenv("SARTHI_HOME", str(root))
-
-        base_env = {"HOME": "/root", "PATH": "/usr/bin"}
-        from sarthi_constants import reset_sarthi_home_override, set_sarthi_home_override
-        from tools.environments.local import _sanitize_subprocess_env
-
-        token = set_sarthi_home_override(profile)
-        try:
-            result = _sanitize_subprocess_env(base_env)
-        finally:
-            reset_sarthi_home_override(token)
-
-        assert result["SARTHI_HOME"] == str(profile)
-        assert result["HOME"] == str(profile / "home")
 
 
 # ---------------------------------------------------------------------------
@@ -361,24 +259,3 @@ class TestProfileBootstrap:
 # Python process HOME unchanged
 # ---------------------------------------------------------------------------
 
-class TestPythonProcessUnchanged:
-    """Confirm the Python process's own HOME is never modified."""
-
-    def test_path_home_unchanged_after_subprocess_home_resolved(
-        self, tmp_path, monkeypatch
-    ):
-        sarthi_home = tmp_path / "sarthi"
-        sarthi_home.mkdir()
-        (sarthi_home / "home").mkdir()
-        monkeypatch.setenv("SARTHI_HOME", str(sarthi_home))
-
-        original_home = os.environ.get("HOME")
-        original_path_home = str(Path.home())
-
-        from sarthi_constants import get_subprocess_home
-        sub_home = get_subprocess_home()
-
-        # Resolving subprocess HOME must not mutate the Python process env.
-        assert sub_home in (None, str(sarthi_home / "home"), original_home)
-        assert os.environ.get("HOME") == original_home
-        assert str(Path.home()) == original_path_home

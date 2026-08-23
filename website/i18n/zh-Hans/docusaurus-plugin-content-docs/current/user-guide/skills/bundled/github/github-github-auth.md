@@ -225,7 +225,7 @@ curl -s -H "Authorization: token $GITHUB_TOKEN" \
 
 ```bash
 # Read from git credential store
-grep "github.com" ~/.git-credentials 2>/dev/null | head -1 | sed 's|https://[^:]*:\([^@]*\)@.*|\1|'
+uv run python3 "${SARTHI_HOME:-$HOME/.sarthi}/skills/github/github-auth/scripts/git-credential-token.py"
 ```
 
 ### 辅助函数：检测认证方式
@@ -242,7 +242,7 @@ elif [ -f ~/.sarthi/.env ] && grep -q "^GITHUB_TOKEN=" ~/.sarthi/.env; then
   export GITHUB_TOKEN=$(grep "^GITHUB_TOKEN=" ~/.sarthi/.env | head -1 | cut -d= -f2 | tr -d '\n\r')
   echo "AUTH_METHOD=curl"
 elif grep -q "github.com" ~/.git-credentials 2>/dev/null; then
-  export GITHUB_TOKEN=$(grep "github.com" ~/.git-credentials | head -1 | sed 's|https://[^:]*:\([^@]*\)@.*|\1|')
+  export GITHUB_TOKEN=$(uv run python3 "${SARTHI_HOME:-$HOME/.sarthi}/skills/github/github-auth/scripts/git-credential-token.py")
   echo "AUTH_METHOD=curl"
 else
   echo "AUTH_METHOD=none"

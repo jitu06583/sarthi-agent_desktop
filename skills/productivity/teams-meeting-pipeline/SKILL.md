@@ -1,9 +1,10 @@
 ---
 name: teams-meeting-pipeline
-description: "Operate the Teams meeting summary pipeline via Sarthi CLI — summarize meetings, inspect pipeline status, replay jobs, manage Microsoft Graph subscriptions."
+description: Teams meeting summaries, job replay, Graph subscriptions.
 version: 1.1.0
 author: Sarthi Agent + Teknium
 license: MIT
+platforms: [linux, macos, windows]
 prerequisites:
   env_vars: [MSGRAPH_TENANT_ID, MSGRAPH_CLIENT_ID, MSGRAPH_CLIENT_SECRET]
   commands: [sarthi]
@@ -69,6 +70,7 @@ sarthi teams-pipeline subscriptions         # current Graph webhook subscription
 sarthi teams-pipeline run <job-id>          # replay a stored job (re-summarize, re-deliver)
 sarthi teams-pipeline fetch --meeting-id <id>   # dry-run: resolve meeting + transcript without persisting
 sarthi teams-pipeline fetch --join-web-url "<url>"   # dry-run by join URL
+sarthi teams-pipeline fetch --join-web-url "<url>" --organizer-user-id <id>   # organizer-scoped lookup (required for /meet/ short URLs)
 ```
 
 ### Subscription management

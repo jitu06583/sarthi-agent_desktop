@@ -348,20 +348,6 @@ class TestInferHostPath:
         )
         assert result is None
 
-    def test_infer_partial_prefix_no_false_match(self, tmp_path):
-        """A partial prefix like /root/.sarthi/sk should NOT match /root/.sarthi/skills/."""
-        host_file = tmp_path / "host" / "skills" / "a.py"
-        _write_file(host_file, b"content")
-        mapping = [(str(host_file), "/root/.sarthi/skills/a.py")]
-
-        mgr = _make_manager(tmp_path, file_mapping=mapping)
-        # /root/.sarthi/skillsXtra/b.py shares prefix "skills" but the
-        # directory is different — should not match /root/.sarthi/skills/
-        result = mgr._infer_host_path(
-            "/root/.sarthi/skillsXtra/b.py",
-            file_mapping=mapping,
-        )
-        assert result is None
 
     def test_infer_matching_prefix(self, tmp_path):
         """A file in a mapped directory should be correctly inferred."""

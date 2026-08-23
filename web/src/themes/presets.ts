@@ -155,7 +155,7 @@ export const cyberpunkTheme: DashboardTheme = {
   },
   colorOverrides: {
     success: "#00ff88",
-    warning: "#2dd4bf",
+    warning: "#ffd700",
     destructive: "#ff0055",
   },
 };

@@ -57,7 +57,7 @@ def remove_path_from_shell_configs():
     
     for config_path in configs:
         try:
-            content = config_path.read_text()
+            content = config_path.read_text(encoding="utf-8")
             original_content = content
             
             # Remove lines containing sarthi-agent or sarthi PATH entries
@@ -87,7 +87,20 @@ def remove_path_from_shell_configs():
                 new_content = new_content.replace('\n\n\n', '\n\n')
             
             if new_content != original_content:
-                config_path.write_text(new_content)
+                from utils import atomic_write_text
+
+                # This is the user's own shell rc, not a Sarthi-owned file, and
+                # nothing in this function backs it up. A bare write_text()
+                # truncates it before the new content lands, so a crash or
+                # SIGINT mid-write leaves the user with an empty or truncated
+                # ~/.zshrc -- and the enclosing `except Exception` downgrades
+                # that to a warning, so the next login just starts a bare
+                # shell. atomic_replace also resolves a symlinked rc file, so a
+                # dotfiles-repo setup keeps the symlink instead of having it
+                # replaced by a regular file. preserve_mode keeps the rc's
+                # permission bits (normally 0644) and owner (sudo-run
+                # uninstalls) instead of mkstemp's 0600/root.
+                atomic_write_text(config_path, new_content, preserve_mode=True)
                 removed_from.append(config_path)
                 
         except Exception as e:
@@ -100,7 +113,11 @@ def remove_wrapper_script():
     """Remove the sarthi wrapper script if it exists."""
     wrapper_paths = [
         Path.home() / ".local" / "bin" / "sarthi",
+        Path.home() / ".local" / "bin" / "sarthi-acp",
+        Path.home() / ".local" / "bin" / "sarthi-agent",
         Path("/usr/local/bin/sarthi"),
+        Path("/usr/local/bin/sarthi-acp"),
+        Path("/usr/local/bin/sarthi-agent"),
     ]
     
     removed = []
@@ -108,7 +125,7 @@ def remove_wrapper_script():
         if wrapper.exists():
             try:
                 # Check if it's our wrapper (contains sarthi_cli reference)
-                content = wrapper.read_text()
+                content = wrapper.read_text(encoding="utf-8")
                 if 'sarthi_cli' in content or 'sarthi-agent' in content:
                     wrapper.unlink()
                     removed.append(wrapper)
@@ -465,7 +482,7 @@ def _uninstall_profile(profile) -> None:
             subprocess.run(
                 sarthi_invocation + ["gateway", subcmd],
                 capture_output=True,
-                text=True,
+                text=True, encoding='utf-8', errors='replace',
                 timeout=60,
                 check=False,
             )
@@ -899,9 +916,9 @@ def _perform_uninstall(
         print()
         print("To reinstall later with your existing settings:")
         if _is_windows():
-            print(color("  iex (irm https://sarthi-agent.vercel.app/install.ps1)", Colors.DIM))
+            print(color("  iex (irm https://hermes-agent.nousresearch.com/install.ps1)", Colors.DIM))
         else:
-            print(color("  curl -fsSL https://sarthi-agent.vercel.app/install.sh | bash", Colors.DIM))
+            print(color("  curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash", Colors.DIM))
         print()
 
     if _is_windows():

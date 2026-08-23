@@ -35,11 +35,11 @@ Sarthi Agent 提供了一个 Nix flake，支持三个层级的集成：
 
 ```bash
 # 直接运行（首次使用时构建，之后使用缓存）
-nix run github:NousResearch/sarthi-agent -- setup
-nix run github:NousResearch/sarthi-agent -- chat
+nix run github:NousResearch/hermes-agent -- setup
+nix run github:NousResearch/hermes-agent -- chat
 
 # 或持久化安装
-nix profile install github:NousResearch/sarthi-agent
+nix profile install github:NousResearch/hermes-agent
 sarthi setup
 sarthi chat
 ```
@@ -50,7 +50,7 @@ sarthi chat
 <summary><strong>从本地克隆构建</strong></summary>
 
 ```bash
-git clone https://github.com/jitendra-singh-thakur/sarthi-agent.git
+git clone https://github.com/NousResearch/hermes-agent.git
 cd sarthi-agent
 nix build
 ./result/bin/sarthi setup
@@ -75,7 +75,7 @@ nix build
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    sarthi-agent.url = "github:NousResearch/sarthi-agent";
+    sarthi-agent.url = "github:NousResearch/hermes-agent";
   };
 
   outputs = { nixpkgs, sarthi-agent, ... }: {
@@ -127,7 +127,7 @@ services.sarthi-agent.environmentFiles = [ "/var/lib/sarthi/env" ];
 :::info
 当 `container.enable = true` 且 `addToSystemPackages = true` 时，主机上的**所有** `sarthi` 命令都会自动路由到托管容器中执行。这意味着你的交互式 CLI 会话在与 gateway 服务相同的环境中运行——可以访问所有容器内安装的包和工具。
 
-- 路由是透明的：`sarthi chat`、`sarthi sessions list`、`sarthi version` 等命令都会在底层 exec 进容器
+- 路由是透明的：`sarthi chat`、`sarthi sessions list`、`sarthi --version` 等命令都会在底层 exec 进容器
 - 所有 CLI 参数原样转发
 - 如果容器未运行，CLI 会短暂重试（交互式使用时显示 5 秒 spinner，脚本中静默等待 10 秒），然后以明确的错误退出——不会静默回退
 - 对于在 sarthi 代码库上工作的开发者，设置 `SARTHI_DEV=1` 可绕过容器路由，直接运行本地检出版本
@@ -171,7 +171,7 @@ systemctl status sarthi-agent
 journalctl -u sarthi-agent -f
 
 # 如果 addToSystemPackages 为 true，测试 CLI
-sarthi version
+sarthi --version
 sarthi config       # 显示生成的配置
 ```
 
@@ -685,7 +685,7 @@ services.sarthi-agent = {
 
 ```nix
 {
-  inputs.sarthi-agent.url = "github:NousResearch/sarthi-agent";
+  inputs.sarthi-agent.url = "github:NousResearch/hermes-agent";
   outputs = { sarthi-agent, nixpkgs, ... }: {
     nixpkgs.overlays = [ sarthi-agent.overlays.default ];
     # 然后：
@@ -763,7 +763,7 @@ nix build .#checks.x86_64-linux.config-roundtrip    # 合并脚本保留用户�
 
 | 检查 | 测试内容 |
 |---|---|
-| `package-contents` | `sarthi` 和 `sarthi-agent` 二进制文件存在且 `sarthi version` 可运行 |
+| `package-contents` | `sarthi` 和 `sarthi-agent` 二进制文件存在且 `sarthi --version` 可运行 |
 | `entry-points-sync` | `pyproject.toml` 中 `[project.scripts]` 的每个条目在 Nix 包中都有对应的封装二进制文件 |
 | `cli-commands` | `sarthi --help` 暴露 `gateway` 和 `config` 子命令 |
 | `managed-guard` | `SARTHI_MANAGED=true sarthi config set ...` 打印 NixOS 错误 |
@@ -967,7 +967,7 @@ nix-store --query --roots $(docker exec sarthi-agent readlink /data/current-pack
 |---|---|---|
 | `Cannot save configuration: managed by NixOS` | CLI 守卫已激活 | 编辑 `configuration.nix` 并执行 `nixos-rebuild switch` |
 | 容器意外重建 | `extraVolumes`、`extraOptions` 或 `image` 发生变更 | 预期行为——可写层重置。重新安装包或使用自定义镜像 |
-| `sarthi version` 显示旧版本 | 容器未重启 | `systemctl restart sarthi-agent` |
+| `sarthi --version` 显示旧版本 | 容器未重启 | `systemctl restart sarthi-agent` |
 | `/var/lib/sarthi` 权限拒绝 | 状态目录为 `0750 sarthi:sarthi` | 使用 `docker exec` 或 `sudo -u sarthi` |
 | `nix-collect-garbage` 删除了 sarthi | GC root 缺失 | 重启服务（preStart 会重新创建 GC root） |
 | `no container with name or ID "sarthi-agent"`（Podman） | Podman rootful 容器对普通用户不可见 | 为 podman 添加免密 sudo（参见[容器模式](#container-mode)章节） |

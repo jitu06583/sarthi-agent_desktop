@@ -13,6 +13,7 @@ const SOURCE_LABELS: Record<string, string> = {
   local: 'Local',
   matrix: 'Matrix',
   mattermost: 'Mattermost',
+  photon: 'Photon',
   qqbot: 'QQ',
   signal: 'Signal',
   slack: 'Slack',
@@ -27,6 +28,7 @@ const SOURCE_LABELS: Record<string, string> = {
 
 const SOURCE_ALIASES: Record<string, string[]> = {
   bluebubbles: ['apple messages', 'imessage'],
+  photon: ['imessage', 'messages'],
   cli: ['terminal'],
   desktop: ['app', 'gui'],
   local: ['machine'],
@@ -44,9 +46,6 @@ const SOURCE_ALIASES: Record<string, string[]> = {
 export const LOCAL_SESSION_SOURCE_IDS = ['cli', 'codex', 'desktop', 'gateway', 'kanban', 'local', 'tui']
 const LOCAL_SOURCE_IDS = new Set(LOCAL_SESSION_SOURCE_IDS)
 
-export const INTERNAL_SESSION_SOURCE_IDS = ['kanban', 'subagent', 'tool']
-const INTERNAL_SOURCE_IDS = new Set(INTERNAL_SESSION_SOURCE_IDS)
-
 // External messaging platforms that each get their own self-managed sidebar
 // section (fetched separately from local recents). Mirrors the gateway platform
 // adapters; keep in sync with PLATFORM_ICONS in app/messaging/platform-icon.tsx.
@@ -59,6 +58,7 @@ export const MESSAGING_SESSION_SOURCE_IDS = [
   'signal',
   'whatsapp',
   'bluebubbles',
+  'photon',
   'homeassistant',
   'email',
   'sms',
@@ -79,13 +79,6 @@ export function isMessagingSource(source: null | string | undefined): boolean {
   const id = normalizeSessionSource(source)
 
   return id != null && MESSAGING_SOURCE_IDS.has(id)
-}
-
-/** Internal execution sessions that must not appear as human conversations. */
-export function isInternalSessionSource(source: null | string | undefined): boolean {
-  const id = normalizeSessionSource(source)
-
-  return id != null && INTERNAL_SOURCE_IDS.has(id)
 }
 
 export function normalizeSessionSource(source: null | string | undefined): string | null {

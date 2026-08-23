@@ -26,7 +26,7 @@ import logging
 import os
 import re
 from pathlib import Path
-from typing import Any, Optional
+from typing import Optional
 
 logger = logging.getLogger("sarthi.security_audit")
 
@@ -168,9 +168,12 @@ def _path_is_mounted(path: Path) -> bool:
 def _container_no_volume_mount(sarthi_home: Optional[Path]) -> Optional[str]:
     if not _in_container():
         return None
-    home = sarthi_home or Path(
-        os.environ.get("SARTHI_HOME", os.path.expanduser("~/.sarthi"))
-    )
+    if sarthi_home is not None:
+        home = sarthi_home
+    else:
+        from sarthi_constants import get_sarthi_home
+
+        home = get_sarthi_home()
     try:
         if _path_is_mounted(home):
             return None

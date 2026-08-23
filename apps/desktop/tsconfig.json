@@ -18,9 +18,11 @@
     "paths": {
       "@/*": ["./src/*"],
       "@sarthi/plugin-sdk": ["./src/sdk/index.ts"],
+      "@sarthi/shared/billing": ["../shared/src/billing-types.ts"],
+      "@sarthi/shared/translucency": ["../shared/src/translucency.ts"],
       "@sarthi/shared": ["../shared/src/index.ts"]
     }
   },
   "include": ["src", "../shared/src"],
-  "references": [{ "path": "./tsconfig.electron.json" }]
+  "exclude": ["e2e", "electron", "playwright.config.ts"]
 }

@@ -118,9 +118,9 @@ Hey, search the web for "Sarthi Agent release notes" and summarize the top 3 hit
 sarthi config set model.default anthropic/claude-sonnet-4.6
 ```
 
-### 不要在 agent 任务中使用 Hermes-4
+### 不要在 agent 任务中使用 Sarthi-4
 
-Hermes-4-70B 和 Hermes-4-405B 在 Portal 上以大幅折扣提供，但它们是**对话/推理模型**，并非针对工具调用优化的模型。它们在多步骤 agent 循环中表现不佳。请通过 [Nous Chat](https://chat.nousresearch.com) 将它们用于对话/研究工作，或通过[订阅代理](/user-guide/features/subscription-proxy)从非 agent 工具中使用。对于 Sarthi Agent 本身，请坚持使用上述前沿 agentic 模型。
+Sarthi-4-70B 和 Hermes-4-405B 在 Portal 上以大幅折扣提供，但它们是**对话/推理模型**，并非针对工具调用优化的模型。它们在多步骤 agent 循环中表现不佳。请通过[订阅代理](/user-guide/features/subscription-proxy)从非 agent 工具中将它们用于对话或研究工作。对于 Sarthi Agent 本身，请坚持使用上述前沿 agentic 模型。
 
 Portal 的[信息页面](https://portal.nousresearch.com/info)也有此说明——这是 Nous 官方指导，并非仅代表 Sarthi 一方的意见。
 
@@ -225,14 +225,14 @@ sarthi auth add nous
 
 ### 我想要的模型不在 `/model` 选择器中
 
-Portal 目录镜像了 OpenRouter 的模型列表（300+ 个）。如果某个模型缺失，尝试直接输入 OpenRouter 风格的 slug：
+Portal 目录基于 OpenRouter 的模型列表（300+ 个），并补充了通过专有或备用提供商提供的模型。如果某个模型缺失，尝试直接输入 OpenRouter 风格的 slug：
 
 ```bash
 /model anthropic/claude-opus-4.6
 /model openai/o1-2025-12-17
 ```
 
-如果某个模型确实不可用，请[提交 issue](https://github.com/jitendra-singh-thakur/sarthi-agent/issues)——大多数缺失是我们可以更新的路由配置问题。
+如果某个模型确实不可用，请[提交 issue](https://github.com/NousResearch/hermes-agent/issues)——大多数缺失是我们可以更新的路由配置问题。
 
 ### 账单未出现在我的 Portal 账号中
 
